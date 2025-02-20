@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Grid, Paper } from '@mui/material';
+import { Box, Typography, Grid, Paper, Button } from '@mui/material';
 import { StorageService } from '../services/storage';
 import { MasturbationRecord, MasturbationStats } from '../types/record';
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 const DAYS_IN_WEEK = 7;
 const WEEKS_TO_SHOW = 4; // 将显示时间范围改为4周
 const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日'];
+const GITHUB_REPO_URL = 'https://github.com/zzzdajb/DickHelper'; // 替换为实际的Github仓库地址
 
 /**
  * 统计图表组件
@@ -152,16 +154,55 @@ export const StatsChart = () => {
                 variant="h5" 
                 sx={{
                     fontWeight: 700,
-                    mb: 3,
                     background: 'linear-gradient(45deg, #2196f3 30%, #64b5f6 90%)',
                     backgroundClip: 'text',
                     textFillColor: 'transparent',
                     WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
+                    WebkitTextFillColor: 'transparent',
+                    mb: 4
                 }}
             >
                 统计数据
             </Typography>
+
+            <Box sx={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                gap: 1,
+                mb: 4
+            }}>
+                <Typography
+                    variant="subtitle2"
+                    sx={{
+                        color: 'text.secondary',
+                        fontWeight: 500,
+                        fontSize: '0.875rem'
+                    }}
+                >
+                    求求你给个Star！
+                </Typography>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<GitHubIcon />}
+                    onClick={() => window.open(GITHUB_REPO_URL, '_blank')}
+                    sx={{
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        background: 'linear-gradient(45deg, #24292e 30%, #40464e 90%)',
+                        '&:hover': {
+                            background: 'linear-gradient(45deg, #40464e 30%, #586069 90%)',
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                        },
+                        transition: 'all 0.3s ease'
+                    }}
+                >
+                    ⭐ Star on GitHub
+                </Button>
+            </Box>
 
             <Grid container spacing={2} sx={{ mb: 3 }} columns={12}>
                 <Grid item xs={12} sm={6}>
