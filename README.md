@@ -1,5 +1,5 @@
 # 牛子小助手 (DickHelper)
-
+![DickHelper](https://socialify.git.ci/zzzdajb/DickHelper/image?language=1&name=1&stargazers=1&theme=Light)
 [![React](https://img.shields.io/badge/React-19.0.0-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue.svg)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.1.0-646CFF.svg)](https://vitejs.dev/)
