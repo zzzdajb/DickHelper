@@ -71,6 +71,7 @@ This is a frontend-only application that can be easily deployed to various stati
    - Build command: `npm run build`
    - Build output directory: `dist`
    - Framework preset: `Vite`
+   - Deploy command: `npm run build`（与构建命令相同）
 
 5. 点击 "Save and Deploy"
    Click "Save and Deploy"
