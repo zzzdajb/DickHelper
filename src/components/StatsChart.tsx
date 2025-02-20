@@ -83,8 +83,9 @@ export const StatsChart = () => {
      */
     const generateContributionData = () => {
         const now = new Date();
+        now.setHours(0, 0, 0, 0);
         const startDate = new Date(now);
-        startDate.setDate(now.getDate() - (DAYS_IN_WEEK * WEEKS_TO_SHOW));
+        startDate.setDate(now.getDate() - (DAYS_IN_WEEK * WEEKS_TO_SHOW - 1));
 
         // 初始化贡献数据数组
         const contributionData = Array(WEEKS_TO_SHOW).fill(0).map(() =>
@@ -94,14 +95,19 @@ export const StatsChart = () => {
         // 统计每天的记录次数
         records.forEach(record => {
             const recordDate = new Date(record.startTime);
-            if (recordDate >= startDate) {
-                const daysSince = Math.floor((now.getTime() - recordDate.getTime()) / (1000 * 60 * 60 * 24));
-                const weekIndex = WEEKS_TO_SHOW - 1 - Math.floor(daysSince / 7);
-                let dayIndex = recordDate.getDay();
-                if (dayIndex === 0) dayIndex = 6; // 将周日从0改为6
-                else dayIndex -= 1; // 其他日期减1，使周一为0
-                if (weekIndex >= 0 && weekIndex < WEEKS_TO_SHOW) {
-                    contributionData[weekIndex][dayIndex]++;
+            recordDate.setHours(0, 0, 0, 0);
+            
+            // 确保记录日期在显示范围内
+            if (recordDate >= startDate && recordDate <= now) {
+                // 计算记录日期距离结束日期（今天）的天数
+                const daysDiff = Math.floor((now.getTime() - recordDate.getTime()) / (1000 * 60 * 60 * 24));
+                
+                // 计算在哪一周和哪一天
+                const weekIndex = Math.floor(daysDiff / DAYS_IN_WEEK);
+                const dayIndex = daysDiff % DAYS_IN_WEEK;
+                
+                if (weekIndex >= 0 && weekIndex < WEEKS_TO_SHOW && dayIndex >= 0 && dayIndex < DAYS_IN_WEEK) {
+                    contributionData[WEEKS_TO_SHOW - 1 - weekIndex][DAYS_IN_WEEK - 1 - dayIndex]++;
                 }
             }
         });
@@ -404,7 +410,8 @@ export const StatsChart = () => {
                                 }}>
                                     {week.map((count, dayIndex) => {
                                         const date = new Date();
-                                        date.setDate(date.getDate() - ((WEEKS_TO_SHOW - weekIndex - 1) * 7 + dayIndex));
+                                        const daysToSubtract = (weekIndex * 7) + dayIndex;
+                                        date.setDate(date.getDate() - (DAYS_IN_WEEK * WEEKS_TO_SHOW - 1) + daysToSubtract);
                                         return (
                                             <Box
                                                 key={`${weekIndex}-${dayIndex}`}
