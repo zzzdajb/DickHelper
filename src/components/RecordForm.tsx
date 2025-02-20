@@ -18,26 +18,32 @@ import TimerIcon from '@mui/icons-material/Timer';
 export const RecordForm = () => {
     // 记录状态：是否正在记录中
     const [isRecording, setIsRecording] = useState(false);
+    // 是否暂停中
+    const [isPaused, setIsPaused] = useState(false);
     // 开始时间
     const [startTime, setStartTime] = useState<Date | null>(null);
     // 已经过的时间（秒）
     const [elapsedTime, setElapsedTime] = useState(0);
+    // 暂停时累计的时间（毫秒）
+    const [accumulatedTime, setAccumulatedTime] = useState(0);
+    // 上次暂停的时间
+    const [lastPauseTime, setLastPauseTime] = useState<Date | null>(null);
     // 备注信息
     const [notes, setNotes] = useState('');
 
     // 计时器效果：每秒更新已经过的时间
     useEffect(() => {
         let intervalId: number;
-        if (isRecording && startTime) {
+        if (isRecording && startTime && !isPaused) {
             intervalId = window.setInterval(() => {
                 const now = new Date();
-                const elapsed = Math.floor((now.getTime() - startTime.getTime()) / 1000);
+                const elapsed = Math.floor((now.getTime() - startTime.getTime() - accumulatedTime) / 1000);
                 setElapsedTime(elapsed);
             }, 1000);
         }
         // 清理定时器
         return () => clearInterval(intervalId);
-    }, [isRecording, startTime]);
+    }, [isRecording, startTime, isPaused, accumulatedTime]);
 
     /**
      * 处理开始/停止按钮点击
@@ -49,12 +55,17 @@ export const RecordForm = () => {
             // 开始记录
             setStartTime(new Date());
             setIsRecording(true);
+            setIsPaused(false);
+            setAccumulatedTime(0);
+            setLastPauseTime(null);
         } else {
             // 停止记录
             setIsRecording(false);
+            setIsPaused(false);
             if (startTime) {
                 const endTime = new Date();
-                const durationInMinutes = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
+                const totalPausedTime = accumulatedTime + (lastPauseTime ? endTime.getTime() - lastPauseTime.getTime() : 0);
+                const durationInMinutes = (endTime.getTime() - startTime.getTime() - totalPausedTime) / (1000 * 60);
                 
                 // 创建记录对象
                 const record = {
@@ -68,11 +79,34 @@ export const RecordForm = () => {
                 StorageService.saveRecord(record);
                 setStartTime(null);
                 setElapsedTime(0);
+                setAccumulatedTime(0);
+                setLastPauseTime(null);
                 setNotes('');
 
                 // 触发自定义事件通知数据更新
                 const event = new CustomEvent('masturbation_record_updated');
                 window.dispatchEvent(event);
+            }
+        }
+    };
+
+    /**
+     * 处理暂停/继续按钮点击
+     */
+    const handlePause = () => {
+        if (!isRecording) return;
+        
+        if (!isPaused) {
+            // 暂停计时
+            setIsPaused(true);
+            setLastPauseTime(new Date());
+        } else {
+            // 继续计时
+            setIsPaused(false);
+            if (lastPauseTime) {
+                const now = new Date();
+                setAccumulatedTime(prev => prev + (now.getTime() - lastPauseTime.getTime()));
+                setLastPauseTime(null);
             }
         }
     };
@@ -166,16 +200,30 @@ export const RecordForm = () => {
                     <Typography variant="h4" color="text.secondary" sx={{ mb: 2 }}>
                         {isRecording ? formatTime(elapsedTime) : '准备开始'}
                     </Typography>
-                    <Button
-                        variant="contained"
-                        size="large"
-                        onClick={handleStartStop}
-                        startIcon={isRecording ? <StopIcon /> : <PlayArrowIcon />}
-                        color={isRecording ? 'error' : 'primary'}
-                        sx={{ borderRadius: 28, px: 4, py: 1.5 }}
-                    >
-                        {isRecording ? '结束' : '开始'}
-                    </Button>
+                    <Stack direction="row" spacing={2}>
+                        <Button
+                            variant="contained"
+                            size="large"
+                            onClick={handleStartStop}
+                            startIcon={isRecording ? <StopIcon /> : <PlayArrowIcon />}
+                            color={isRecording ? 'error' : 'primary'}
+                            sx={{ borderRadius: 28, px: 4, py: 1.5 }}
+                        >
+                            {isRecording ? '结束' : '开始'}
+                        </Button>
+                        {isRecording && (
+                            <Button
+                                variant="contained"
+                                size="large"
+                                onClick={handlePause}
+                                startIcon={isPaused ? <PlayArrowIcon /> : <TimerIcon />}
+                                color="warning"
+                                sx={{ borderRadius: 28, px: 4, py: 1.5 }}
+                            >
+                                {isPaused ? '继续' : '暂停'}
+                            </Button>
+                        )}
+                    </Stack>
                 </Box>
 
                 <TextField

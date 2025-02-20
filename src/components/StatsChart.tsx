@@ -96,10 +96,11 @@ export const StatsChart = () => {
             const recordDate = new Date(record.startTime);
             if (recordDate >= startDate) {
                 const daysSince = Math.floor((now.getTime() - recordDate.getTime()) / (1000 * 60 * 60 * 24));
-                const weekIndex = Math.floor(daysSince / 7);
-                let dayIndex = recordDate.getDay() - 1;
-                if (dayIndex === -1) dayIndex = 6; // 将周日从0改为6
-                if (weekIndex < WEEKS_TO_SHOW) {
+                const weekIndex = WEEKS_TO_SHOW - 1 - Math.floor(daysSince / 7);
+                let dayIndex = recordDate.getDay();
+                if (dayIndex === 0) dayIndex = 6; // 将周日从0改为6
+                else dayIndex -= 1; // 其他日期减1，使周一为0
+                if (weekIndex >= 0 && weekIndex < WEEKS_TO_SHOW) {
                     contributionData[weekIndex][dayIndex]++;
                 }
             }
