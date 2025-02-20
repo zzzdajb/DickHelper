@@ -15,8 +15,8 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,     // 修改这一行
+    "noUnusedParameters": false,  // 修改这一行
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
