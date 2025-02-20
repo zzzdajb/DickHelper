@@ -5,6 +5,15 @@
 [![Vite](https://img.shields.io/badge/Vite-6.1.0-646CFF.svg)](https://vitejs.dev/)
 [![Material-UI](https://img.shields.io/badge/MUI-6.4.5-0081CB.svg)](https://mui.com/)
 
+## 在线演示 | Online Demo
+
+🔗 演示demo：[牛子小助手Demo](https://dick.juwo.my)
+
+⚠️ 注意事项：
+- 这只是一个演示站点，不保证长期可用性和数据持久性
+- 数据存储是基于域名的，即不同域名下的数据是相互独立的
+- 建议自行部署使用，以确保可用性
+
 ## 特点 | Features
 
 - 🔒 **数据安全**: 所有数据完全存储在本地，无需担心隐私泄露
@@ -22,11 +31,12 @@
 ## 本地部署 | Local Deployment
 
 如果你想在本地运行此项目，请按照以下步骤操作：
+
 If you want to run this project locally, follow these steps:
 
 ```bash
 # 克隆项目 | Clone the repository
-git clone https://github.com/yourusername/GoodDick.git
+git clone https://github.com/zzzdajb/DickHelper.git
 
 # 进入项目目录 | Enter the project directory
 cd GoodDick
@@ -41,27 +51,34 @@ npm run dev
 ## 云端部署 | Cloud Deployment
 
 本项目是纯前端应用，可以轻松部署到各种静态网站托管平台。
+
 This is a frontend-only application that can be easily deployed to various static site hosting platforms. 
 
 ### Vercel
 
 1. 在 GitHub 上创建仓库并推送代码
+
    Create a repository on GitHub and push your code
 
 2. 登录 [Vercel](https://vercel.com)
+
    Login to Vercel
 
 3. 点击 "New Project" 并导入你的 GitHub 仓库
+
    Click "New Project" and import your GitHub repository
 
 4. 保持默认配置即可，Vercel 会自动检测 Vite 项目
+
    Keep the default configuration, Vercel will automatically detect Vite project
 
 5. 点击 "Deploy"
+
    Click "Deploy"
 
-部署完成后，这两个平台都会提供一个可访问的URL。你可以选择使用自己的域名。
-After deployment, both platforms will provide an accessible URL. You can choose to use your own domain name.
+部署完成后，Vercel会提供一个可访问的URL。中国大陆地区污染了Vercel的默认域名，你可以通过绑定自己的域名来解决这个问题。
+
+After the deployment is complete, Vercel will provide an accessible URL. The default domain name of Vercel is polluted in mainland China, and you can solve this problem by binding your own domain name.
 
 ## 技术栈 | Tech Stack
 
