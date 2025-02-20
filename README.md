@@ -1,15 +1,9 @@
 # 牛子小助手 (DickHelper)
-![DickHelper](https://socialify.git.ci/zzzdajb/DickHelper/image?language=1&name=1&stargazers=1&theme=Light)
+
 [![React](https://img.shields.io/badge/React-19.0.0-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue.svg)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.1.0-646CFF.svg)](https://vitejs.dev/)
 [![Material-UI](https://img.shields.io/badge/MUI-6.4.5-0081CB.svg)](https://mui.com/)
-
-## 项目简介 | Introduction
-
-牛子小助手是一个帮助用户科学自慰的工具应用。它提供了记录、统计和分析功能，帮助用户更好地了解自己的习惯。
-
-GoodDick Assistant is a tool application that helps users masturbate scientifically. It provides recording, statistics, and analysis functions to help users better understand their habits.
 
 ## 特点 | Features
 
@@ -25,13 +19,6 @@ GoodDick Assistant is a tool application that helps users masturbate scientifica
 - 🌐 **无需后端**: 纯前端应用，无需服务器
   - Frontend-only application, no backend required
 
-## 在线演示 | Online Demo
-
-你可以访问以下链接体验在线版本：
-You can try the online version here:
-
-[https://yourusername.github.io/GoodDick](https://yourusername.github.io/GoodDick)
-
 ## 本地部署 | Local Deployment
 
 如果你想在本地运行此项目，请按照以下步骤操作：
@@ -39,7 +26,7 @@ If you want to run this project locally, follow these steps:
 
 ```bash
 # 克隆项目 | Clone the repository
-git clone https://github.com/zzzdajb/DickHelper.git
+git clone https://github.com/yourusername/GoodDick.git
 
 # 进入项目目录 | Enter the project directory
 cd GoodDick
@@ -53,28 +40,8 @@ npm run dev
 
 ## 云端部署 | Cloud Deployment
 
-本项目是纯前端应用，可以轻松部署到各种静态网站托管平台。以下是两个推荐的免费托管方案：
-This is a frontend-only application that can be easily deployed to various static site hosting platforms. Here are two recommended free hosting solutions:
-
-### Cloudflare Pages
-
-1. 在 GitHub 上创建仓库并推送代码
-   Create a repository on GitHub and push your code
-
-2. 登录 [Cloudflare Pages](https://pages.cloudflare.com)
-   Login to Cloudflare Pages
-
-3. 点击 "Create a project" 并选择你的 GitHub 仓库
-   Click "Create a project" and select your GitHub repository
-
-4. 配置构建设置 | Configure build settings:
-   - Build command: `npm run build`
-   - Build output directory: `dist`
-   - Framework preset: `Vite`
-   - Deploy command: `npm run build`（与构建命令相同）
-
-5. 点击 "Save and Deploy"
-   Click "Save and Deploy"
+本项目是纯前端应用，可以轻松部署到各种静态网站托管平台。
+This is a frontend-only application that can be easily deployed to various static site hosting platforms. 
 
 ### Vercel
 
