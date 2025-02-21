@@ -1,4 +1,5 @@
 ![DickHelper](https://socialify.git.ci/zzzdajb/DickHelper/image?custom_description=An+easy-to-use+masturbation+management+recording+tool&description=1&forks=1&language=1&logo=https%3A%2F%2Fs2.loli.net%2F2025%2F02%2F21%2FkI3Ebc5hdGTSlLp.png&name=1&owner=1&stargazers=1&theme=Light)
+
 # 牛子小助手 (DickHelper)
 
 [![React](https://img.shields.io/badge/React-19.0.0-blue.svg)](https://reactjs.org/)
@@ -57,9 +58,9 @@ This is a frontend-only application that can be easily deployed to various stati
 
 ### Vercel
 
-1. 在 GitHub 上创建仓库并推送代码
+1. 在 GitHub上Fork本仓库
 
-   Create a repository on GitHub and push your code
+   Fork the repository on GitHub
 
 2. 登录 [Vercel](https://vercel.com)
 
@@ -79,7 +80,7 @@ This is a frontend-only application that can be easily deployed to various stati
 
 部署完成后，Vercel会提供一个可访问的URL。中国大陆地区污染了Vercel的默认域名，你可以通过绑定自己的域名来解决这个问题。
 
-After the deployment is complete, Vercel will provide an accessible URL. The default domain name of Vercel is polluted in mainland China, and you can solve this problem by binding your own domain name.
+After the program is deployed, Vercel will provide an accessible domain name. The default domain name is usually not accessible in mainland China, and you can solve this problem by binding your own domain name.
 
 ## 技术栈 | Tech Stack
 
@@ -91,9 +92,9 @@ After the deployment is complete, Vercel will provide an accessible URL. The def
 
 ## 隐私说明 | Privacy Statement
 
-本应用完全基于前端技术构建，所有数据均存储在用户本地浏览器中，不会上传到任何服务器。您可以放心使用而无需担心隐私问题。
+本项目基于纯前端技术构建，默认情况下，所有的数据会根据域名保存在您的浏览器当中，未经您允许，我们不会收集并使用您的任何信息。在后续开发当中，可能会有部分功能需要联网并且上传数据，在此之前，我们会征得您的同意，如果您拒绝上传数据，您将无法访问少数功能，但这不会对您正常使用程序造成任何影响。
 
-This application is entirely frontend-based. All data is stored in your local browser and will never be uploaded to any server. You can use it with confidence without privacy concerns.
+This project is built using pure front-end technology. By default, all data will be saved in your browser according to the domain name. Without your permission, we will not collect or use any of your information. In future development, some features may require internet access and data upload. Before that, we will seek your consent. If you refuse to upload data, you will not be able to access a few features, but this will not affect your normal use of the program in any way.
 
 ## 项目维护说明 | Maintenance Statement
 
@@ -104,3 +105,7 @@ This application is entirely frontend-based. All data is stored in your local br
 ## 许可证 | License
 
 GPL-3.0（GNU General Public License v3.0）
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=zzzdajb/DickHelper&type=Date)](https://star-history.com/#zzzdajb/DickHelper&Date)
