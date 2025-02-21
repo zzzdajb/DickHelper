@@ -102,4 +102,4 @@ This application is entirely frontend-based. All data is stored in your local br
 
 ## 许可证 | License
 
-还没想好，反正开源，后续再加
+GPL-3.0（GNU General Public License v3.0）
