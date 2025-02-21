@@ -186,7 +186,7 @@ export const RecordForm = () => {
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'
                     }}>
-                    记录新的自慰
+                    记录新的手艺活
                 </Typography>
                 
                 <Box sx={{ 
