@@ -108,4 +108,4 @@ GPL-3.0（GNU General Public License v3.0）
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=zzzdajb/DickHelper&type=Date)](https://star-history.com/#zzzdajb/DickHelper&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=zzzdajb/DickHelper&type=Timeline)](https://star-history.com/#zzzdajb/DickHelper&Timeline)
