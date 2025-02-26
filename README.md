@@ -82,6 +82,16 @@ This is a frontend-only application that can be easily deployed to various stati
 
 After the program is deployed, Vercel will provide an accessible domain name. The default domain name is usually not accessible in mainland China, and you can solve this problem by binding your own domain name.
 
+## Docker 部署 | Docker Deployment
+
+```bash
+# build image 构建镜像
+docker build -t dick-helper .
+
+# run container 运行容器
+docker run -p 80:80 dick-helper
+```
+
 ## 技术栈 | Tech Stack
 
 - React 19.0.0
