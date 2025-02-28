@@ -84,12 +84,16 @@ After the program is deployed, Vercel will provide an accessible domain name. Th
 
 ## Docker 部署 | Docker Deployment
 
+你可以使用 Docker 快速部署此应用：
+
+You can quickly deploy this application using Docker:
+
 ```bash
-# build image 构建镜像
+# 构建镜像 | Build image
 docker build -t dick-helper .
 
-# run container 运行容器
-docker run -p 80:80 dick-helper
+# 运行容器 | Run container
+docker run -d -p 80:80 --name dick-helper dick-helper
 ```
 
 ## 技术栈 | Tech Stack
