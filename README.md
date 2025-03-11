@@ -83,6 +83,22 @@ docker build -t dick-helper .
 docker run -d -p 80:80 --name dick-helper dick-helper
 ```
 
+#### Electron版本 | Electron Version
+
+```bash
+# 启动Electron开发环境
+npm run electron:dev
+```
+
+这个命令会同时启动Vite开发服务器和Electron应用。Electron应用会自动连接到Vite开发服务器。
+
+```bash
+# 构建Electron应用
+npm run electron:build
+```
+
+构建后的安装包将位于`release`目录中，支持Windows、macOS和Linux平台。
+
 ## 技术栈 | Tech Stack
 
 - React 19.0.0
