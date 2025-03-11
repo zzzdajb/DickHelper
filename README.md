@@ -19,16 +19,12 @@
 ## 特点 | Features
 
 - 🔒 **数据安全**: 所有数据完全存储在本地，无需担心隐私泄露
-  - All data is stored locally, no privacy concerns
 
 - 📊 **数据可视化**: 直观的图表展示统计信息
-  - Intuitive charts for statistical information
 
 - 📱 **响应式设计**: 支持各种设备尺寸
-  - Responsive design for various device sizes
 
 - 🌐 **无需后端**: 纯前端应用，无需服务器
-  - Frontend-only application, no backend required
 
 ## 本地部署 | Local Deployment
 
@@ -54,39 +50,30 @@ npm run dev
 
 本项目是纯前端应用，可以轻松部署到各种静态网站托管平台。
 
-This is a frontend-only application that can be easily deployed to various static site hosting platforms. 
-
 ### Vercel
 
 1. 在 GitHub上Fork本仓库
 
-   Fork the repository on GitHub
 
 2. 登录 [Vercel](https://vercel.com)
 
-   Login to Vercel
 
 3. 点击 "New Project" 并导入你的 GitHub 仓库
 
-   Click "New Project" and import your GitHub repository
 
 4. 保持默认配置即可，Vercel 会自动检测 Vite 项目
 
-   Keep the default configuration, Vercel will automatically detect Vite project
 
 5. 点击 "Deploy"
 
-   Click "Deploy"
 
 部署完成后，Vercel会提供一个可访问的URL。中国大陆地区污染了Vercel的默认域名，你可以通过绑定自己的域名来解决这个问题。
 
-After the program is deployed, Vercel will provide an accessible domain name. The default domain name is usually not accessible in mainland China, and you can solve this problem by binding your own domain name.
 
 ## Docker 部署 | Docker Deployment
 
 你可以使用 Docker 快速部署此应用：
 
-You can quickly deploy this application using Docker:
 
 ```bash
 # 构建镜像 | Build image
@@ -108,13 +95,11 @@ docker run -d -p 80:80 --name dick-helper dick-helper
 
 本项目基于纯前端技术构建，默认情况下，所有的数据会根据域名保存在您的浏览器当中，未经您允许，我们不会收集并使用您的任何信息。在后续开发当中，可能会有部分功能需要联网并且上传数据，在此之前，我们会征得您的同意，如果您拒绝上传数据，您将无法访问少数功能，但这不会对您正常使用程序造成任何影响。
 
-This project is built using pure front-end technology. By default, all data will be saved in your browser according to the domain name. Without your permission, we will not collect or use any of your information. In future development, some features may require internet access and data upload. Before that, we will seek your consent. If you refuse to upload data, you will not be able to access a few features, but this will not affect your normal use of the program in any way.
 
 ## 项目维护说明 | Maintenance Statement
 
 ⚠️ 请注意：本项目由AI工具Trae编写，原作者可能没有持续维护的能力。欢迎社区贡献者参与改进。
 
-⚠️ Note: This project was written by AI tool Trae, and the original author may not have the ability to maintain it continuously. Community contributors are welcome to participate in improvements.
 
 ## 许可证 | License
 
