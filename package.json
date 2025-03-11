@@ -1,15 +1,15 @@
 {
   "name": "gooddick",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "electron:dev": "concurrently \"npm run dev\" \"npm run electron\"",
-    "electron": "wait-on http://localhost:5173 && electron .",
-    "electron:build": "cross-env NODE_ENV=production npm run build && electron-builder"
+    "electron": "wait-on http://localhost:5174 && electron .",
+    "electron:build": "npm run build && electron-builder"
   },
   "main": "electron/main.js",
   "dependencies": {
@@ -30,7 +30,6 @@
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^8.2.2",
-    "cross-env": "^7.0.3",
     "electron": "^30.5.1",
     "electron-builder": "^24.13.3",
     "eslint": "^9.19.0",
@@ -52,7 +51,6 @@
     "directories": {
       "output": "release"
     },
-    "icon": "src/assets/icon.png",
     "win": {
       "target": "nsis"
     },

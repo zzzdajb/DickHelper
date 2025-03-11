@@ -5,11 +5,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 确保在打包环境中设置正确的NODE_ENV
-if (app.isPackaged) {
-  process.env.NODE_ENV = 'production';
-}
-
 // 保持对window对象的全局引用，如果不这么做的话，当JavaScript对象被
 // 垃圾回收的时候，window对象将会自动的关闭
 let mainWindow;
@@ -27,19 +22,14 @@ function createWindow() {
   });
 
   // 加载应用
-  // 在开发环境中，我们总是使用localhost:5173
+  // 在开发环境中，我们总是使用localhost:5174
   // 在生产环境中，我们使用打包后的文件
-  if (!app.isPackaged) {
-    // 开发环境：加载本地开发服务器
-    mainWindow.loadURL('http://localhost:5173/');
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined) {
+    mainWindow.loadURL('http://localhost:5174/');
     // 打开开发者工具
     mainWindow.webContents.openDevTools();
   } else {
-    // 生产环境：加载打包后的静态文件
-    const indexPath = path.join(app.getAppPath(), 'dist', 'index.html');
-    console.log('Loading from:', indexPath);
-    console.log('NODE_ENV:', process.env.NODE_ENV);
-    mainWindow.loadFile(indexPath);
+    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 
   // 当 window 被关闭，这个事件会被触发
