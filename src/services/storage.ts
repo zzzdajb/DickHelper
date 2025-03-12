@@ -53,19 +53,27 @@ export class StorageService {
     static getStats(): MasturbationStats {
         const records = this.getRecords();
         const now = new Date();
+        
+        // 计算本周开始时间（过去7天）
         const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-
+        
+        // 计算本月开始时间（当月1号）
+        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        
+        // 计算过去30天的开始时间（用于保持原有的frequencyPerMonth兼容性）
+    
         const totalCount = records.length;
         const totalDuration = records.reduce((sum, record) => sum + record.duration, 0);
         const recordsLastWeek = records.filter(record => record.startTime >= oneWeekAgo);
-        const recordsLastMonth = records.filter(record => record.startTime >= oneMonthAgo);
-
+        
+        // 修改为使用当月1号作为过滤条件
+        const recordsCurrentMonth = records.filter(record => record.startTime >= currentMonthStart);
+    
         return {
             totalCount,
             averageDuration: totalCount > 0 ? totalDuration / totalCount : 0,
             frequencyPerWeek: recordsLastWeek.length,
-            frequencyPerMonth: recordsLastMonth.length
+            frequencyPerMonth: recordsCurrentMonth.length
         };
     }
 
