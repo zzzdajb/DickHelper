@@ -7,6 +7,10 @@
 [![Vite](https://img.shields.io/badge/Vite-6.1.0-646CFF.svg)](https://vitejs.dev/)
 [![Material-UI](https://img.shields.io/badge/MUI-6.4.5-0081CB.svg)](https://mui.com/)
 
+一个简单、高效、易用的打飞机记录工具，帮助你科学管理✈️生活。
+
+QQ交流群：745297798
+
 ## 在线演示 | Online Demo
 
 🔗 演示demo：[牛子小助手Demo](https://dick.juwo.my)
