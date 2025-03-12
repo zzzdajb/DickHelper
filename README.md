@@ -68,9 +68,7 @@ npm run dev
    
 部署完成后，Vercel会提供一个可访问的URL。中国大陆地区污染了Vercel的默认域名，你可以通过绑定自己的域名来解决这个问题。
 
-### Cloudflare Pages
-
-[参考文档](https://vitejs.cn/vite3-cn/guide/static-deploy.html#cloudflare-pages)
+### Cloudflare Pages [参考文档](https://vitejs.cn/vite3-cn/guide/static-deploy.html#cloudflare-pages)
 
 1. 在 GitHub上Fork本仓库
 
