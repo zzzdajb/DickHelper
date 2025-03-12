@@ -86,7 +86,7 @@ npm run dev
 
 ## Docker 部署 | Docker Deployment
 
-你可以使用 Docker 快速部署此应用：
+### 使用预构建镜像 | Using Pre-built Image
 
 ```bash
 # 构建镜像 | Build image
