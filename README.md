@@ -87,6 +87,18 @@ npm run dev
 ## Docker 部署 | Docker Deployment
 
 ### 使用预构建镜像 | Using Pre-built Image
+我们提供了预构建的Docker镜像，您可以直接拉取使用：
+
+```bash
+# 拉取最新镜像 | Pull the latest image
+docker pull ghcr.io/zzzdajb/dickhelper:latest
+
+# 运行容器 | Run container
+docker run -d -p 80:80 --name dick-helper ghcr.io/zzzdajb/dickhelper:latest
+```
+
+### 自行构建镜像 | Build Your Own Image
+如果您想自行构建Docker镜像，可以按照以下步骤操作：
 
 ```bash
 # 构建镜像 | Build image
