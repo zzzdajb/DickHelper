@@ -76,18 +76,15 @@ npm run dev
 
 3. 在"Workers & Pages" 中点击 "Create" , 类型选择 "Pages" 并导入你的 GitHub 仓库
 
-
 4. 在"Framework preset" 中选择 "React(Vite)"
 
 5. 点击 "Deploy"
 
-部署完成后，Cloudflare Pages会提供一个可访问的URL。中国大陆地区污染了Cloudflare Pages的默认域名，你可以通过绑定自己的域名来解决这个问题。
-
+部署完成后，Cloudflare Pages 会提供一个可访问的URL。中国大陆地区污染了 Cloudflare Pages 的默认域名，你可以通过绑定自己的域名来解决这个问题。
 
 ## Docker 部署 | Docker Deployment
 
 你可以使用 Docker 快速部署此应用：
-
 
 ```bash
 # 构建镜像 | Build image
