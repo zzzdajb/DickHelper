@@ -65,28 +65,28 @@ npm run dev
 
 
 5. 点击 "Deploy"
-
-
+   
 部署完成后，Vercel会提供一个可访问的URL。中国大陆地区污染了Vercel的默认域名，你可以通过绑定自己的域名来解决这个问题。
 
+### Cloudflare Pages
+
+[参考文档](https://vitejs.cn/vite3-cn/guide/static-deploy.html#cloudflare-pages)
+
+1. 在 GitHub上Fork本仓库
+
+2. 登录 [Cloudflare](https://dash.cloudflare.com/)
+
+3. 在"Workers & Pages" 中点击 "Create" , 类型选择 "Pages" 并导入你的 GitHub 仓库
+
+4. 在"Framework preset" 中选择 "React(Vite)"
+
+5. 点击 "Deploy"
+
+部署完成后，Cloudflare Pages 会提供一个可访问的URL。中国大陆地区污染了 Cloudflare Pages 的默认域名，你可以通过绑定自己的域名来解决这个问题。
 
 ## Docker 部署 | Docker Deployment
 
 ### 使用预构建镜像 | Using Pre-built Image
-
-我们提供了预构建的Docker镜像，您可以直接拉取使用：
-
-```bash
-# 拉取最新镜像 | Pull the latest image
-docker pull ghcr.io/zzzdajb/dickhelper:latest
-
-# 运行容器 | Run container
-docker run -d -p 80:80 --name dick-helper ghcr.io/zzzdajb/dickhelper:latest
-```
-
-### 自行构建镜像 | Build Your Own Image
-
-如果您想自行构建Docker镜像，可以按照以下步骤操作：
 
 ```bash
 # 构建镜像 | Build image
