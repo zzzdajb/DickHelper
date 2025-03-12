@@ -66,8 +66,22 @@ npm run dev
 
 5. 点击 "Deploy"
 
+### Cloudflare Pages
 
-部署完成后，Vercel会提供一个可访问的URL。中国大陆地区污染了Vercel的默认域名，你可以通过绑定自己的域名来解决这个问题。
+[参考文档](https://vitejs.cn/vite3-cn/guide/static-deploy.html#cloudflare-pages)
+
+1. 在 GitHub上Fork本仓库
+
+2. 登录 [Cloudflare](https://dash.cloudflare.com/)
+
+3. 在"Workers & Pages" 中点击 "Create" , 类型选择 "Pages" 并导入你的 GitHub 仓库
+
+
+4. 在"Framework preset" 中选择 "React(Vite)"
+
+5. 点击 "Deploy"
+
+部署完成后，Cloudflare Pages会提供一个可访问的URL。中国大陆地区污染了Cloudflare Pages的默认域名，你可以通过绑定自己的域名来解决这个问题。
 
 
 ## Docker 部署 | Docker Deployment
