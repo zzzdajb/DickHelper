@@ -1,9 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import {
+    Box,
+    Typography,
+    Paper,
+    IconButton,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button,
+    Stack
+} from '@mui/material';
 import { StorageService } from '../services/storage';
 import { MasturbationRecord } from '../types/record';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 /**
  * 历史记录列表组件
@@ -14,6 +27,42 @@ import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
  * 4. 自动更新数据（定时更新和事件监听）
  */
 export const HistoryList = () => {
+
+    /**
+     * 导出数据为JSON文件
+     */
+    const handleExport = () => {
+        const data = StorageService.exportData();
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'masturbation_records.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    /**
+     * 从JSON文件导入数据
+     */
+    const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target?.result as string;
+            if (content) {
+                const success = StorageService.importData(content);
+                if (!success) {
+                    alert('导入失败：数据格式不正确');
+                }
+            }
+        };
+        reader.readAsText(file);
+    };
     // 所有记录数据
     const [records, setRecords] = useState<MasturbationRecord[]>([]);
     // 清空确认对话框的显示状态
@@ -85,8 +134,9 @@ export const HistoryList = () => {
                 alignItems: 'center',
                 mb: 3
             }}>
-                <Typography 
-                    variant="h5" 
+
+                <Typography
+                    variant="h5"
                     sx={{
                         fontWeight: 700,
                         background: 'linear-gradient(45deg, #2196f3 30%, #64b5f6 90%)',
@@ -113,8 +163,37 @@ export const HistoryList = () => {
                 </IconButton>
             </Box>
 
-            <Box sx={{ 
-                overflowX: 'auto',
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'end',
+                alignItems: 'center',
+                mb: 3
+            }}>
+                <Stack direction="row" spacing={2} justifyContent="center">
+                    <Button
+                      variant="outlined"
+                      startIcon={<FileDownloadIcon />}
+                      onClick={handleExport}
+                    >
+                        导出数据
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      component="label"
+                      startIcon={<FileUploadIcon />}
+                    >
+                        导入数据
+                        <input
+                          type="file"
+                          hidden
+                          accept=".json"
+                          onChange={handleImport}
+                        />
+                    </Button>
+                </Stack>
+            </Box>
+
+            <Box sx={{
                 width: '100%',
                 maxWidth: '800px',
                 mb: 4,
@@ -135,6 +214,7 @@ export const HistoryList = () => {
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
                                 p: 2.5,
+                                boxSizing: 'border-box',
                                 borderRadius: 3,
                                 background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
                                 transition: 'all 0.3s ease',
@@ -146,19 +226,19 @@ export const HistoryList = () => {
                             }}
                         >
                                 <Box sx={{ flex: 1 }}>
-                                    <Typography 
-                                        variant="h6" 
-                                        sx={{ 
-                                            mb: 1, 
+                                    <Typography
+                                        variant="h6"
+                                        sx={{
+                                            mb: 1,
                                             color: 'primary.main',
-                                            fontWeight: 600 
+                                            fontWeight: 600
                                         }}
                                     >
                                         {new Date(record.startTime).toLocaleString()}
                                     </Typography>
-                                    <Typography 
-                                        variant="body1" 
-                                        sx={{ 
+                                    <Typography
+                                        variant="body1"
+                                        sx={{
                                             color: 'text.secondary',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -177,16 +257,17 @@ export const HistoryList = () => {
                                             持续时间：{minutes}分{seconds}秒
                                         </Box>
                                         {record.notes && (
-                                            <Typography 
-                                                component="span" 
-                                                sx={{ 
+                                            <Typography
+                                                component="span"
+                                                sx={{
                                                     color: 'text.secondary',
                                                     display: 'inline-flex',
                                                     alignItems: 'center',
                                                     backgroundColor: 'rgba(0, 0, 0, 0.04)',
                                                     borderRadius: 1,
                                                     px: 1.5,
-                                                    py: 0.5
+                                                    py: 0.5,
+                                                    wordBreak: 'break-all'
                                                 }}
                                             >
                                                 备注：{record.notes}

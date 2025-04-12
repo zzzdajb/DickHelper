@@ -1,7 +1,6 @@
 #root {
-  max-width: 600px;
+  max-width: 750px;
   margin: 0 auto;
-  padding: 1.5rem;
   min-height: 100vh;
   width: 100%;
 }
@@ -11,12 +10,6 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
-}
-
-@media (max-width: 768px) {
-  #root {
-    padding: 1rem;
-  }
 }
 
 .logo {

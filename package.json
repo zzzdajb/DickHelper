@@ -11,8 +11,8 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^6.4.5",
-    "@mui/material": "^6.4.5",
+    "@mui/icons-material": "^7.0.1",
+    "@mui/material": "^7.0.1",
     "@types/uuid": "^10.0.0",
     "chart.js": "^4.4.7",
     "react": "^19.0.0",
