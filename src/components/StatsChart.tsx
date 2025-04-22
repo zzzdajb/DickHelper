@@ -5,7 +5,7 @@ import { MasturbationRecord, MasturbationStats } from '../types/record';
 // 删除 GitHubIcon 导入
 
 const DAYS_IN_WEEK = 7;
-const WEEKS_TO_SHOW = 4; // 将显示时间范围改为4周
+const WEEKS_TO_SHOW = 52; // 将显示时间范围改为4周
 const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日'];
 // 删除 GITHUB_REPO_URL 常量
 
@@ -21,8 +21,10 @@ export const StatsChart = () => {
     const [stats, setStats] = useState<MasturbationStats>({
         totalCount: 0,
         averageDuration: 0,
+        maxDuration: 0,
         frequencyPerWeek: 0,
-        frequencyPerMonth: 0
+        frequencyPerMonth: 0,
+        frequencyPerYear: 0,
     });
     // 记录数据状态
     const [records, setRecords] = useState<MasturbationRecord[]>([]);
@@ -86,8 +88,12 @@ export const StatsChart = () => {
     const generateContributionData = () => {
         const now = new Date();
         now.setHours(0, 0, 0, 0);
+        // 获取当前日期所在周的结束日期
+        const endOfWeek = new Date(now);
+        endOfWeek.setDate(now.getDate() + (DAYS_IN_WEEK - now.getDay()));
+
         const startDate = new Date(now);
-        startDate.setDate(now.getDate() - (DAYS_IN_WEEK * WEEKS_TO_SHOW - 1));
+        startDate.setDate(endOfWeek.getDate() - (DAYS_IN_WEEK * WEEKS_TO_SHOW - 1));
 
         // 初始化贡献数据数组
         const contributionData = Array(WEEKS_TO_SHOW).fill(0).map(() =>
@@ -100,9 +106,9 @@ export const StatsChart = () => {
             recordDate.setHours(0, 0, 0, 0);
             
             // 确保记录日期在显示范围内
-            if (recordDate >= startDate && recordDate <= now) {
+            if (recordDate >= startDate && recordDate <= endOfWeek) {
                 // 计算记录日期距离结束日期（今天）的天数
-                const daysDiff = Math.floor((now.getTime() - recordDate.getTime()) / (1000 * 60 * 60 * 24));
+                const daysDiff = Math.floor((endOfWeek.getTime() - recordDate.getTime()) / (1000 * 60 * 60 * 24));
                 
                 // 计算在哪一周和哪一天
                 const weekIndex = Math.floor(daysDiff / DAYS_IN_WEEK);
@@ -123,9 +129,14 @@ export const StatsChart = () => {
      */
     const getMonthLabels = () => {
         const now = new Date();
+        // 获取当前日期所在周的结束日期
+        const endOfWeek = new Date(now);
+        endOfWeek.setDate(now.getDate() + (DAYS_IN_WEEK - now.getDay()));
+
         const startDate = new Date(now);
-        startDate.setDate(now.getDate() - (DAYS_IN_WEEK * WEEKS_TO_SHOW));
-        const months: { label: string; index: number }[] = [];
+        startDate.setDate(endOfWeek.getDate() - (DAYS_IN_WEEK * WEEKS_TO_SHOW));
+        // const months: { label: string; index: number }[] = [];
+        const months: { [key: number]: string } = {};
         
         // 生成月份标签
         for (let week = 0; week < WEEKS_TO_SHOW; week++) {
@@ -133,8 +144,9 @@ export const StatsChart = () => {
             date.setDate(date.getDate() + (week * 7));
             const monthName = date.getMonth() + 1;
             if (week === 0 || date.getDate() <= 7) {
-                months.push({ label: `${monthName}月`, index: week });
-            }
+                // months.push({ label: `${monthName}月`, index: week });
+                months[week] = `${monthName}月`
+            };
         }
         return months;
     };
@@ -168,37 +180,6 @@ export const StatsChart = () => {
             {/* 删除整个 GitHub Star 按钮的 Box 组件 */}
 
             <Grid container spacing={2} sx={{ mb: 3 }} columns={12}>
-                <Grid item xs={12} sm={6}>
-                    <Paper 
-                        sx={{ 
-                            p: 2,
-                            background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
-                            borderRadius: 3,
-                            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                            '&:hover': {
-                                transform: 'translateY(-4px)',
-                                boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
-                            }
-                        }}
-                    >
-                        <Typography 
-                            variant="subtitle1" 
-                            color="text.secondary"
-                            sx={{ mb: 1, fontWeight: 500 }}
-                        >
-                            总次数
-                        </Typography>
-                        <Typography 
-                            variant="h3"
-                            sx={{ 
-                                fontWeight: 700,
-                                color: 'primary.main'
-                            }}
-                        >
-                            {stats.totalCount}
-                        </Typography>
-                    </Paper>
-                </Grid>
                 <Grid item xs={12} sm={6}>
                     <Paper 
                         sx={{ 
@@ -238,6 +219,78 @@ export const StatsChart = () => {
                             >
                                 分钟
                             </Typography>
+                        </Typography>
+                    </Paper>
+                </Grid><Grid item xs={12} sm={6}>
+                    <Paper 
+                        sx={{ 
+                            p: 3,
+                            background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                            borderRadius: 3,
+                            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
+                            }
+                        }}
+                    >
+                        <Typography 
+                            variant="subtitle1" 
+                            color="text.secondary"
+                            sx={{ mb: 1, fontWeight: 500 }}
+                        >
+                            最长持续时间
+                        </Typography>
+                        <Typography 
+                            variant="h3"
+                            sx={{ 
+                                fontWeight: 700,
+                                color: 'primary.main'
+                            }}
+                        >
+                            {stats.maxDuration.toFixed(1)}
+                            <Typography 
+                                component="span" 
+                                variant="h5" 
+                                sx={{ 
+                                    ml: 1,
+                                    color: 'text.secondary',
+                                    fontWeight: 500
+                                }}
+                            >
+                                分钟
+                            </Typography>
+                        </Typography>
+                    </Paper>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <Paper 
+                        sx={{ 
+                            p: 2,
+                            background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                            borderRadius: 3,
+                            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
+                            }
+                        }}
+                    >
+                        <Typography 
+                            variant="subtitle1" 
+                            color="text.secondary"
+                            sx={{ mb: 1, fontWeight: 500 }}
+                        >
+                            总次数
+                        </Typography>
+                        <Typography 
+                            variant="h3"
+                            sx={{ 
+                                fontWeight: 700,
+                                color: 'primary.main'
+                            }}
+                        >
+                            {stats.totalCount}
                         </Typography>
                     </Paper>
                 </Grid>
@@ -303,6 +356,37 @@ export const StatsChart = () => {
                         </Typography>
                     </Paper>
                 </Grid>
+                <Grid item xs={12} sm={6}>
+                    <Paper 
+                        sx={{ 
+                            p: 3,
+                            background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                            borderRadius: 3,
+                            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
+                            }
+                        }}
+                    >
+                        <Typography 
+                            variant="subtitle1" 
+                            color="text.secondary"
+                            sx={{ mb: 1, fontWeight: 500 }}
+                        >
+                            本年次数
+                        </Typography>
+                        <Typography 
+                            variant="h3"
+                            sx={{ 
+                                fontWeight: 700,
+                                color: 'primary.main'
+                            }}
+                        >
+                            {stats.frequencyPerYear}
+                        </Typography>
+                    </Paper>
+                </Grid>
             </Grid>
 
             <Paper elevation={2} sx={{
@@ -353,10 +437,10 @@ export const StatsChart = () => {
                     <Box sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '4px',
+                        gap: '2px',
                         pt: 4
                     }}>
-                        {monthLabels.map((month, index) => (
+                        {/* {monthLabels.map((month, index) => (
                             <Typography
                                 key={index}
                                 variant="caption"
@@ -364,13 +448,36 @@ export const StatsChart = () => {
                                     color: 'text.secondary',
                                     fontSize: '10px',
                                     height: '12px',
-                                    lineHeight: '12px',
+                                    lineHeight: '10px',
                                     mb: month.index === 0 ? 0 : '2px'
                                 }}
                             >
                                 {month.label}
                             </Typography>
-                        ))}
+                        ))} */}
+                        {(() => {
+                            const elements = []
+                            for (let week = 0; week < WEEKS_TO_SHOW; week++) {
+                                elements.push(
+                                    <Typography
+                                        key={week}
+                                        variant="caption"
+                                        // 垂直居中
+                                        alignItems={'vertical'}
+                                        sx={{
+                                            color: 'text.secondary',
+                                            fontSize: '10px',
+                                            height: '16px',
+                                            lineHeight: '0px',
+                                            mb: week === 0 ? 0 : '2px'
+                                        }}
+                                    >
+                                        {monthLabels[week] ? monthLabels[week] : ''}
+                                    </Typography>
+                                );
+                            }
+                            return elements;
+                        })()}
                     </Box>
 
                     <Box sx={{
@@ -388,10 +495,10 @@ export const StatsChart = () => {
                                     key={index}
                                     variant="caption"
                                     sx={{
-                                        width: '10px',
+                                        width: '18px',
                                         textAlign: 'center',
                                         color: 'text.secondary',
-                                        fontSize: '9px'
+                                        fontSize: '10px'
                                     }}
                                 >
                                     {day}
@@ -414,6 +521,8 @@ export const StatsChart = () => {
                                 }}>
                                     {week.map((count, dayIndex) => {
                                         const date = new Date();
+                                        // 计算当前日期所在周的结束日期
+                                        date.setDate(date.getDate() + (DAYS_IN_WEEK - date.getDay()));
                                         const daysToSubtract = (weekIndex * 7) + dayIndex;
                                         date.setDate(date.getDate() - (DAYS_IN_WEEK * WEEKS_TO_SHOW - 1) + daysToSubtract);
                                         return (

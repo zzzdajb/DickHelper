@@ -1,6 +1,7 @@
 import { MasturbationRecord, MasturbationStats } from '../types/record';
 
 const STORAGE_KEY = 'masturbation_records';
+const ACTIVE_SESSION_KEY = 'active_masturbation_session';
 
 export class StorageService {
     static exportData(): string {
@@ -59,21 +60,36 @@ export class StorageService {
         
         // 计算本月开始时间（当月1号）
         const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        // 计算本年开始日期（1月1日）
+        const currentYearStart = new Date(now.getFullYear(), 0, 1);
+
         
         // 计算过去30天的开始时间（用于保持原有的frequencyPerMonth兼容性）
     
         const totalCount = records.length;
         const totalDuration = records.reduce((sum, record) => sum + record.duration, 0);
+        // 计算记录里面最长时间的记录
+        const maxDuration = records.reduce((longest, record) => {
+            if (record.duration > longest) {
+                return record.duration;
+            }
+            return longest;
+        }, 0);
         const recordsLastWeek = records.filter(record => record.startTime >= oneWeekAgo);
         
         // 修改为使用当月1号作为过滤条件
         const recordsCurrentMonth = records.filter(record => record.startTime >= currentMonthStart);
+
+        // 修改为使用本年1月1号作为过滤条件
+        const recordsCurrentYear = records.filter(record => record.startTime >= currentMonthStart);
     
         return {
             totalCount,
             averageDuration: totalCount > 0 ? totalDuration / totalCount : 0,
+            maxDuration,
             frequencyPerWeek: recordsLastWeek.length,
-            frequencyPerMonth: recordsCurrentMonth.length
+            frequencyPerMonth: recordsCurrentMonth.length,
+            frequencyPerYear: recordsCurrentYear.length,
         };
     }
 
@@ -81,5 +97,37 @@ export class StorageService {
         const records = this.getRecords();
         const filteredRecords = records.filter(record => record.id !== id);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredRecords));
+    }
+
+    static saveActiveSession(session: {
+        startTime: Date;
+        accumulatedTime: number;
+        isPaused: boolean;
+        lastPauseTime: Date | null;
+        notes: string;
+    }) {
+        localStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify({
+            ...session,
+            startTime: session.startTime.getTime(),
+            lastPauseTime: session.lastPauseTime?.getTime() || null
+        }));
+    }
+
+    static getActiveSession() {
+        const data = localStorage.getItem(ACTIVE_SESSION_KEY);
+        if (!data) return null;
+        
+        const parsed = JSON.parse(data);
+        return {
+            startTime: new Date(parsed.startTime),
+            accumulatedTime: parsed.accumulatedTime,
+            isPaused: parsed.isPaused,
+            lastPauseTime: parsed.lastPauseTime ? new Date(parsed.lastPauseTime) : null,
+            notes: parsed.notes
+        };
+    }
+
+    static clearActiveSession() {
+        localStorage.removeItem(ACTIVE_SESSION_KEY);
     }
 }

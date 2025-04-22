@@ -8,6 +8,8 @@ export interface MasturbationRecord {
 export interface MasturbationStats {
     totalCount: number;
     averageDuration: number;
+    maxDuration: number;
     frequencyPerWeek: number;
     frequencyPerMonth: number;
+    frequencyPerYear: number;
 }

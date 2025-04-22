@@ -9,10 +9,18 @@ interface UpdateInfo {
 
 const VERSION_HISTORY: UpdateInfo[] = [
     {
+        version: 'v0.2.0',
+        date: '2025-04-22',
+        changes: [
+            '支持刷新页面恢复计时',
+            '新增最长持续时间、本年次数统计',
+            '优化贡献图展示样式，展示近一年的统计数据',
+        ]
+    },
+    {
         version: 'v0.1.1',
         date: '2025-02-20',
         changes: [
-            '非常感谢每一个给我Star的小伙伴！',
             '新增更新公告弹窗，方便用户了解最新变化',
             '调整了一些文字内容，防止尴尬',
             '修复了一些已知问题'
