@@ -1,24 +1,11 @@
-![DickHelper](https://socialify.git.ci/zzzdajb/DickHelper/image?custom_description=An+easy-to-use+masturbation+management+recording+tool&description=1&forks=1&language=1&logo=https%3A%2F%2Fs2.loli.net%2F2025%2F02%2F21%2FkI3Ebc5hdGTSlLp.png&name=1&owner=1&stargazers=1&theme=Light)
-
-# 牛子小助手 (DickHelper)
+# 手工活小助手 (Handworker)
 
 [![React](https://img.shields.io/badge/React-19.0.0-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue.svg)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.1.0-646CFF.svg)](https://vitejs.dev/)
 [![Material-UI](https://img.shields.io/badge/MUI-6.4.5-0081CB.svg)](https://mui.com/)
 
-一个简单、高效、易用的打飞机记录工具，帮助你科学管理✈️生活。
-
-QQ交流群：745297798
-
-## 在线演示 | Online Demo
-
-🔗 演示demo：[牛子小助手Demo](https://dick.juwo.my)
-
-⚠️ 注意事项：
-- 这只是一个演示站点，不保证长期可用性和数据持久性
-- 数据存储是基于域名的，即不同域名下的数据是相互独立的
-- 建议自行部署使用，以确保可用性
+一个简单、高效、易用的手工活记录工具，帮助你科学管理时间。
 
 ## 特点 | Features
 
@@ -38,10 +25,10 @@ If you want to run this project locally, follow these steps:
 
 ```bash
 # 克隆项目 | Clone the repository
-git clone https://github.com/zzzdajb/DickHelper.git
+git clone https://github.com/dabenlee/Handworker.git
 
 # 进入项目目录 | Enter the project directory
-cd GoodDick
+cd Handworker
 
 # 安装依赖 | Install dependencies
 npm install
@@ -86,28 +73,15 @@ npm run dev
 
 部署完成后，Cloudflare Pages 会提供一个可访问的URL。中国大陆地区污染了 Cloudflare Pages 的默认域名，你可以通过绑定自己的域名来解决这个问题。
 
-## Docker 部署 | Docker Deployment
-
-### 使用预构建镜像 | Using Pre-built Image
-我们提供了预构建的Docker镜像，您可以直接拉取使用：
-
-```bash
-# 拉取最新镜像 | Pull the latest image
-docker pull ghcr.io/zzzdajb/dickhelper:latest
-
-# 运行容器 | Run container
-docker run -d -p 80:80 --name dick-helper ghcr.io/zzzdajb/dickhelper:latest
-```
-
 ### 自行构建镜像 | Build Your Own Image
 如果您想自行构建Docker镜像，可以按照以下步骤操作：
 
 ```bash
 # 构建镜像 | Build image
-docker build -t dick-helper .
+docker build -t handworker .
 
 # 运行容器 | Run container
-docker run -d -p 80:80 --name dick-helper dick-helper
+docker run -d -p 80:80 --name handworker handworker
 ```
 
 ## 技术栈 | Tech Stack
@@ -134,4 +108,4 @@ GPL-3.0（GNU General Public License v3.0）
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=zzzdajb/DickHelper&type=Timeline)](https://star-history.com/#zzzdajb/DickHelper&Timeline)
+[![Star History Chart](https://api.star-history.com/svg?repos=dabenlee/Handworker&type=Timeline)](https://www.star-history.com/#dabenlee/Handworker&Timeline)

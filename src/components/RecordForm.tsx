@@ -10,7 +10,7 @@ import TimerIcon from '@mui/icons-material/Timer';
 
 /**
  * 记录表单组件
- * 用于记录新的自慰数据，包含以下功能：
+ * 用于记录新的发射数据，包含以下功能：
  * 1. 计时器功能：开始/停止计时
  * 2. 添加备注信息
  * 3. 数据导入导出功能
@@ -186,7 +186,7 @@ export const RecordForm = () => {
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'
                     }}>
-                    记录新的手艺活
+                    记录新的手工活
                 </Typography>
                 
                 <Box sx={{ 
@@ -230,7 +230,7 @@ export const RecordForm = () => {
                     fullWidth
                     multiline
                     rows={3}
-                    label="备注（可选）"
+                    label="备注"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     sx={{ mt: 2 }}

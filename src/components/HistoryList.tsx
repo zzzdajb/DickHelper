@@ -7,7 +7,7 @@ import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 
 /**
  * 历史记录列表组件
- * 展示所有自慰记录的历史列表，包含以下功能：
+ * 展示所有发射记录的历史列表，包含以下功能：
  * 1. 显示记录的详细信息（时间、持续时间、备注）
  * 2. 删除单条记录
  * 3. 清空所有记录（带确认对话框）

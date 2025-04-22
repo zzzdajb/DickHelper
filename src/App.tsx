@@ -110,21 +110,11 @@ function App() {
                 gap: 1,
                 mb: 4
               }}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    color: 'text.secondary',
-                    fontWeight: 500,
-                    fontSize: '0.875rem'
-                  }}
-                >
-                  祝愿所有给本项目Star的小伙伴牛子长度翻倍！
-                </Typography>
                 <Button
                   variant="contained"
                   color="primary"
                   startIcon={<GitHubIcon />}
-                  onClick={() => window.open('https://github.com/zzzdajb/DickHelper', '_blank')}
+                  onClick={() => window.open('https://github.com/dabenlee/Handworker', '_blank')}
                   sx={{
                     borderRadius: 2,
                     textTransform: 'none',
