@@ -81,7 +81,7 @@ export class StorageService {
         const recordsCurrentMonth = records.filter(record => record.startTime >= currentMonthStart);
 
         // 修改为使用本年1月1号作为过滤条件
-        const recordsCurrentYear = records.filter(record => record.startTime >= currentMonthStart);
+        const recordsCurrentYear = records.filter(record => record.startTime >= currentYearStart);
     
         return {
             totalCount,

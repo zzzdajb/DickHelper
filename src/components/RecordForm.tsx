@@ -76,7 +76,7 @@ export const RecordForm = () => {
 
     // 监听 startTime 变化，当 startTime 有值时调用 saveSession()
     useEffect(() => {
-        if (isRecording && !isResume) {
+        if (isRecording) {
             saveSession();
         }
     }, [isRecording, isPaused, notes]);
