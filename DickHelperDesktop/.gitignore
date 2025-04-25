@@ -1,0 +1,91 @@
+# .NET / C# specific ignores
+## Ignore Visual Studio temporary files, build results, and user-specific files
+[Bb]in/
+[Oo]bj/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.tmp
+*.pdb # Often excluded, unless needed for debugging release builds shared outside. Consider carefully.
+*.errordump # Crash dumps
+
+# Ignore build outputs
+publish/
+artifacts/
+
+# Rider / IntelliJ specific files
+.idea/
+*.iml
+
+# Visual Studio Code specific files
+.vscode/
+# Note: If you want to share launch/tasks settings, uncomment the following lines:
+#!.vscode/launch.json
+#!.vscode/tasks.json
+#!.vscode/settings.json # Only if you want to share workspace settings
+
+# NuGet packages
+# Ignore packages folder (for packages.config), NuGet internally uses a global cache now mostly
+packages/
+# Ignore generated NuGet packages
+*.nupkg
+*.snupkg
+# NuGet v3 caches
+*.nuget.props
+*.nuget.targets
+
+# Avalonia specific (usually covered by bin/obj, but good to be explicit if needed later)
+# Generally, no specific Avalonia files need ignoring beyond standard .NET build outputs.
+
+# Vim specific files
+*.[Ss][Ww][Pp] # Swap files
+*~ # Backup files
+*.un~ # Undo files
+.undo/ # Undo directory (if configured)
+Session.vim # Session files (if used)
+# .viminfo # Usually user-specific, kept outside the project
+
+# Secrets files - VERY IMPORTANT
+# Ensure any files containing secrets (API keys, connection strings) are NOT committed.
+# Common examples (add your specific files if needed):
+secrets.json
+appsettings.*.json # Often development-specific settings with secrets
+!appsettings.json # Keep the base template
+!appsettings.Production.json # Keep production template if it doesn't contain secrets
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coverlet.json
+
+# Log files
+*.log
+logs/
+*.log.* # Log files with rolling numbers/dates
+
+# OS generated files
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._* # Resource fork files
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+
+# Environment specific files
+.env # Common for environment variables
+
+# Build server or Continuous Integration specific files
+*.cache
+# Add files specific to your CI system if necessary (e.g., Jenkins workspace, Azure Pipelines artifacts)

@@ -1,0 +1,66 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\York\\Works\\GoodDick\\DickHelperDesktop\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9757F953-61A4-4242-A69E-2004073B7FA9}|DickHelperDesktop\\DickHelperDesktop.csproj|c:\\york\\works\\gooddick\\dickhelperdesktop\\dickhelperdesktop\\views\\mainwindow.axaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{9757F953-61A4-4242-A69E-2004073B7FA9}|DickHelperDesktop\\DickHelperDesktop.csproj|solutionrelative:dickhelperdesktop\\views\\mainwindow.axaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9757F953-61A4-4242-A69E-2004073B7FA9}|DickHelperDesktop\\DickHelperDesktop.csproj|c:\\york\\works\\gooddick\\dickhelperdesktop\\dickhelperdesktop\\viewmodels\\mainwindowviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9757F953-61A4-4242-A69E-2004073B7FA9}|DickHelperDesktop\\DickHelperDesktop.csproj|solutionrelative:dickhelperdesktop\\viewmodels\\mainwindowviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{c9c0ae26-aa77-11d2-b3f0-0000f87570ee}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.axaml",
+              "DocumentMoniker": "C:\\York\\Works\\GoodDick\\DickHelperDesktop\\DickHelperDesktop\\Views\\MainWindow.axaml",
+              "RelativeDocumentMoniker": "DickHelperDesktop\\Views\\MainWindow.axaml",
+              "ToolTip": "C:\\York\\Works\\GoodDick\\DickHelperDesktop\\DickHelperDesktop\\Views\\MainWindow.axaml",
+              "RelativeToolTip": "DickHelperDesktop\\Views\\MainWindow.axaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-04-25T04:33:45.628Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainWindowViewModel.cs",
+              "DocumentMoniker": "C:\\York\\Works\\GoodDick\\DickHelperDesktop\\DickHelperDesktop\\ViewModels\\MainWindowViewModel.cs",
+              "RelativeDocumentMoniker": "DickHelperDesktop\\ViewModels\\MainWindowViewModel.cs",
+              "ToolTip": "C:\\York\\Works\\GoodDick\\DickHelperDesktop\\DickHelperDesktop\\ViewModels\\MainWindowViewModel.cs",
+              "RelativeToolTip": "DickHelperDesktop\\ViewModels\\MainWindowViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-25T04:33:39.546Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
