@@ -137,6 +137,9 @@ docker run -d -p 80:80 --name dick-helper dick-helper
 
 GPL-3.0（GNU General Public License v3.0）
 
+[![image](iframe组件截图图片链接)](https://yxvm.com/)
+[NodeSupport](https://github.com/NodeSeekDev/NodeSupport)赞助了本项目
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=zzzdajb/DickHelper&type=Timeline)](https://star-history.com/#zzzdajb/DickHelper&Timeline)
