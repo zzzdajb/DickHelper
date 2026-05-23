@@ -1,0 +1,12 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend guidelines index with tech stack overview"}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Actual directory layout and naming conventions from codebase"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Component structure, styling patterns, and common mistakes from existing components"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "localStorage + CustomEvent sync pattern documented from actual code"}
+{"file": ".trellis/spec/frontend/hook-guidelines.md", "reason": "Hook patterns and proposed rewrite improvements"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Type definitions, weak points, and rules for rewrite"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Forbidden patterns, required patterns, and review checklist"}
+{"file": ".trellis/spec/frontend/data-migration.md", "reason": "Old version export JSON format, field semantics, import strategy with validation and merge logic"}
+{"file": ".trellis/spec/frontend/code-style.md", "reason": "C#/.NET style TypeScript conventions — naming, patterns, and forbidden practices"}
+{"file": ".trellis/spec/frontend/app-shell.md", "reason": "Mantine AppShell layout, navbar design, useState view switching (no Router needed)"}
+{"file": ".trellis/spec/backend/index.md", "reason": "Documents that no backend exists, placeholder for rewrite"}
+{"file": ".trellis/tasks/05-23-spec/prd.md", "reason": "Complete PRD with architecture, data model, data flow, feature list, and known issues"}

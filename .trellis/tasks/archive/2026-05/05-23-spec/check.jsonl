@@ -1,0 +1,10 @@
+{"file": ".trellis/spec/frontend/index.md", "reason": "Verify tech stack and index match actual package.json"}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Verify directory layout matches actual src/ tree"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Verify component patterns match actual code in src/components/"}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify state flow diagram matches actual localStorage + CustomEvent usage"}
+{"file": ".trellis/spec/frontend/hook-guidelines.md", "reason": "Verify all useEffect patterns in components are documented"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify type definitions match src/types/record.ts"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Verify forbidden patterns list covers all issues found in codebase"}
+{"file": ".trellis/spec/frontend/data-migration.md", "reason": "Verify export JSON format matches actual RecordForm export logic and import validation rules"}
+{"file": ".trellis/spec/frontend/code-style.md", "reason": "Verify C# style conventions are consistent and cover all code patterns expected in rewrite"}
+{"file": ".trellis/spec/frontend/app-shell.md", "reason": "Verify layout matches Electron window constraints and all 4 views are listed"}
