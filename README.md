@@ -11,6 +11,8 @@
 
 An easy-to-use masturbation management recording tool, now as a cross-platform desktop app.
 
+<img width="944" height="615" alt="image" src="https://github.com/user-attachments/assets/124fe82c-088e-4b3f-995e-321a693aaf3f" />
+
 没有什么人活跃的QQ交流群：745297798 
 
 该群为作者私人群，仅供作者产出奇怪的开源作品使用
