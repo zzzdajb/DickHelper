@@ -129,3 +129,14 @@ Components are the one place where React rules overrule C# conventions:
 - The author is a C# developer. TypeScript code should feel like reading C#.
 - LLM coding agents follow explicit, boundary-clear rules better than vague ones.
 - "One class per file" + named methods makes code greppable and debuggable.
+
+---
+
+## Git Commit Convention
+
+- **提交信息统一使用中文（Chinese commit messages）**。项目面向中文用户，中文注释更直观。
+- 格式：`<类型>: <简要描述>`，与常见 conventional commits 一致，只是语言用中文。
+- 示例：
+  - `修复: 热力图时区导致日期显示为空白的问题`
+  - `重构: 将 better-sqlite3 迁移为 sql.js (WASM)`
+  - `文档: 更新数据库指南，补充 sql.js 模式`
