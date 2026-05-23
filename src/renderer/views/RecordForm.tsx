@@ -7,6 +7,7 @@ import {
     Textarea,
     Group,
     Text,
+    Badge,
     rem,
 } from "@mantine/core";
 import { IconPlayerPlay, IconPlayerStop, IconPlayerPause } from "@tabler/icons-react";
@@ -24,6 +25,9 @@ export const RecordForm = () => {
     const { IsRecording, IsPaused, ElapsedSeconds, Start, Pause, Resume, Stop } = useTimer();
     const { refresh } = useRecords();
     const [notes, setNotes] = useState<string>("");
+
+    const statusLabel: string = !IsRecording ? "未开始" : IsPaused ? "已暂停" : "记录中";
+    const statusColor: string = !IsRecording ? "gray" : IsPaused ? "yellow" : "green";
 
     const HandleStartStop = (): void => {
         if (!IsRecording) {
@@ -53,66 +57,82 @@ export const RecordForm = () => {
     };
 
     return (
-        <Paper shadow="sm" radius="md" p="xl" withBorder>
-            <Stack gap="lg" align="center">
-                <Title order={3} c="blue">
-                    记录新的手艺活
-                </Title>
-
-                <Text
-                    size="48px"
-                    fw={700}
-                    variant="gradient"
-                    gradient={{ from: "blue", to: "cyan", deg: 135 }}
-                    style={{ fontVariantNumeric: "tabular-nums" }}
-                >
-                    {IsRecording ? FormatTime(ElapsedSeconds) : "准备开始"}
+        <Stack gap="lg" maw={720} mx="auto">
+            <Stack gap={4}>
+                <Title order={3} c="blue">记录</Title>
+                <Text size="sm" c="dimmed">
+                    开始计时，结束后自动保存本次记录。
                 </Text>
+            </Stack>
 
-                <Group>
-                    <Button
-                        size="lg"
-                        radius="xl"
-                        color={IsRecording ? "red" : "blue"}
-                        leftSection={
-                            IsRecording ? (
-                                <IconPlayerStop style={{ width: rem(20), height: rem(20) }} />
-                            ) : (
-                                <IconPlayerPlay style={{ width: rem(20), height: rem(20) }} />
-                            )
-                        }
-                        onClick={HandleStartStop}
-                    >
-                        {IsRecording ? "结束" : "开始"}
-                    </Button>
-                    {IsRecording && (
+            <Paper shadow="sm" radius="md" p="xl" withBorder>
+                <Stack gap="lg" align="center">
+                    <Badge variant="light" color={statusColor} size="lg">
+                        {statusLabel}
+                    </Badge>
+
+                    <Stack gap={4} align="center">
+                        <Text size="sm" c="dimmed">
+                            本次用时
+                        </Text>
+                        <Text
+                            size="48px"
+                            fw={700}
+                            c="blue"
+                            style={{ fontVariantNumeric: "tabular-nums" }}
+                        >
+                            {IsRecording ? FormatTime(ElapsedSeconds) : "准备开始"}
+                        </Text>
+                    </Stack>
+
+                    <Group justify="center">
                         <Button
                             size="lg"
-                            radius="xl"
-                            color={IsPaused ? "green" : "yellow"}
+                            color={IsRecording ? "red" : "blue"}
+                            variant={IsRecording ? "light" : "filled"}
+                            miw={120}
                             leftSection={
-                                IsPaused ? (
-                                    <IconPlayerPlay style={{ width: rem(20), height: rem(20) }} />
+                                IsRecording ? (
+                                    <IconPlayerStop style={{ width: rem(20), height: rem(20) }} />
                                 ) : (
-                                    <IconPlayerPause style={{ width: rem(20), height: rem(20) }} />
+                                    <IconPlayerPlay style={{ width: rem(20), height: rem(20) }} />
                                 )
                             }
-                            onClick={HandlePauseResume}
+                            onClick={HandleStartStop}
                         >
-                            {IsPaused ? "继续" : "暂停"}
+                            {IsRecording ? "结束" : "开始"}
                         </Button>
-                    )}
-                </Group>
+                        {IsRecording && (
+                            <Button
+                                size="lg"
+                                color={IsPaused ? "green" : "yellow"}
+                                variant="light"
+                                miw={120}
+                                leftSection={
+                                    IsPaused ? (
+                                        <IconPlayerPlay style={{ width: rem(20), height: rem(20) }} />
+                                    ) : (
+                                        <IconPlayerPause style={{ width: rem(20), height: rem(20) }} />
+                                    )
+                                }
+                                onClick={HandlePauseResume}
+                            >
+                                {IsPaused ? "继续" : "暂停"}
+                            </Button>
+                        )}
+                    </Group>
 
-                <Textarea
-                    label="备注（可选）"
-                    placeholder="记录一些想法..."
-                    minRows={3}
-                    value={notes}
-                    onChange={(e) => setNotes(e.currentTarget.value)}
-                    style={{ width: "100%", maxWidth: 400 }}
-                />
-            </Stack>
-        </Paper>
+                    <Textarea
+                        label="备注（可选）"
+                        placeholder="记录一些想法..."
+                        description="备注会和本次记录一起保存。"
+                        minRows={3}
+                        value={notes}
+                        onChange={(e) => setNotes(e.currentTarget.value)}
+                        style={{ width: "100%", maxWidth: 520 }}
+                    />
+                </Stack>
+            </Paper>
+        </Stack>
     );
 };

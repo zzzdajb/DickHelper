@@ -9,6 +9,7 @@ import {
     Notification,
     rem,
     Divider,
+    Badge,
 } from "@mantine/core";
 import { IconDownload, IconUpload, IconDatabase, IconInfoCircle } from "@tabler/icons-react";
 import { DatabaseService } from "../services/DatabaseService";
@@ -66,15 +67,25 @@ export const Settings = () => {
     };
 
     return (
-        <Stack gap="lg">
-            <Title order={3} c="blue">
-                设置
-            </Title>
+        <Stack gap="lg" maw={760} mx="auto">
+            <Stack gap={4}>
+                <Title order={3} c="blue">
+                    设置
+                </Title>
+                <Text size="sm" c="dimmed">
+                    管理数据导入导出，并查看应用信息。
+                </Text>
+            </Stack>
 
             <Paper shadow="sm" radius="md" p="lg" withBorder>
-                <Group gap="sm" mb="xs">
-                    <IconDatabase size={22} />
-                    <Title order={4}>数据管理</Title>
+                <Group justify="space-between" align="flex-start" mb="xs">
+                    <Group gap="sm">
+                        <IconDatabase size={22} />
+                        <Title order={4}>数据管理</Title>
+                    </Group>
+                    <Badge variant="light" color="blue">
+                        {records.length} 条记录
+                    </Badge>
                 </Group>
                 <Text size="sm" c="dimmed" mb="md">
                     导出或导入您的记录数据，支持新旧格式兼容
@@ -104,10 +115,6 @@ export const Settings = () => {
                     />
                 </Group>
 
-                <Text size="xs" c="dimmed" mt="sm">
-                    当前共 {records.length} 条记录
-                </Text>
-
                 {importMessage !== null && (
                     <Notification
                         color="blue"
@@ -129,17 +136,17 @@ export const Settings = () => {
 
                 <Stack gap={4}>
                     <Group justify="space-between">
-                        <Text size="sm">应用名称</Text>
+                        <Text size="sm" c="dimmed">应用名称</Text>
                         <Text size="sm" fw={500}>牛子小助手 (DickHelper)</Text>
                     </Group>
                     <Divider />
                     <Group justify="space-between">
-                        <Text size="sm">版本</Text>
+                        <Text size="sm" c="dimmed">版本</Text>
                         <Text size="sm" fw={500}>v2.0.0</Text>
                     </Group>
                     <Divider />
                     <Group justify="space-between">
-                        <Text size="sm">技术栈</Text>
+                        <Text size="sm" c="dimmed">技术栈</Text>
                         <Text size="sm" fw={500}>Electron + React + Mantine</Text>
                     </Group>
                 </Stack>

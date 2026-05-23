@@ -41,14 +41,19 @@ export const HistoryList = () => {
     }
 
     return (
-        <Stack gap="md">
+        <Stack gap="lg" maw={760} mx="auto">
             <Group justify="space-between" align="center">
-                <Title order={3} c="blue">
-                    历史记录
-                </Title>
+                <Stack gap={4}>
+                    <Title order={3} c="blue">
+                        历史
+                    </Title>
+                    <Text size="sm" c="dimmed">
+                        查看、删除或清空已经保存的记录。
+                    </Text>
+                </Stack>
                 {records.length > 0 && (
                     <ActionIcon
-                        variant="light"
+                        variant="subtle"
                         color="red"
                         size="lg"
                         onClick={() => setDeleteModalOpen(true)}
@@ -61,7 +66,7 @@ export const HistoryList = () => {
 
             {records.length === 0 ? (
                 <Paper shadow="sm" radius="md" p="xl" withBorder>
-                    <Text ta="center" c="dimmed" size="lg">
+                    <Text ta="center" fw={600} size="lg">
                         暂无记录
                     </Text>
                     <Text ta="center" c="dimmed" size="sm" mt="xs">
@@ -72,12 +77,12 @@ export const HistoryList = () => {
                 <Stack gap="sm">
                     {records.map((record: IRecord) => (
                         <Paper key={record.Id} shadow="xs" radius="md" p="md" withBorder>
-                            <Group justify="space-between" align="center" wrap="nowrap">
-                                <Stack gap={4} style={{ flex: 1 }}>
-                                    <Text size="sm" fw={600}>
-                                        {record.EndTime.toLocaleString()}
-                                    </Text>
-                                    <Group gap="xs">
+                            <Group justify="space-between" align="flex-start" wrap="nowrap">
+                                <Stack gap={6} style={{ flex: 1 }}>
+                                    <Group gap="xs" wrap="wrap">
+                                        <Text size="sm" fw={600}>
+                                            {record.EndTime.toLocaleString()}
+                                        </Text>
                                         <Badge
                                             variant="light"
                                             color="blue"
@@ -85,18 +90,17 @@ export const HistoryList = () => {
                                         >
                                             {FormatDuration(record.Duration)}
                                         </Badge>
-                                        {record.Notes && (
-                                            <Text size="sm" c="dimmed" lineClamp={1}>
-                                                {record.Notes}
-                                            </Text>
-                                        )}
                                     </Group>
+                                    <Text size="sm" c="dimmed" lineClamp={2}>
+                                        {record.Notes || "无备注"}
+                                    </Text>
                                 </Stack>
                                 <ActionIcon
-                                    variant="light"
+                                    variant="subtle"
                                     color="red"
                                     onClick={() => HandleDeleteRecord(record.Id)}
                                     title="删除"
+                                    aria-label="删除记录"
                                 >
                                     <IconTrash size={18} />
                                 </ActionIcon>

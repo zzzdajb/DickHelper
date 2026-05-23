@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
-import { Paper, Title, SimpleGrid, Stack, Text, Group, Box, Tooltip } from "@mantine/core";
+import { useState, useEffect, type ReactNode } from "react";
+import { Paper, Title, SimpleGrid, Stack, Text, Group, Box, Tooltip, ThemeIcon } from "@mantine/core";
+import { IconChartBar, IconClock, IconDroplet, IconHistory } from "@tabler/icons-react";
 import { DatabaseService } from "../services/DatabaseService";
 import type { IStats, IDailyCount } from "../types/IRecord";
 
@@ -107,27 +108,66 @@ export const StatsChart = () => {
 
     const heatmapData = GenerateHeatmapData();
     const monthLabels = GetMonthLabels();
+    const hasRecords: boolean = stats.TotalCount > 0;
 
     return (
-        <Stack gap="lg">
-            <Title order={3} c="blue">
-                统计数据
-            </Title>
+        <Stack gap="lg" maw={860} mx="auto">
+            <Stack gap={4}>
+                <Title order={3} c="blue">
+                    统计
+                </Title>
+                <Text size="sm" c="dimmed">
+                    查看累计数据和最近 4 周的记录分布。
+                </Text>
+            </Stack>
 
-            <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="md">
-                <StatCard title="总次数" value={stats.TotalCount} />
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md">
+                <StatCard
+                    title="总次数"
+                    value={stats.TotalCount}
+                    description="全部已保存记录"
+                    icon={<IconHistory size={18} />}
+                    color="blue"
+                />
                 <StatCard
                     title="平均时长"
                     value={`${stats.AverageDuration.toFixed(1)} 分钟`}
+                    description="按全部记录计算"
+                    icon={<IconClock size={18} />}
+                    color="cyan"
                 />
-                <StatCard title="本周次数" value={stats.FrequencyPerWeek} />
-                <StatCard title="本月次数" value={stats.FrequencyPerMonth} />
+                <StatCard
+                    title="本周次数"
+                    value={stats.FrequencyPerWeek}
+                    description="最近 7 天"
+                    icon={<IconChartBar size={18} />}
+                    color="green"
+                />
+                <StatCard
+                    title="本月次数"
+                    value={stats.FrequencyPerMonth}
+                    description="最近 30 天"
+                    icon={<IconDroplet size={18} />}
+                    color="violet"
+                />
             </SimpleGrid>
 
             <Paper shadow="sm" radius="md" p="lg" withBorder>
-                <Title order={4} ta="center" mb="md">
-                    发射日历
-                </Title>
+                <Group justify="space-between" align="flex-start" mb="md">
+                    <Stack gap={2}>
+                        <Title order={4}>
+                            发射日历
+                        </Title>
+                        <Text size="sm" c="dimmed">
+                            颜色越深，代表当天记录次数越多。
+                        </Text>
+                    </Stack>
+                    {!hasRecords && (
+                        <Text size="sm" c="dimmed">
+                            暂无可统计数据
+                        </Text>
+                    )}
+                </Group>
 
                 <Group gap="xs" wrap="nowrap" align="flex-start" justify="center">
                     <Stack gap={0} pt={24}>
@@ -180,12 +220,34 @@ export const StatsChart = () => {
     );
 };
 
-const StatCard = ({ title, value }: { title: string; value: string | number }) => (
+const StatCard = ({
+    title,
+    value,
+    description,
+    icon,
+    color,
+}: {
+    title: string;
+    value: string | number;
+    description: string;
+    icon: ReactNode;
+    color: string;
+}) => (
     <Paper shadow="sm" radius="md" p="md" withBorder>
-        <Text size="xs" c="dimmed" tt="uppercase" fw={500} mb={6}>
-            {title}
-        </Text>
-        <Text size="28px" fw={700} c="blue">
+        <Group justify="space-between" align="flex-start" mb="sm" wrap="nowrap">
+            <Stack gap={2}>
+                <Text size="xs" c="dimmed" tt="uppercase" fw={500}>
+                    {title}
+                </Text>
+                <Text size="xs" c="dimmed">
+                    {description}
+                </Text>
+            </Stack>
+            <ThemeIcon variant="light" color={color} size="md">
+                {icon}
+            </ThemeIcon>
+        </Group>
+        <Text size="26px" fw={700} c="blue">
             {value}
         </Text>
     </Paper>
