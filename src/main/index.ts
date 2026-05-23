@@ -10,7 +10,7 @@ const IS_DEV: boolean = process.env.ELECTRON_RENDERER_URL !== undefined;
 
 // 创建窗口时不显示，等 ready-to-show 再显示，避免白屏闪烁
 function CreateWindow(): void {
-    const preloadPath: string = path.join(__dirname, "../preload/index.js");
+    const preloadPath: string = path.join(__dirname, "../preload/index.cjs");
     console.log("[Main] Creating window, preload path:", preloadPath);
     console.log("[Main] __dirname:", __dirname);
     console.log("[Main] Dev mode:", IS_DEV);
