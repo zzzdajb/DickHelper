@@ -23,3 +23,8 @@ out
 *.njsproj
 *.sln
 *.sw?
+
+# 忽略SKILLS文件（部分）
+.agents
+.claude
+.codex
