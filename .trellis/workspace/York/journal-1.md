@@ -74,3 +74,39 @@ High-confidence fixes: (1) electron-vite preload MUST use format:'cjs' — ESM .
 ### Next Steps
 
 - None - task complete
+
+
+## Session 3: Fix Electron startup white screen
+
+**Date**: 2026-05-23
+**Task**: Fix Electron startup white screen
+**Branch**: `main`
+
+### Summary
+
+Fixed Electron startup white screen by correcting renderer electronAPI access and aligning BrowserWindow preload path with the CommonJS preload build output. Documented both contracts in frontend and backend Trellis specs.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `0bdd132` | (see git log) |
+| `fdb120c` | (see git log) |
+| `ba04a55` | (see git log) |
+| `18b95bd` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
