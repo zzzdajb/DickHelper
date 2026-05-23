@@ -1,4 +1,5 @@
-import Database from "better-sqlite3";
+import initSqlJs, { type Database, type SqlJsStatic, type BindParams, type ParamsObject } from "sql.js";
+import fs from "node:fs";
 import path from "node:path";
 import { app } from "electron";
 import { randomUUID } from "node:crypto";
@@ -26,16 +27,26 @@ interface IImportResult {
 const TABLE_NAME = "Records";
 
 export class DatabaseService {
-    private readonly _db: Database.Database;
+    private readonly _db: Database;
+    private readonly _dbPath: string;
 
-    public constructor() {
-        const dbPath: string = path.join(app.getPath("userData"), "dickhelper.db");
-        this._db = new Database(dbPath);
+    private constructor(db: Database, dbPath: string) {
+        this._db = db;
+        this._dbPath = dbPath;
+    }
 
-        // WAL 模式提高并发读性能
-        this._db.pragma("journal_mode = WAL");
-
-        this._db.exec(`
+    // Async factory — replaces sync constructor
+    public static async create(): Promise<DatabaseService> {
+        const SQL: SqlJsStatic = await initSqlJs();
+        const dbPath = path.join(app.getPath("userData"), "dickhelper.db");
+        let db: Database;
+        if (fs.existsSync(dbPath)) {
+            const buffer = fs.readFileSync(dbPath);
+            db = new SQL.Database(buffer);
+        } else {
+            db = new SQL.Database();
+        }
+        db.run(`
             CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
                 Id        TEXT PRIMARY KEY,
                 StartTime TEXT NOT NULL,
@@ -44,13 +55,47 @@ export class DatabaseService {
                 Notes     TEXT
             )
         `);
+        return new DatabaseService(db, dbPath);
+    }
+
+    private _save(): void {
+        const data = this._db.export();
+        fs.writeFileSync(this._dbPath, data);
+    }
+
+    /** Execute a SELECT query and return all rows as objects */
+    private _queryAll(sql: string, params?: BindParams): ParamsObject[] {
+        const stmt = this._db.prepare(sql);
+        if (params !== undefined) {
+            stmt.bind(params);
+        }
+        const rows: ParamsObject[] = [];
+        while (stmt.step()) {
+            rows.push(stmt.getAsObject());
+        }
+        stmt.free();
+        return rows;
+    }
+
+    /** Execute a SELECT query and return the first row as an object, or undefined */
+    private _queryOne(sql: string, params?: BindParams): ParamsObject | undefined {
+        const stmt = this._db.prepare(sql);
+        if (params !== undefined) {
+            stmt.bind(params);
+        }
+        let row: ParamsObject | undefined;
+        if (stmt.step()) {
+            row = stmt.getAsObject();
+        }
+        stmt.free();
+        return row;
     }
 
     public GetRecords(): IDbRecord[] {
-        const stmt = this._db.prepare(
+        const rows = this._queryAll(
             `SELECT Id, StartTime, EndTime, Duration, Notes FROM ${TABLE_NAME} ORDER BY EndTime DESC`
         );
-        return stmt.all() as IDbRecord[];
+        return rows as unknown as IDbRecord[];
     }
 
     public SaveRecord(startTime: Date, endTime: Date, duration: number, notes?: string): IDbRecord {
@@ -58,18 +103,26 @@ export class DatabaseService {
         const stmt = this._db.prepare(
             `INSERT INTO ${TABLE_NAME} (Id, StartTime, EndTime, Duration, Notes) VALUES (?, ?, ?, ?, ?)`
         );
-        stmt.run(id, startTime.toISOString(), endTime.toISOString(), duration, notes ?? null);
+        stmt.run([id, startTime.toISOString(), endTime.toISOString(), duration, notes ?? null]);
+        stmt.free();
+        this._save();
         return { Id: id, StartTime: startTime.toISOString(), EndTime: endTime.toISOString(), Duration: duration, Notes: notes ?? null };
     }
 
     public DeleteRecord(id: string): boolean {
         const stmt = this._db.prepare(`DELETE FROM ${TABLE_NAME} WHERE Id = ?`);
-        const result = stmt.run(id);
-        return result.changes > 0;
+        stmt.run([id]);
+        const changes = this._db.getRowsModified();
+        stmt.free();
+        this._save();
+        return changes > 0;
     }
 
     public ClearAll(): void {
-        this._db.prepare(`DELETE FROM ${TABLE_NAME}`).run();
+        const stmt = this._db.prepare(`DELETE FROM ${TABLE_NAME}`);
+        stmt.run();
+        stmt.free();
+        this._save();
     }
 
     public GetStats(): {
@@ -86,39 +139,44 @@ export class DatabaseService {
         // 本月开始
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-        const totalRow = this._db
-            .prepare(`SELECT COUNT(*) as count, AVG(Duration) as avgDur FROM ${TABLE_NAME}`)
-            .get() as { count: number; avgDur: number | null };
+        const totalRow = this._queryOne(
+            `SELECT COUNT(*) as count, AVG(Duration) as avgDur FROM ${TABLE_NAME}`
+        );
 
-        const weekRow = this._db
-            .prepare(`SELECT COUNT(*) as count FROM ${TABLE_NAME} WHERE EndTime >= ?`)
-            .get(oneWeekAgo.toISOString()) as { count: number };
+        const weekRow = this._queryOne(
+            `SELECT COUNT(*) as count FROM ${TABLE_NAME} WHERE EndTime >= ?`,
+            [oneWeekAgo.toISOString()]
+        );
 
-        const monthRow = this._db
-            .prepare(`SELECT COUNT(*) as count FROM ${TABLE_NAME} WHERE EndTime >= ?`)
-            .get(monthStart.toISOString()) as { count: number };
+        const monthRow = this._queryOne(
+            `SELECT COUNT(*) as count FROM ${TABLE_NAME} WHERE EndTime >= ?`,
+            [monthStart.toISOString()]
+        );
 
         return {
-            TotalCount: totalRow.count,
-            AverageDuration: totalRow.avgDur ?? 0,
-            FrequencyPerWeek: weekRow.count,
-            FrequencyPerMonth: monthRow.count,
+            TotalCount: (totalRow?.count as number) ?? 0,
+            AverageDuration: (totalRow?.avgDur as number) ?? 0,
+            FrequencyPerWeek: (weekRow?.count as number) ?? 0,
+            FrequencyPerMonth: (monthRow?.count as number) ?? 0,
         };
     }
 
     public GetDailyCounts(startDate: string, endDate: string): IDailyCount[] {
-        const stmt = this._db.prepare(`
+        const rows = this._queryAll(`
             SELECT date(EndTime) as Date, COUNT(*) as Count
             FROM ${TABLE_NAME}
             WHERE date(EndTime) >= ? AND date(EndTime) <= ?
             GROUP BY date(EndTime)
             ORDER BY Date
-        `);
-        return stmt.all(startDate, endDate) as IDailyCount[];
+        `, [startDate, endDate]);
+        return rows as unknown as IDailyCount[];
     }
 
     public RecordExists(id: string): boolean {
-        const row = this._db.prepare(`SELECT 1 FROM ${TABLE_NAME} WHERE Id = ?`).get(id);
+        const row = this._queryOne(
+            `SELECT 1 FROM ${TABLE_NAME} WHERE Id = ?`,
+            [id]
+        );
         return row !== undefined;
     }
 
@@ -126,7 +184,7 @@ export class DatabaseService {
     public ImportRecords(
         records: { Id: string; StartTime?: string; EndTime?: string; Duration: number; Notes?: string }[]
     ): IImportResult {
-        const insertStmt = this._db.prepare(
+        const stmt = this._db.prepare(
             `INSERT INTO ${TABLE_NAME} (Id, StartTime, EndTime, Duration, Notes) VALUES (?, ?, ?, ?, ?)`
         );
 
@@ -167,15 +225,14 @@ export class DatabaseService {
                 finalStartTime = new Date(endDate.getTime() - record.Duration * 60 * 1000);
             }
 
-            insertStmt.run(
-                record.Id,
-                finalStartTime.toISOString(),
-                endDate.toISOString(),
-                record.Duration,
-                record.Notes ?? null
-            );
+            stmt.bind([record.Id, finalStartTime.toISOString(), endDate.toISOString(), record.Duration, record.Notes ?? null]);
+            stmt.step();
+            stmt.reset();
             imported.push(record.Id);
         }
+
+        stmt.free();
+        this._save();
 
         // 计算跳过的重复记录
         const totalValid = records.length - rejected;

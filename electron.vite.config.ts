@@ -5,9 +5,7 @@ export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
     build: {
-      rollupOptions: {
-        external: ["better-sqlite3"],
-      },
+      rollupOptions: {},
     },
   },
   preload: {

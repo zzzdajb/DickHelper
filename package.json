@@ -7,24 +7,22 @@
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
-    "preview": "electron-vite preview",
-    "postinstall": "electron-rebuild"
+    "preview": "electron-vite preview"
   },
   "dependencies": {
-    "better-sqlite3": "^11.7.0",
     "@mantine/core": "^7.17.0",
     "@mantine/hooks": "^7.17.0",
     "@tabler/icons-react": "^3.31.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "sql.js": "^1.14.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
-    "@types/better-sqlite3": "^7.6.12",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
+    "@types/sql.js": "^1.4.11",
     "@vitejs/plugin-react": "^4.3.4",
-    "@electron/rebuild": "^3.7.0",
     "electron": "^35.0.0",
     "electron-vite": "^3.0.0",
     "eslint": "^9.19.0",

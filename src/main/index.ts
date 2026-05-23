@@ -161,9 +161,9 @@ function RegisterIpcHandlers(): void {
     });
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
     console.log("[Main] App ready");
-    databaseService = new DatabaseService();
+    databaseService = await DatabaseService.create();
     console.log("[Main] DatabaseService initialized");
     RegisterIpcHandlers();
     CreateWindow();
