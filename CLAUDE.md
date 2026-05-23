@@ -94,14 +94,51 @@ GitHub Actions 工作流 `.github/workflows/release.yml`：
 
 ## 编码规范
 
-- **命名风格**：C# / .NET 风格 PascalCase
-  - 组件：`RecordForm`、`StatsChart`
-  - 服务方法：`DatabaseService.GetRecords()`
-  - Hooks：`useRecords`、`useTimer`（React 惯例）
-  - 接口：`I` 前缀（`IRecord`、`IStats`）
-- **TypeScript**：strict 模式启用全部严格检查（`noUnusedLocals`、`noUncheckedIndexedAccess` 等）
-- **注释语言**：代码注释使用中文，文档使用中英双语
-- **架构约束**：Main 进程代码不得导入 Renderer（反之亦然），通过 IPC 通信
+### 命名风格（C# / .NET 风格）
+
+| 类别 | 风格 | 示例 |
+|------|------|------|
+| 函数 / 方法 | PascalCase | `GetRecords()`、`HandleStartStop()`、`FormatTime()` |
+| 组件 | PascalCase 箭头函数 | `export const RecordForm = () => {` |
+| 局部变量 | 工具函数中 PascalCase | `const preloadPath: string = ...` |
+| React 状态 | camelCase（React 惯例） | `const [notes, setNotes] = useState(...)` |
+| Hook | camelCase `use` 前缀 | `useTimer`、`useRecords` |
+| Hook 返回值 | PascalCase | `IsRecording`、`Start`、`Pause` |
+| 接口 | `I` 前缀 + PascalCase | `IRecord`、`IStats`、`IImportResult` |
+| 接口字段 | PascalCase + `readonly` | `readonly StartTime: Date` |
+| 常量 | UPPER_SNAKE | `const IS_DEV: boolean = ...` |
+
+### 类型注解
+
+所有变量、参数、返回值必须显式标注类型，不依赖推断：
+
+```typescript
+// 正确
+const statusLabel: string = "未开始";
+function CreateWindow(): void { ... }
+public static async GetRecords(): Promise<IRecord[]> { ... }
+
+// 错误 — 缺少类型注解
+const statusLabel = "未开始";
+function CreateWindow() { ... }
+```
+
+### 禁止事项
+
+- **禁止 `any`**：用 `unknown` + 类型守卫代替（参考 `ImportFromJson` 中 `rawData: unknown` 的处理）
+- **禁止滥用抽象**：不要引入 DI 容器、中间件链、事件总线等。直接调用优先（组件直接调 `DatabaseService` 静态方法）
+- **禁止过度解耦**：不要为了"可扩展"拆出只用一次的接口/工厂/策略。三层架构（Main/Preload/Renderer）已经够了
+- **禁止过度设计**：4 个视图用 `useState` 切换，不需要 React Router；数据用 SQLite 本地状态，不需要 Redux/Zustand
+- **禁止 default export**：全部使用 named export
+- **禁止隐式 falsy 检查**：用 `!== null`、`!== undefined` 代替 `if (!value)`
+
+### 代码组织
+
+- 注释语言：中文，简洁说明"为什么"
+- 组件风格：箭头函数 + named export，不用 `function` 声明
+- 服务层：静态类方法（`DatabaseService.GetRecords()`），不实例化
+- 架构约束：Main 进程代码不得导入 Renderer（反之亦然），通过 IPC 通信
+- TypeScript：strict 模式启用全部严格检查（`noUnusedLocals`、`noUncheckedIndexedAccess` 等）
 
 ## AI 使用指引
 
