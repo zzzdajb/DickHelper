@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 4
+- **Total Sessions**: 5
 - **Last Active**: 2026-05-23
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~145 | Active |
+| `journal-1.md` | ~180 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 5 | 2026-05-23 | 修复热力图时区、release asset 扩展名、切换 NSIS、删除冗余 CI、同步文档 | `327b536`, `2f7e089`, `34dd596` | `main` |
 | 4 | 2026-05-23 | Electron前端UI美化与导入导出功能迁移 | `37ac507` | `main` |
 | 3 | 2026-05-23 | Fix Electron startup white screen | `0bdd132`, `fdb120c`, `ba04a55`, `18b95bd` | `main` |
 | 2 | 2026-05-23 | Debug session: preload CJS fix, ErrorBoundary fix, RecordForm crash unresolved | `6091059`, `618e4ec`, `ddea20b`, `7e25705` | `main` |

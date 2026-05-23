@@ -143,3 +143,38 @@ Fixed Electron startup white screen by correcting renderer electronAPI access an
 ### Next Steps
 
 - None - task complete
+
+
+## Session 5: 修复热力图时区、release asset 扩展名、切换 NSIS、删除冗余 CI、同步文档
+
+**Date**: 2026-05-23
+**Task**: 修复热力图时区、release asset 扩展名、切换 NSIS、删除冗余 CI、同步文档
+**Branch**: `main`
+
+### Summary
+
+修复四个问题: (1) 热力图 UTC/本地日期 mismatch 导致非 UTC 时区始终白色 — 改为 JS 端本地日期分组 (2) release asset 文件名漏点扩展名 — 补上 . (3) Windows 打包从 portable 切换到 NSIS 安装器 (4) 删除无用的 CI workflow。同步更新 database-guidelines/ci-github-actions/backend-index/frontend-index 四个 spec 文件，添加 Git 中文提交规范。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `327b536` | (see git log) |
+| `2f7e089` | (see git log) |
+| `34dd596` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
