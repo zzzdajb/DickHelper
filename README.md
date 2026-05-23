@@ -48,11 +48,6 @@ DickHelper v2 has been completely rewritten as an **Electron desktop app** with 
 
 - **Node.js** >= 18
 - **npm** >= 9
-- **Windows**: 需要 [windows-build-tools](https://github.com/felixrieseberg/windows-build-tools) 或 Visual Studio Build Tools（用于编译 better-sqlite3 原生模块）
-- **macOS**: Xcode Command Line Tools (`xcode-select --install`)
-- **Linux**: `build-essential` + `python3`
-
-> **Windows**: better-sqlite3 requires native module compilation. Install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022) with "Desktop development with C++" workload, or run `npm install --global windows-build-tools` as administrator.
 
 ### 启动开发环境 | Start Development
 
@@ -90,15 +85,6 @@ npm run build
 
 ### 常见问题 | Troubleshooting
 
-**`better-sqlite3` 安装失败 | Installation fails**
-
-```bash
-# 手动重编译原生模块 | Manually rebuild native modules
-npx electron-rebuild
-```
-
-`npm install` 已配置 `postinstall` 脚本自动执行此步骤。如果仍然失败，请确保安装了 Visual Studio Build Tools (Windows) 或 Xcode Command Line Tools (macOS)。
-
 **窗口白屏 | White screen on launch**
 
 开发模式下确保 Vite dev server 已启动。生产模式下检查 `out/renderer/index.html` 是否存在。
@@ -115,7 +101,7 @@ npx electron-rebuild
 | 构建 | Build | electron-vite + Vite 6 | — |
 | 组件库 | UI Library | Mantine 7 | — |
 | 图标 | Icons | @tabler/icons-react | — |
-| 数据库 | Database | SQLite via better-sqlite3 | — |
+| 数据库 | Database | SQLite via sql.js (WASM) | — |
 | 图表 | Charts | 纯 CSS 热力图 | Pure CSS heatmap |
 
 ## 数据迁移 | Data Migration
