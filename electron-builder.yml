@@ -1,0 +1,12 @@
+appId: com.york.dickhelper
+productName: DickHelper
+directories:
+  output: dist
+files:
+  - out/**/*
+win:
+  target: portable
+mac:
+  target: dmg
+linux:
+  target: AppImage

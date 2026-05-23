@@ -66,53 +66,30 @@ jobs:
       - name: Build Electron app
         run: npm run build
 
-      - name: Assemble portable package
+      - name: Package with electron-builder
         shell: bash
         run: |
           set -euo pipefail
-          STAGING="dist/dickhelper"
-          mkdir -p "$STAGING"
+          npx electron-builder --publish=never
 
-          # Copy built app
-          cp -r out/ "$STAGING/"
-
-          # Copy only the runtime dependency (sql.js WASM — all other deps are bundled by Vite)
-          mkdir -p "$STAGING/node_modules"
-          cp -r node_modules/sql.js/ "$STAGING/node_modules/"
-
-          # Copy Electron runtime
-          mkdir -p "$STAGING/electron"
-          cp -r node_modules/electron/dist/* "$STAGING/electron/"
-
-          # Copy package.json (Electron reads "main" from it)
-          cp package.json "$STAGING/"
-
-          # Create launcher script
+          # Collect output artifacts into release-assets
+          mkdir -p release-assets
+          ASSET=""
           if [[ "${{ matrix.os-short }}" == "windows" ]]; then
-            printf '@start "" ".\\electron\\electron.exe" .\r\n' > "$STAGING/start.bat"
+            ASSET=$(ls dist/DickHelper*.exe | head -1)
           elif [[ "${{ matrix.os-short }}" == "macos" ]]; then
-            printf '#!/bin/bash\n"./electron/Electron.app/Contents/MacOS/Electron" .\n' > "$STAGING/start.command"
-            chmod +x "$STAGING/start.command"
+            ASSET=$(ls dist/DickHelper*.dmg | head -1)
           else
-            printf '#!/bin/bash\n"./electron/electron" .\n' > "$STAGING/start.sh"
-            chmod +x "$STAGING/start.sh"
+            ASSET=$(ls dist/DickHelper*.AppImage | head -1)
           fi
-
-          echo "Package assembled: $(du -sh "$STAGING" | cut -f1)"
-
-      - name: Compress portable package
-        shell: pwsh
-        run: |
-          $assetName = "dickhelper-${{ env.RELEASE_TAG }}-${{ matrix.os-short }}.zip"
-          New-Item -ItemType Directory -Force release-assets
-          Compress-Archive -Path dist/dickhelper/* -DestinationPath "release-assets/$assetName" -Force
-          Write-Host "Archive: $assetName ($((Get-Item "release-assets/$assetName").Length / 1MB) MB)"
+          cp "$ASSET" "release-assets/dickhelper-${{ env.RELEASE_TAG }}-${{ matrix.os-short }}${ASSET##*.}"
+          echo "Release asset: $(ls -lh release-assets/)"
 
       - name: Upload release asset artifact
         uses: actions/upload-artifact@v4
         with:
           name: release-${{ env.RELEASE_TAG }}-${{ matrix.os-short }}
-          path: release-assets/*.zip
+          path: release-assets/*
           if-no-files-found: error
           retention-days: 7
 
@@ -142,7 +119,7 @@ jobs:
           set -euo pipefail
           shopt -s nullglob
 
-          assets=(release-assets/*.zip)
+          assets=(release-assets/dickhelper*)
           echo "Found ${#assets[@]} release asset(s):"
           for a in "${assets[@]}"; do
             echo "  - $a ($(du -h "$a" | cut -f1))"
