@@ -1,6 +1,6 @@
-![DickHelper](https://socialify.git.ci/zzzdajb/DickHelper/image?custom_description=An+easy-to-use+masturbation+management+recording+tool&description=1&forks=1&language=1&logo=https%3A%2F%2Fs2.loli.net%2F2025%2F02%2F21%2FkI3Ebc5hdGTSlLp.png&name=1&owner=1&stargazers=1&theme=Light)
+![DickHelper](https://socialify.git.ci/zzzdajb/DickHelper/image?description=1&forks=1&name=1&owner=1&pattern=Plus&stargazers=1&theme=Light)
 
-# 牛子小助手 (DickHelper) v2
+# 牛子小助手 (DickHelper)
 
 [![Electron](https://img.shields.io/badge/Electron-35-47848F.svg)](https://www.electronjs.org/)
 [![React](https://img.shields.io/badge/React-19.1-blue.svg)](https://reactjs.org/)
