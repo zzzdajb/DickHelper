@@ -161,15 +161,25 @@ export class DatabaseService {
         };
     }
 
-    public GetDailyCounts(startDate: string, endDate: string): IDailyCount[] {
-        const rows = this._queryAll(`
-            SELECT date(EndTime) as Date, COUNT(*) as Count
-            FROM ${TABLE_NAME}
-            WHERE date(EndTime) >= ? AND date(EndTime) <= ?
-            GROUP BY date(EndTime)
-            ORDER BY Date
-        `, [startDate, endDate]);
-        return rows as unknown as IDailyCount[];
+    public GetDailyCounts(startTimestamp: number, endTimestamp: number): IDailyCount[] {
+        const rows = this._queryAll(
+            `SELECT EndTime FROM ${TABLE_NAME} WHERE EndTime >= ? AND EndTime <= ?`,
+            [new Date(startTimestamp).toISOString(), new Date(endTimestamp).toISOString()]
+        );
+
+        const countMap = new Map<string, number>();
+        for (const row of rows) {
+            const d = new Date((row as { EndTime: string }).EndTime);
+            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+            countMap.set(key, (countMap.get(key) ?? 0) + 1);
+        }
+
+        const result: IDailyCount[] = [];
+        for (const [date, count] of countMap) {
+            result.push({ Date: date, Count: count });
+        }
+        result.sort((a, b) => a.Date.localeCompare(b.Date));
+        return result;
     }
 
     public RecordExists(id: string): boolean {

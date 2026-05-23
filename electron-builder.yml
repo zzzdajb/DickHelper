@@ -5,7 +5,7 @@ directories:
 files:
   - out/**/*
 win:
-  target: portable
+  target: nsis
 mac:
   target: dmg
 linux:

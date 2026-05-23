@@ -10,8 +10,8 @@ const electronAPI = {
     DeleteRecord: (id: string): Promise<boolean> => ipcRenderer.invoke("records:delete", id),
     ClearAll: (): Promise<void> => ipcRenderer.invoke("records:clear-all"),
     GetStats: (): Promise<unknown> => ipcRenderer.invoke("records:get-stats"),
-    GetDailyCounts: (startDate: string, endDate: string): Promise<unknown[]> =>
-        ipcRenderer.invoke("records:get-daily-counts", startDate, endDate),
+    GetDailyCounts: (startTimestamp: number, endTimestamp: number): Promise<unknown[]> =>
+        ipcRenderer.invoke("records:get-daily-counts", startTimestamp, endTimestamp),
     ImportRecords: (records: unknown[]): Promise<unknown> => ipcRenderer.invoke("records:import", records),
     OnRecordsUpdated: (callback: () => void): (() => void) => {
         const listener = (): void => callback();

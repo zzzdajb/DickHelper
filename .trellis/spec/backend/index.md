@@ -7,7 +7,7 @@
 ## Overview
 
 The Electron main process is the backend layer:
-- Holds the SQLite database connection (better-sqlite3)
+- Holds the SQLite database connection (sql.js, WASM)
 - Creates and manages the BrowserWindow and system Tray
 - Registers IPC handlers for all data operations
 - Sends update notifications to the renderer process after mutations
@@ -32,7 +32,7 @@ The Electron main process is the backend layer:
 | Component | Choice |
 |-----------|--------|
 | Runtime | Electron 35 |
-| Database | SQLite via better-sqlite3 (synchronous) |
+| Database | SQLite via sql.js (WASM, in-memory + periodic write) |
 | IPC | ipcMain.handle / ipcRenderer.invoke |
 | Security | contextIsolation + no nodeIntegration |
 | Data format | ISO 8601 TEXT for dates |

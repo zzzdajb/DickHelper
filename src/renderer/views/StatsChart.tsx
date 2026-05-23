@@ -67,7 +67,10 @@ export const StatsChart = () => {
             for (let day = 0; day < DAYS_IN_WEEK; day++) {
                 const cellDate = new Date(startDate);
                 cellDate.setDate(startDate.getDate() + week * DAYS_IN_WEEK + day);
-                const dateKey: string = cellDate.toISOString().slice(0, 10);
+                const y = cellDate.getFullYear();
+                const m = String(cellDate.getMonth() + 1).padStart(2, "0");
+                const d = String(cellDate.getDate()).padStart(2, "0");
+                const dateKey = `${y}-${m}-${d}`;
                 weekData.push({
                     date: cellDate,
                     count: dailyCounts.get(dateKey) ?? 0,

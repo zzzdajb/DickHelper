@@ -35,8 +35,8 @@ This directory contains guidelines for the new Electron-based DickHelper rewrite
 | Language | TypeScript 5.9 (strict, C# style) |
 | Build | Vite 6.3 + electron-vite |
 | UI Library | Mantine 7 |
-| Database | SQLite via better-sqlite3 |
-| Charts | TBD (evaluate when needed) |
+| Database | SQLite via sql.js (WASM) |
+| Charts | Pure CSS heatmap (StatsChart.tsx) |
 | State | SQLite + React state (no localStorage) |
 | Routing | useState view switching (no Router) — see App Shell spec |
 

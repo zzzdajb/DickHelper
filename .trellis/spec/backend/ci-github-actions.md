@@ -110,6 +110,89 @@ publish-release:
 
 ---
 
+---
+## Scenario: electron-builder packaging and asset naming
+
+### 1. Scope / Trigger
+
+Any release workflow that uses `electron-builder` to produce native executables and uploads them as release assets.
+
+### 2. Signatures
+
+```yaml
+# electron-builder.yml
+appId: com.york.dickhelper
+productName: DickHelper
+directories:
+  output: dist
+files:
+  - out/**/*
+win:
+  target: nsis        # NOT portable — NSIS installs once, launches fast
+mac:
+  target: dmg
+linux:
+  target: AppImage
+```
+
+### 3. Contracts
+
+- `npx electron-builder --publish=never` — build without publishing to auto-update channels
+- Windows output: `dist/DickHelper Setup X.X.X.exe` (NSIS installer)
+- macOS output: `dist/DickHelper-X.X.X.dmg`
+- Linux output: `dist/DickHelper-X.X.X.AppImage`
+- Asset naming: `dickhelper-$TAG-$PLATFORM.$EXT` (note the `.` before `${ASSET##*.}`)
+
+### 4. Asset Collection in Workflow
+
+```yaml
+- name: Package with electron-builder
+  shell: bash
+  run: |
+    set -euo pipefail
+    npx electron-builder --publish=never
+    mkdir -p release-assets
+    ASSET=""
+    if [[ "${{ matrix.os-short }}" == "windows" ]]; then
+      ASSET=$(ls dist/DickHelper*.exe | head -1)
+    elif [[ "${{ matrix.os-short }}" == "macos" ]]; then
+      ASSET=$(ls dist/DickHelper*.dmg | head -1)
+    else
+      ASSET=$(ls dist/DickHelper*.AppImage | head -1)
+    fi
+    cp "$ASSET" "release-assets/dickhelper-${{ env.RELEASE_TAG }}-${{ matrix.os-short }}.${ASSET##*.}"
+```
+
+### 5. Validation & Error Matrix
+
+| Condition | Error |
+|-----------|-------|
+| `files` only contains `out/**/*` | Electron runtime NOT bundled — app won't launch |
+| Using `portable` target on Windows | Single .exe extracts to temp dir on every launch — slow startup |
+| Missing `.` before `${ASSET##*.}` | Output file named `windows.exe` instead of `windows.exe` |
+| Multiple .exe files matched by glob | `head -1` picks first; may pick wrong file (unlikely with clean dist/) |
+
+### 6. Tests Required
+
+- Manual: Download each platform asset from release, install/run, verify app launches
+- Manual: Verify `npm run build` produces `out/` directory with main/preload/renderer
+
+### 7. Wrong vs Correct
+
+#### Wrong (missing dot)
+```bash
+cp "$ASSET" "release-assets/dickhelper-$TAG-$PLATFORM${ASSET##*.}"
+# Produces: dickhelper-v2.0.0-windowsexe  (no dot!)
+```
+
+#### Correct
+```bash
+cp "$ASSET" "release-assets/dickhelper-$TAG-$PLATFORM.${ASSET##*.}"
+# Produces: dickhelper-v2.0.0-windows.exe
+```
+
+---
+
 ## Convention: `gh` CLI in GitHub Actions
 
 **What**: Always use `--repo "$GH_REPO"` (or `${{ github.repository }}`) in `gh` commands within jobs that do NOT run `actions/checkout`.

@@ -57,10 +57,7 @@ export class DatabaseService {
     }
 
     public static async GetDailyCounts(startDate: Date, endDate: Date): Promise<IDailyCount[]> {
-        return GetApi().GetDailyCounts(
-            startDate.toISOString().slice(0, 10),
-            endDate.toISOString().slice(0, 10)
-        );
+        return GetApi().GetDailyCounts(startDate.getTime(), endDate.getTime());
     }
 
     /**

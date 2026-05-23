@@ -17,7 +17,7 @@ declare global {
             DeleteRecord: (id: string) => Promise<boolean>;
             ClearAll: () => Promise<void>;
             GetStats: () => Promise<IStats>;
-            GetDailyCounts: (startDate: string, endDate: string) => Promise<IDailyCount[]>;
+            GetDailyCounts: (startTimestamp: number, endTimestamp: number) => Promise<IDailyCount[]>;
             ImportRecords: (records: IImportRecord[]) => Promise<IImportResult>;
             OnRecordsUpdated: (callback: () => void) => () => void;
         };

@@ -82,7 +82,7 @@ jobs:
           else
             ASSET=$(ls dist/DickHelper*.AppImage | head -1)
           fi
-          cp "$ASSET" "release-assets/dickhelper-${{ env.RELEASE_TAG }}-${{ matrix.os-short }}${ASSET##*.}"
+          cp "$ASSET" "release-assets/dickhelper-${{ env.RELEASE_TAG }}-${{ matrix.os-short }}.${ASSET##*.}"
           echo "Release asset: $(ls -lh release-assets/)"
 
       - name: Upload release asset artifact

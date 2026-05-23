@@ -146,9 +146,9 @@ function RegisterIpcHandlers(): void {
     });
 
     ipcMain.handle("records:get-daily-counts", (...args) => {
-        const startDate: string = args[1] as string;
-        const endDate: string = args[2] as string;
-        return databaseService!.GetDailyCounts(startDate, endDate);
+        const startTimestamp: number = args[1] as number;
+        const endTimestamp: number = args[2] as number;
+        return databaseService!.GetDailyCounts(startTimestamp, endTimestamp);
     });
 
     ipcMain.handle("records:import", (...args) => {
