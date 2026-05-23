@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-    "target": "ES2022",
-    "lib": ["ES2023"],
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.web.tsbuildinfo",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
@@ -10,6 +11,7 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "jsx": "react-jsx",
     "composite": true,
     "strict": true,
     "noUnusedLocals": false,
@@ -17,9 +19,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": [
-    "src/main/**/*.ts",
-    "src/preload/**/*.ts",
-    "electron.vite.config.ts"
-  ]
+  "include": ["src/renderer/**/*.ts", "src/renderer/**/*.tsx", "src/preload/index.d.ts"]
 }
