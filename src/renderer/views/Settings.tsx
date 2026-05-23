@@ -1,18 +1,149 @@
-import { Paper, Title, Text, Stack } from "@mantine/core";
+import { useState, useRef } from "react";
+import {
+    Paper,
+    Stack,
+    Title,
+    Button,
+    Group,
+    Text,
+    Notification,
+    rem,
+    Divider,
+} from "@mantine/core";
+import { IconDownload, IconUpload, IconDatabase, IconInfoCircle } from "@tabler/icons-react";
+import { DatabaseService } from "../services/DatabaseService";
+import { useRecords } from "../hooks/useRecords";
 
-/**
- * 设置页面（MVP 占位）
- * 后续迭代中可添加深色模式切换、数据路径配置等功能
- */
 export const Settings = () => {
+    const { records, refresh } = useRecords();
+    const [importMessage, setImportMessage] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const importTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const HandleExport = async (): Promise<void> => {
+        const allRecords = await DatabaseService.GetRecords();
+        const jsonText: string = DatabaseService.ExportToJson(allRecords);
+        const blob = new Blob([jsonText], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "masturbation_records.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    const HandleImport = async (file: File | null): Promise<void> => {
+        if (file === null) return;
+        try {
+            const text = await file.text();
+            const result = await DatabaseService.ImportFromJson(text);
+            const msg: string = `导入完成：成功 ${result.Imported} 条，跳过 ${result.Skipped} 条重复，拒绝 ${result.Rejected} 条无效数据`;
+            ShowImportMessage(msg);
+            refresh();
+        } catch {
+            ShowImportMessage("导入失败：数据格式不正确");
+        }
+    };
+
+    const ShowImportMessage = (msg: string): void => {
+        setImportMessage(msg);
+        if (importTimerRef.current !== null) {
+            clearTimeout(importTimerRef.current);
+        }
+        importTimerRef.current = setTimeout(() => {
+            setImportMessage(null);
+        }, 5000);
+    };
+
+    const HandleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+        const file = e.target.files?.[0];
+        if (file !== null && file !== undefined) {
+            HandleImport(file);
+        }
+        e.target.value = "";
+    };
+
     return (
-        <Paper shadow="sm" radius="md" p="lg" withBorder>
-            <Stack gap="md" align="center">
-                <Title order={3} c="blue">
-                    设置
-                </Title>
-                <Text c="dimmed">更多设置功能即将推出...</Text>
-            </Stack>
-        </Paper>
+        <Stack gap="lg">
+            <Title order={3} c="blue">
+                设置
+            </Title>
+
+            <Paper shadow="sm" radius="md" p="lg" withBorder>
+                <Group gap="sm" mb="xs">
+                    <IconDatabase size={22} />
+                    <Title order={4}>数据管理</Title>
+                </Group>
+                <Text size="sm" c="dimmed" mb="md">
+                    导出或导入您的记录数据，支持新旧格式兼容
+                </Text>
+
+                <Group>
+                    <Button
+                        variant="outline"
+                        leftSection={<IconDownload style={{ width: rem(16), height: rem(16) }} />}
+                        onClick={HandleExport}
+                    >
+                        导出记录
+                    </Button>
+                    <Button
+                        variant="outline"
+                        leftSection={<IconUpload style={{ width: rem(16), height: rem(16) }} />}
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        导入记录
+                    </Button>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".json"
+                        onChange={HandleFileChange}
+                        style={{ display: "none" }}
+                    />
+                </Group>
+
+                <Text size="xs" c="dimmed" mt="sm">
+                    当前共 {records.length} 条记录
+                </Text>
+
+                {importMessage !== null && (
+                    <Notification
+                        color="blue"
+                        title="导入结果"
+                        onClose={() => setImportMessage(null)}
+                        withCloseButton
+                        mt="md"
+                    >
+                        {importMessage}
+                    </Notification>
+                )}
+            </Paper>
+
+            <Paper shadow="sm" radius="md" p="lg" withBorder>
+                <Group gap="sm" mb="xs">
+                    <IconInfoCircle size={22} />
+                    <Title order={4}>关于</Title>
+                </Group>
+
+                <Stack gap={4}>
+                    <Group justify="space-between">
+                        <Text size="sm">应用名称</Text>
+                        <Text size="sm" fw={500}>牛子小助手 (DickHelper)</Text>
+                    </Group>
+                    <Divider />
+                    <Group justify="space-between">
+                        <Text size="sm">版本</Text>
+                        <Text size="sm" fw={500}>v2.0.0</Text>
+                    </Group>
+                    <Divider />
+                    <Group justify="space-between">
+                        <Text size="sm">技术栈</Text>
+                        <Text size="sm" fw={500}>Electron + React + Mantine</Text>
+                    </Group>
+                </Stack>
+            </Paper>
+        </Stack>
     );
 };

@@ -8,18 +8,19 @@ import {
     ActionIcon,
     Modal,
     Button,
-    Box,
+    Badge,
 } from "@mantine/core";
 import { IconTrash, IconEraser } from "@tabler/icons-react";
 import { useRecords } from "../hooks/useRecords";
 import { DatabaseService } from "../services/DatabaseService";
 import type { IRecord } from "../types/IRecord";
 
-/**
- * 历史记录列表组件
- * 倒序显示所有记录，支持单条删除和清空全部（带确认对话框）
- * 通过 IPC 事件自动刷新
- */
+const FormatDuration = (durationMinutes: number): string => {
+    const minutes: number = Math.floor(durationMinutes);
+    const seconds: number = Math.round((durationMinutes - minutes) * 60);
+    return `${minutes}分${seconds}秒`;
+};
+
 export const HistoryList = () => {
     const { records, loading, refresh } = useRecords();
     const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
@@ -35,15 +36,8 @@ export const HistoryList = () => {
         refresh();
     };
 
-    // 格式化时长为 "X分X秒"
-    const FormatDuration = (durationMinutes: number): string => {
-        const minutes: number = Math.floor(durationMinutes);
-        const seconds: number = Math.round((durationMinutes - minutes) * 60);
-        return `${minutes}分${seconds}秒`;
-    };
-
     if (loading) {
-        return <Text ta="center">加载中...</Text>;
+        return <Text ta="center" c="dimmed">加载中...</Text>;
     }
 
     return (
@@ -52,57 +46,52 @@ export const HistoryList = () => {
                 <Title order={3} c="blue">
                     历史记录
                 </Title>
-                <ActionIcon
-                    variant="light"
-                    color="red"
-                    size="lg"
-                    onClick={() => setDeleteModalOpen(true)}
-                    title="清空所有数据"
-                >
-                    <IconEraser size={20} />
-                </ActionIcon>
+                {records.length > 0 && (
+                    <ActionIcon
+                        variant="light"
+                        color="red"
+                        size="lg"
+                        onClick={() => setDeleteModalOpen(true)}
+                        title="清空所有数据"
+                    >
+                        <IconEraser size={20} />
+                    </ActionIcon>
+                )}
             </Group>
 
-            <Stack gap="sm">
-                {/* 倒序显示（返回的数据已经是倒序，直接遍历） */}
-                {records.length === 0 ? (
-                    <Text ta="center" c="dimmed" py="xl">
+            {records.length === 0 ? (
+                <Paper shadow="sm" radius="md" p="xl" withBorder>
+                    <Text ta="center" c="dimmed" size="lg">
                         暂无记录
                     </Text>
-                ) : (
-                    records.map((record: IRecord) => (
+                    <Text ta="center" c="dimmed" size="sm" mt="xs">
+                        开始记录你的第一次手艺活吧
+                    </Text>
+                </Paper>
+            ) : (
+                <Stack gap="sm">
+                    {records.map((record: IRecord) => (
                         <Paper key={record.Id} shadow="xs" radius="md" p="md" withBorder>
-                            <Group justify="space-between" align="flex-start" wrap="nowrap">
-                                <Box style={{ flex: 1 }}>
-                                    <Text size="sm" fw={600} c="blue" mb={4}>
+                            <Group justify="space-between" align="center" wrap="nowrap">
+                                <Stack gap={4} style={{ flex: 1 }}>
+                                    <Text size="sm" fw={600}>
                                         {record.EndTime.toLocaleString()}
                                     </Text>
-                                    <Group gap="sm">
-                                        <Text
+                                    <Group gap="xs">
+                                        <Badge
+                                            variant="light"
+                                            color="blue"
                                             size="sm"
-                                            style={{
-                                                backgroundColor: "rgba(33, 150, 243, 0.1)",
-                                                padding: "2px 8px",
-                                                borderRadius: 4,
-                                            }}
                                         >
-                                            持续时间：{FormatDuration(record.Duration)}
-                                        </Text>
+                                            {FormatDuration(record.Duration)}
+                                        </Badge>
                                         {record.Notes && (
-                                            <Text
-                                                size="sm"
-                                                c="dimmed"
-                                                style={{
-                                                    backgroundColor: "rgba(0, 0, 0, 0.04)",
-                                                    padding: "2px 8px",
-                                                    borderRadius: 4,
-                                                }}
-                                            >
-                                                备注：{record.Notes}
+                                            <Text size="sm" c="dimmed" lineClamp={1}>
+                                                {record.Notes}
                                             </Text>
                                         )}
                                     </Group>
-                                </Box>
+                                </Stack>
                                 <ActionIcon
                                     variant="light"
                                     color="red"
@@ -113,11 +102,10 @@ export const HistoryList = () => {
                                 </ActionIcon>
                             </Group>
                         </Paper>
-                    ))
-                )}
-            </Stack>
+                    ))}
+                </Stack>
+            )}
 
-            {/* 清空确认对话框 */}
             <Modal
                 opened={deleteModalOpen}
                 onClose={() => setDeleteModalOpen(false)}

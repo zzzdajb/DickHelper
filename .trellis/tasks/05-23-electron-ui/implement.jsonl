@@ -1,0 +1,4 @@
+{"file": "frontend/app-shell.md", "reason": "App.tsx sidebar layout upgrade guidelines"}
+{"file": "frontend/component-guidelines.md", "reason": "View component design patterns for modernization"}
+{"file": "frontend/code-style.md", "reason": "Code style conventions for UI code"}
+{"file": "frontend/hook-guidelines.md", "reason": "Hook patterns for import/export logic in Settings"}

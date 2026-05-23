@@ -1,0 +1,4 @@
+{"file": "frontend/quality-guidelines.md", "reason": "Quality verification checklist"}
+{"file": "frontend/component-guidelines.md", "reason": "Verify component patterns follow guidelines"}
+{"file": "frontend/code-style.md", "reason": "Verify code style compliance"}
+{"file": "frontend/type-safety.md", "reason": "Verify type safety after refactoring"}

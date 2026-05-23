@@ -5,6 +5,9 @@ import {
     NavLink,
     Title,
     Stack,
+    ThemeIcon,
+    Group,
+    Divider,
     createTheme,
 } from "@mantine/core";
 import {
@@ -12,6 +15,7 @@ import {
     IconChartBar,
     IconHistory,
     IconSettings,
+    IconDroplet,
 } from "@tabler/icons-react";
 import "@mantine/core/styles.css";
 import { RecordForm } from "./views/RecordForm";
@@ -21,8 +25,6 @@ import { Settings } from "./views/Settings";
 
 type View = "record" | "stats" | "history" | "settings";
 
-// 错误边界：捕获渲染进程中的 React 错误，避免白屏
-// 使用纯 HTML 元素（不能用 Mantine 组件），因为它包裹在 MantineProvider 之外
 interface IErrorBoundaryProps { children: ReactNode; }
 interface IErrorBoundaryState { hasError: boolean; error: Error | null; }
 
@@ -69,17 +71,17 @@ class ErrorBoundary extends Component<IErrorBoundaryProps, IErrorBoundaryState> 
 }
 
 const theme = createTheme({
-    primaryColor: "blue",
     fontFamily:
         "思源黑体, Noto Sans SC, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     defaultRadius: "md",
 });
 
-/**
- * 应用根组件
- * MantineProvider + AppShell 布局，左右分栏
- * 左侧 200px 导航栏，4 个导航项；右侧条件渲染单视图
- */
+const NAV_ITEMS: { view: View; label: string; icon: typeof IconClock }[] = [
+    { view: "record", label: "记录", icon: IconClock },
+    { view: "stats", label: "统计", icon: IconChartBar },
+    { view: "history", label: "历史", icon: IconHistory },
+];
+
 export const App = () => {
     const [activeView, setActiveView] = useState<View>("record");
 
@@ -87,48 +89,45 @@ export const App = () => {
         <ErrorBoundary>
         <MantineProvider theme={theme}>
             <AppShell
-                navbar={{ width: 200, breakpoint: 0 }}
+                navbar={{ width: 220, breakpoint: 0 }}
                 padding="md"
             >
-                <AppShell.Navbar p="md">
-                    <Stack gap="xs">
-                        <Title order={4} ta="center" c="blue" mb="md">
+                <AppShell.Navbar p="md" style={{ display: "flex", flexDirection: "column" }}>
+                    <Group gap="sm" pb="md" wrap="nowrap">
+                        <ThemeIcon size="lg" radius="md" variant="light" color="blue">
+                            <IconDroplet size={20} />
+                        </ThemeIcon>
+                        <Title order={4} c="blue" style={{ whiteSpace: "nowrap" }}>
                             牛子小助手
                         </Title>
+                    </Group>
 
-                        <NavLink
-                            label="记录"
-                            leftSection={<IconClock size={20} />}
-                            active={activeView === "record"}
-                            onClick={() => setActiveView("record")}
-                            variant="filled"
-                            style={{ borderRadius: 8 }}
-                        />
-                        <NavLink
-                            label="统计"
-                            leftSection={<IconChartBar size={20} />}
-                            active={activeView === "stats"}
-                            onClick={() => setActiveView("stats")}
-                            variant="filled"
-                            style={{ borderRadius: 8 }}
-                        />
-                        <NavLink
-                            label="历史"
-                            leftSection={<IconHistory size={20} />}
-                            active={activeView === "history"}
-                            onClick={() => setActiveView("history")}
-                            variant="filled"
-                            style={{ borderRadius: 8 }}
-                        />
-                        <NavLink
-                            label="设置"
-                            leftSection={<IconSettings size={20} />}
-                            active={activeView === "settings"}
-                            onClick={() => setActiveView("settings")}
-                            variant="filled"
-                            style={{ borderRadius: 8 }}
-                        />
+                    <Divider />
+
+                    <Stack gap={4} mt="md" style={{ flex: 1 }}>
+                        {NAV_ITEMS.map((item) => (
+                            <NavLink
+                                key={item.view}
+                                label={item.label}
+                                leftSection={<item.icon size={20} />}
+                                active={activeView === item.view}
+                                onClick={() => setActiveView(item.view)}
+                                variant="filled"
+                                style={{ borderRadius: 8 }}
+                            />
+                        ))}
                     </Stack>
+
+                    <Divider mb="xs" />
+
+                    <NavLink
+                        label="设置"
+                        leftSection={<IconSettings size={20} />}
+                        active={activeView === "settings"}
+                        onClick={() => setActiveView("settings")}
+                        variant="filled"
+                        style={{ borderRadius: 8 }}
+                    />
                 </AppShell.Navbar>
 
                 <AppShell.Main>
