@@ -5,10 +5,6 @@ import {
     NavLink,
     Title,
     Stack,
-    Text,
-    Button,
-    Code,
-    Paper,
     createTheme,
 } from "@mantine/core";
 import {
@@ -26,6 +22,7 @@ import { Settings } from "./views/Settings";
 type View = "record" | "stats" | "history" | "settings";
 
 // 错误边界：捕获渲染进程中的 React 错误，避免白屏
+// 使用纯 HTML 元素（不能用 Mantine 组件），因为它包裹在 MantineProvider 之外
 interface IErrorBoundaryProps { children: ReactNode; }
 interface IErrorBoundaryState { hasError: boolean; error: Error | null; }
 
@@ -46,12 +43,25 @@ class ErrorBoundary extends Component<IErrorBoundaryProps, IErrorBoundaryState> 
     public render(): ReactNode {
         if (this.state.hasError) {
             return (
-                <Paper p="xl" m="xl" shadow="sm" withBorder style={{ maxWidth: 600, margin: "80px auto" }}>
-                    <Title order={3} c="red" mb="md">应用错误 | App Error</Title>
-                    <Text mb="sm">渲染进程发生未捕获错误。请查看 DevTools console 获取详情。</Text>
-                    <Code block mb="md">{this.state.error?.message}</Code>
-                    <Button onClick={() => window.location.reload()}>重新加载 | Reload</Button>
-                </Paper>
+                <div style={{ maxWidth: 600, margin: "80px auto", padding: 32, fontFamily: "sans-serif" }}>
+                    <h2 style={{ color: "#e03131" }}>应用错误 | App Error</h2>
+                    <p>渲染进程发生未捕获错误。请查看 DevTools console 获取详情。</p>
+                    <pre style={{
+                        background: "#f1f3f5", padding: 16, borderRadius: 4,
+                        whiteSpace: "pre-wrap", fontSize: 13
+                    }}>
+                        {this.state.error?.message}
+                    </pre>
+                    <button
+                        onClick={() => window.location.reload()}
+                        style={{
+                            padding: "8px 20px", background: "#228be6", color: "#fff",
+                            border: "none", borderRadius: 4, cursor: "pointer", fontSize: 14
+                        }}
+                    >
+                        重新加载 | Reload
+                    </button>
+                </div>
             );
         }
         return this.props.children;
