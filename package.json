@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
-    "preview": "electron-vite preview"
+    "preview": "electron-vite preview",
+    "postinstall": "electron-rebuild"
   },
   "dependencies": {
     "better-sqlite3": "^11.7.0",
@@ -23,6 +24,7 @@
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
+    "@electron/rebuild": "^3.7.0",
     "electron": "^35.0.0",
     "electron-vite": "^3.0.0",
     "eslint": "^9.19.0",

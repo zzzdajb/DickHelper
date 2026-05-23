@@ -93,13 +93,11 @@ npm run build
 **`better-sqlite3` 安装失败 | Installation fails**
 
 ```bash
-# 尝试重新编译原生模块 | Try rebuilding native modules
+# 手动重编译原生模块 | Manually rebuild native modules
 npx electron-rebuild
-
-# 或者清理后重装 | Or clean install
-rm -rf node_modules package-lock.json
-npm install
 ```
+
+`npm install` 已配置 `postinstall` 脚本自动执行此步骤。如果仍然失败，请确保安装了 Visual Studio Build Tools (Windows) 或 Xcode Command Line Tools (macOS)。
 
 **窗口白屏 | White screen on launch**
 
