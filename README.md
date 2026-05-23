@@ -119,6 +119,9 @@ GPL-3.0（GNU General Public License v3.0）
 
 ---
 
+## 友链
+[Linux.do](https://linux.do/)
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=zzzdajb/DickHelper&type=Timeline)](https://star-history.com/#zzzdajb/DickHelper&Timeline)
