@@ -1,5 +1,16 @@
 import type { IRecord, IRecordRaw, IStats, IDailyCount, IImportResult } from "../types/IRecord";
 
+// 检查 electronAPI 是否可用，不在 Electron 环境时给出明确错误
+function GetApi(): Window["electronAPI"] {
+    if (GetApi() === undefined) {
+        throw new Error(
+            "electronAPI is not available. The app must run inside Electron, not a browser. " +
+            "The preload script may have failed to load. Check the terminal for [Preload] log messages."
+        );
+    }
+    return GetApi();
+}
+
 /**
  * 封装渲染进程与主进程 SQLite 之间的 IPC 通信
  * 负责数据格式转换（ISO 字符串 <-> Date 对象）和导入导出逻辑
@@ -9,7 +20,7 @@ export class DatabaseService {
      * 获取所有记录，ISO 字符串转 Date
      */
     public static async GetRecords(): Promise<IRecord[]> {
-        const rawRecords: IRecordRaw[] = await window.electronAPI.GetRecords();
+        const rawRecords: IRecordRaw[] = await GetApi().GetRecords();
         return rawRecords.map((r) => DatabaseService.MapRawToRecord(r));
     }
 
@@ -22,7 +33,7 @@ export class DatabaseService {
         duration: number,
         notes?: string
     ): Promise<IRecord> {
-        const raw: IRecordRaw = await window.electronAPI.SaveRecord(
+        const raw: IRecordRaw = await GetApi().SaveRecord(
             startTime.toISOString(),
             endTime.toISOString(),
             duration,
@@ -32,19 +43,19 @@ export class DatabaseService {
     }
 
     public static async DeleteRecord(id: string): Promise<boolean> {
-        return window.electronAPI.DeleteRecord(id);
+        return GetApi().DeleteRecord(id);
     }
 
     public static async ClearAll(): Promise<void> {
-        return window.electronAPI.ClearAll();
+        return GetApi().ClearAll();
     }
 
     public static async GetStats(): Promise<IStats> {
-        return window.electronAPI.GetStats();
+        return GetApi().GetStats();
     }
 
     public static async GetDailyCounts(startDate: Date, endDate: Date): Promise<IDailyCount[]> {
-        return window.electronAPI.GetDailyCounts(
+        return GetApi().GetDailyCounts(
             startDate.toISOString().slice(0, 10),
             endDate.toISOString().slice(0, 10)
         );
@@ -94,7 +105,7 @@ export class DatabaseService {
             return { Imported: 0, Skipped: 0, Rejected: 0 };
         }
 
-        return window.electronAPI.ImportRecords(records);
+        return GetApi().ImportRecords(records);
     }
 
     /**
@@ -119,7 +130,7 @@ export class DatabaseService {
      * 注册数据更新回调，返回取消监听的函数
      */
     public static OnRecordsUpdated(callback: () => void): () => void {
-        return window.electronAPI.OnRecordsUpdated(callback);
+        return GetApi().OnRecordsUpdated(callback);
     }
 
     private static MapRawToRecord(raw: IRecordRaw): IRecord {

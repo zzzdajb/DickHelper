@@ -1,5 +1,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 
+console.log("[Preload] Script loading...");
+
 // 暴露给渲染进程的 API
 const electronAPI = {
     GetRecords: (): Promise<unknown[]> => ipcRenderer.invoke("records:get-all"),
@@ -14,11 +16,15 @@ const electronAPI = {
     OnRecordsUpdated: (callback: () => void): (() => void) => {
         const listener = (): void => callback();
         ipcRenderer.on("records-updated", listener);
-        // 返回取消监听的函数
         return () => {
             ipcRenderer.removeListener("records-updated", listener);
         };
     },
 };
 
-contextBridge.exposeInMainWorld("electronAPI", electronAPI);
+try {
+    contextBridge.exposeInMainWorld("electronAPI", electronAPI);
+    console.log("[Preload] electronAPI exposed successfully");
+} catch (error) {
+    console.error("[Preload] Failed to expose electronAPI:", error);
+}
