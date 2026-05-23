@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 1
+- **Total Sessions**: 2
 - **Last Active**: 2026-05-23
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~40 | Active |
+| `journal-1.md` | ~76 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 2 | 2026-05-23 | Debug session: preload CJS fix, ErrorBoundary fix, RecordForm crash unresolved | `6091059`, `618e4ec`, `ddea20b`, `7e25705` | `main` |
 | 1 | 2026-05-23 | Electron refactoring: full rewrite from MUI+localStorage to Electron+Mantine+SQLite | `323feae` | `main` |
 <!-- @@@/auto:session-history -->
 
