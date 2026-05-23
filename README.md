@@ -81,7 +81,12 @@ npm run build
 - `out/preload/` — 预加载脚本
 - `out/renderer/` — React 渲染进程（静态文件）
 
-> 自动更新和安装包打包（electron-builder）暂未配置，后续版本添加。
+打包工具 `electron-builder` 已配置（见 `electron-builder.yml`），支持三平台输出：
+- **Windows**: NSIS 安装包
+- **macOS**: DMG
+- **Linux**: AppImage
+
+CI/CD 通过 GitHub Actions（`.github/workflows/release.yml`）自动构建并上传到 GitHub Release。
 
 ## 技术栈 | Tech Stack
 
