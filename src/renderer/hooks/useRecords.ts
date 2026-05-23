@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { DatabaseService } from "../services/DatabaseService";
 import type { IRecord } from "../types/IRecord";
 
@@ -9,23 +9,34 @@ import type { IRecord } from "../types/IRecord";
 export function useRecords() {
     const [records, setRecords] = useState<IRecord[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const mountedRef = useRef<boolean>(true);
 
     const refresh = useCallback((): void => {
-        DatabaseService.GetRecords().then((data) => {
-            setRecords(data);
-            setLoading(false);
-        });
+        DatabaseService.GetRecords()
+            .then((data) => {
+                if (mountedRef.current) {
+                    setRecords(data);
+                    setLoading(false);
+                }
+            })
+            .catch((error: unknown) => {
+                console.error("[useRecords] Failed to fetch records:", error);
+                if (mountedRef.current) {
+                    setLoading(false);
+                }
+            });
     }, []);
 
     useEffect(() => {
+        mountedRef.current = true;
         refresh();
 
-        // 监听来自主进程的数据变更通知
         const unsubscribe: () => void = DatabaseService.OnRecordsUpdated(() => {
             refresh();
         });
 
         return () => {
+            mountedRef.current = false;
             unsubscribe();
         };
     }, [refresh]);
