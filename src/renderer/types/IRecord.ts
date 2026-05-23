@@ -12,7 +12,7 @@ export interface IRecordRaw {
     readonly StartTime: string;
     readonly EndTime: string;
     readonly Duration: number;
-    readonly Notes?: string;
+    readonly Notes: string | null;
 }
 
 // 统计数据结构

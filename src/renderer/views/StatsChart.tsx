@@ -95,7 +95,7 @@ export const StatsChart = () => {
             "rgba(48, 161, 78, 0.8)",  // 3
             "rgba(33, 110, 57, 0.9)",  // 4
         ];
-        return colors[level] ?? colors[0];
+        return colors[level]!;
     };
 
     // 月份标签

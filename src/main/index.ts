@@ -81,14 +81,19 @@ function RegisterIpcHandlers(): void {
         return databaseService!.GetRecords();
     });
 
-    ipcMain.handle("records:save", (_event, startTime: string, endTime: string, duration: number, notes?: string) => {
+    ipcMain.handle("records:save", (...args) => {
+        const startTime: string = args[1] as string;
+        const endTime: string = args[2] as string;
+        const duration: number = args[3] as number;
+        const notes: string | undefined = args[4] as string | undefined;
         const record = databaseService!.SaveRecord(new Date(startTime), new Date(endTime), duration, notes);
         // 通知渲染进程数据已更新
         mainWindow?.webContents.send("records-updated");
         return record;
     });
 
-    ipcMain.handle("records:delete", (_event, id: string) => {
+    ipcMain.handle("records:delete", (...args) => {
+        const id: string = args[1] as string;
         const success = databaseService!.DeleteRecord(id);
         if (success) {
             mainWindow?.webContents.send("records-updated");
@@ -105,11 +110,14 @@ function RegisterIpcHandlers(): void {
         return databaseService!.GetStats();
     });
 
-    ipcMain.handle("records:get-daily-counts", (_event, startDate: string, endDate: string) => {
+    ipcMain.handle("records:get-daily-counts", (...args) => {
+        const startDate: string = args[1] as string;
+        const endDate: string = args[2] as string;
         return databaseService!.GetDailyCounts(startDate, endDate);
     });
 
-    ipcMain.handle("records:import", (_event, records: { Id: string; StartTime?: string; EndTime?: string; Duration: number; Notes?: string }[]) => {
+    ipcMain.handle("records:import", (...args) => {
+        const records = args[1] as { Id: string; StartTime?: string; EndTime?: string; Duration: number; Notes?: string }[];
         const result = databaseService!.ImportRecords(records);
         if (result.Imported > 0) {
             mainWindow?.webContents.send("records-updated");
