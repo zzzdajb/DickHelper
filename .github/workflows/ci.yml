@@ -7,9 +7,13 @@ on:
   pull_request:
     branches: ["main"]
 
+permissions:
+  contents: read
+
 jobs:
-  build:
-    name: Build (${{ matrix.os }})
+  ci:
+    name: CI (${{ matrix.os }})
+    if: github.event_name != 'push' || startsWith(github.ref, 'refs/heads/')
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -41,3 +45,84 @@ jobs:
           name: dickhelper-${{ matrix.os }}
           path: out/
           retention-days: 7
+
+  release-build:
+    name: Release build (${{ matrix.os }})
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc -b --noEmit
+
+      - name: Build Electron app
+        run: npm run build
+
+      - name: Compress build output
+        shell: pwsh
+        run: |
+          $tagName = "${{ github.ref_name }}"
+          $osName = "${{ matrix.os }}"
+          $assetName = "dickhelper-$tagName-$osName.zip"
+          New-Item -ItemType Directory -Force release-assets
+          Compress-Archive -Path out/* -DestinationPath "release-assets/$assetName" -Force
+
+      - name: Upload release asset artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ github.ref_name }}-${{ matrix.os }}
+          path: release-assets/*.zip
+          if-no-files-found: error
+          retention-days: 7
+
+  publish-release:
+    name: Publish GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: release-build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download release assets
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release-${{ github.ref_name }}-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          assets=(release-assets/*.zip)
+          if [ ${#assets[@]} -eq 0 ]; then
+            echo "No release assets found"
+            exit 1
+          fi
+
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release upload "$TAG_NAME" "${assets[@]}" --clobber
+          else
+            gh release create "$TAG_NAME" "${assets[@]}" --title "$TAG_NAME" --generate-notes --verify-tag
+          fi
