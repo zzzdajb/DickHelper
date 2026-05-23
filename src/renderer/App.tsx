@@ -16,14 +16,18 @@ import {
     IconHistory,
     IconSettings,
     IconDroplet,
+    IconBolt,
+    IconFingerprint,
 } from "@tabler/icons-react";
 import "@mantine/core/styles.css";
 import { RecordForm } from "./views/RecordForm";
 import { StatsChart } from "./views/StatsChart";
 import { HistoryList } from "./views/HistoryList";
 import { Settings } from "./views/Settings";
+import { Prediction } from "./views/Prediction";
+import { Fingerprint } from "./views/Fingerprint";
 
-type View = "record" | "stats" | "history" | "settings";
+type View = "record" | "stats" | "history" | "prediction" | "fingerprint" | "settings";
 
 interface IErrorBoundaryProps { children: ReactNode; }
 interface IErrorBoundaryState { hasError: boolean; error: Error | null; }
@@ -79,6 +83,8 @@ const theme = createTheme({
 const NAV_ITEMS: { view: View; label: string; icon: typeof IconClock }[] = [
     { view: "record", label: "记录", icon: IconClock },
     { view: "stats", label: "统计", icon: IconChartBar },
+    { view: "prediction", label: "预测", icon: IconBolt },
+    { view: "fingerprint", label: "指纹", icon: IconFingerprint },
     { view: "history", label: "历史", icon: IconHistory },
 ];
 
@@ -133,6 +139,8 @@ export const App = () => {
                 <AppShell.Main>
                     {activeView === "record" && <RecordForm />}
                     {activeView === "stats" && <StatsChart />}
+                    {activeView === "prediction" && <Prediction />}
+                    {activeView === "fingerprint" && <Fingerprint />}
                     {activeView === "history" && <HistoryList />}
                     {activeView === "settings" && <Settings />}
                 </AppShell.Main>
