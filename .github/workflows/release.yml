@@ -3,6 +3,8 @@ name: Release
 on:
   push:
     tags: ["v*.*.*"]
+  release:
+    types: [published, edited]
   workflow_dispatch:
     inputs:
       tag:
@@ -18,7 +20,7 @@ jobs:
     name: Build release asset (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     env:
-      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+      RELEASE_TAG: ${{ github.event.release.tag_name || github.event.inputs.tag || github.ref_name }}
     strategy:
       fail-fast: false
       matrix:
@@ -76,7 +78,7 @@ jobs:
     permissions:
       contents: write
     env:
-      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+      RELEASE_TAG: ${{ github.event.release.tag_name || github.event.inputs.tag || github.ref_name }}
 
     steps:
       - name: Download release assets
