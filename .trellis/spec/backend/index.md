@@ -22,6 +22,7 @@ The Electron main process is the backend layer:
 | [Database Guidelines](./database-guidelines.md) | SQLite setup, query patterns, date gotcha | Filled |
 | [Error Handling](./error-handling.md) | IPC error propagation, import validation | Filled |
 | [Quality Guidelines](./quality-guidelines.md) | Forbidden/required patterns, IPC channel naming | Filled |
+| [CI/CD Guidelines](./ci-github-actions.md) | GitHub Actions permissions, gh CLI rules, workflow patterns | Filled |
 | [Logging Guidelines](./logging-guidelines.md) | Structured logging (N/A — no logging infra yet) | N/A |
 
 ---

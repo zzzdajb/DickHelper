@@ -14,11 +14,15 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   release-build:
     name: Build release asset (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      actions: write
     env:
       RELEASE_TAG: ${{ github.event.release.tag_name || github.event.inputs.tag || github.ref_name }}
     strategy:
@@ -77,6 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: read
     env:
       RELEASE_TAG: ${{ github.event.release.tag_name || github.event.inputs.tag || github.ref_name }}
 
@@ -92,19 +97,37 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          TAG_NAME: ${{ env.RELEASE_TAG }}
         run: |
           set -euo pipefail
           shopt -s nullglob
 
           assets=(release-assets/*.zip)
+          echo "Found ${#assets[@]} release asset(s):"
+          for a in "${assets[@]}"; do
+            echo "  - $a ($(du -h "$a" | cut -f1))"
+          done
+
           if [ ${#assets[@]} -eq 0 ]; then
-            echo "No release assets found"
+            echo "::error::No release assets found in release-assets/"
+            ls -la release-assets/ || true
             exit 1
           fi
 
-          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
-            gh release upload "$TAG_NAME" "${assets[@]}" --clobber
+          echo "Target release tag: $RELEASE_TAG"
+          echo "Target repo: $GH_REPO"
+
+          if gh release view "$RELEASE_TAG" --repo "$GH_REPO" >/dev/null 2>&1; then
+            echo "Release exists. Uploading assets..."
+            gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber --repo "$GH_REPO"
+            echo "Upload command completed."
           else
-            gh release create "$TAG_NAME" "${assets[@]}" --title "$TAG_NAME" --generate-notes --verify-tag
+            echo "Release does not exist. Creating release with assets..."
+            gh release create "$RELEASE_TAG" "${assets[@]}" \
+              --title "$RELEASE_TAG" \
+              --generate-notes \
+              --repo "$GH_REPO"
+            echo "Release created with assets."
           fi
+
+          echo "Verifying release assets:"
+          gh release view "$RELEASE_TAG" --repo "$GH_REPO" --json assets --jq '.assets[] | "  \(.name) (\(.size) bytes)"' || echo "(could not verify)"
