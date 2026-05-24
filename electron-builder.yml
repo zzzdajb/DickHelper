@@ -4,9 +4,14 @@ directories:
   output: dist
 files:
   - out/**/*
+publish:
+  provider: generic
+  url: https://github.com/zzzdajb/DickHelper/releases/latest/download/
 win:
   target: nsis
 mac:
-  target: dmg
+  target:
+    - dmg
+    - zip
 linux:
   target: AppImage

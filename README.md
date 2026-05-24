@@ -65,6 +65,38 @@ npm install
 npm run dev
 ```
 
+`npm run dev` 会同时启动：
+- Vite dev server（React 渲染进程热重载）
+- Electron 主进程（自动打开桌面窗口）
+
+### 构建生产版本 | Build for Production
+
+```bash
+# 构建可分发安装包 | Build distributable package
+npm run build
+```
+
+构建输出在 `out/` 目录：
+- `out/main/` — Electron 主进程
+- `out/preload/` — 预加载脚本
+- `out/renderer/` — React 渲染进程（静态文件）
+
+### 发布版本 | Release
+
+GitHub Release 使用 `vX.Y.Z` tag，例如 `v2.0.4`。发布前必须先把 `package.json` 的 `version` 改为不带 `v` 的版本号，例如 `2.0.4`。
+
+Release workflow 会校验：
+- `RELEASE_TAG` 必须形如 `v2.0.4`
+- `package.json.version` 必须等于 `2.0.4`
+
+校验通过后，workflow 会打包 Windows / macOS / Linux 安装包，并上传自动更新所需的 `latest.yml`、`latest-mac.yml`、`latest-linux.yml` 等 metadata。已安装 `2.0.3` 的客户端会在发现 `2.0.4` metadata 后提示更新。
+
+### 自动更新 | Auto Update
+
+应用启动时会自动检查更新。发现新版本后，会在应用内弹窗询问是否下载，不会静默下载。下载完成后，用户可以手动点击重启安装。
+
+更新源默认使用 `https://ghfast.top/` 镜像，适合 GitHub 访问不稳定的网络环境；也可以在设置页切换到 GitHub 直连。如果当前更新源检查失败，应用只会提示失败并建议切换源，不会自动回退到另一个源。
+
 ## 技术栈 | Tech Stack
 
 | 层 | Layer | 技术 |

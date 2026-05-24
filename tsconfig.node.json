@@ -20,6 +20,7 @@
     "noUncheckedSideEffectImports": true
   },
   "include": [
+    "src/shared/**/*.ts",
     "src/main/**/*.ts",
     "src/preload/**/*.ts",
     "electron.vite.config.ts"

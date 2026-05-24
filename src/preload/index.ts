@@ -1,4 +1,5 @@
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer, type IpcRendererEvent } from "electron";
+import type { IUpdateSettings, IUpdateState, UpdateSource } from "../shared/IUpdate";
 
 console.log("[Preload] Script loading...");
 
@@ -13,11 +14,24 @@ const electronAPI = {
     GetDailyCounts: (startTimestamp: number, endTimestamp: number): Promise<unknown[]> =>
         ipcRenderer.invoke("records:get-daily-counts", startTimestamp, endTimestamp),
     ImportRecords: (records: unknown[]): Promise<unknown> => ipcRenderer.invoke("records:import", records),
+    GetUpdateState: (): Promise<IUpdateState> => ipcRenderer.invoke("updates:get-state"),
+    GetUpdateSettings: (): Promise<IUpdateSettings> => ipcRenderer.invoke("updates:get-settings"),
+    SetUpdateSource: (source: UpdateSource): Promise<IUpdateSettings> => ipcRenderer.invoke("updates:set-source", source),
+    CheckForUpdates: (): Promise<IUpdateState> => ipcRenderer.invoke("updates:check"),
+    DownloadUpdate: (): Promise<IUpdateState> => ipcRenderer.invoke("updates:download"),
+    InstallUpdate: (): Promise<void> => ipcRenderer.invoke("updates:install"),
     OnRecordsUpdated: (callback: () => void): (() => void) => {
         const listener = (): void => callback();
         ipcRenderer.on("records-updated", listener);
         return () => {
             ipcRenderer.removeListener("records-updated", listener);
+        };
+    },
+    OnUpdateStateChanged: (callback: (state: IUpdateState) => void): (() => void) => {
+        const listener = (_event: IpcRendererEvent, state: IUpdateState): void => callback(state);
+        ipcRenderer.on("updates:state-changed", listener);
+        return () => {
+            ipcRenderer.removeListener("updates:state-changed", listener);
         };
     },
 };

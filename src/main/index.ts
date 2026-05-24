@@ -1,10 +1,13 @@
 import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage } from "electron";
 import path from "node:path";
 import { DatabaseService } from "./database";
+import { UpdateService } from "./updateService";
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let databaseService: DatabaseService | null = null;
+let updateService: UpdateService | null = null;
+let isQuitting: boolean = false;
 
 const IS_DEV: boolean = process.env.ELECTRON_RENDERER_URL !== undefined;
 
@@ -66,7 +69,7 @@ function CreateWindow(): void {
 
     // 关闭窗口时缩到托盘而不是退出
     mainWindow.on("close", (event) => {
-        if (tray !== null) {
+        if (tray !== null && !isQuitting) {
             event.preventDefault();
             mainWindow?.hide();
         }
@@ -92,6 +95,7 @@ function CreateTray(): void {
         {
             label: "退出",
             click: (): void => {
+                isQuitting = true;
                 tray = null;
                 app.quit();
             },
@@ -159,15 +163,42 @@ function RegisterIpcHandlers(): void {
         }
         return result;
     });
+
+    ipcMain.handle("updates:get-state", () => {
+        return updateService!.GetState();
+    });
+
+    ipcMain.handle("updates:get-settings", () => {
+        return updateService!.GetSettings();
+    });
+
+    ipcMain.handle("updates:set-source", (_event, source: string) => {
+        return updateService!.SetSource(source);
+    });
+
+    ipcMain.handle("updates:check", () => {
+        return updateService!.CheckForUpdates();
+    });
+
+    ipcMain.handle("updates:download", () => {
+        return updateService!.DownloadUpdate();
+    });
+
+    ipcMain.handle("updates:install", () => {
+        isQuitting = true;
+        updateService!.InstallUpdate();
+    });
 }
 
 app.whenReady().then(async () => {
     console.log("[Main] App ready");
     databaseService = await DatabaseService.create();
     console.log("[Main] DatabaseService initialized");
+    updateService = new UpdateService(() => mainWindow);
     RegisterIpcHandlers();
     CreateWindow();
     CreateTray();
+    updateService.StartStartupCheck();
     console.log("[Main] Startup complete");
 
     app.on("activate", () => {
@@ -188,6 +219,7 @@ app.on("window-all-closed", () => {
 });
 
 app.on("before-quit", () => {
+    isQuitting = true;
     tray = null;
     databaseService?.Close();
 });
