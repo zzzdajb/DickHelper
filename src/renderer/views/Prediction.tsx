@@ -145,7 +145,7 @@ export const Prediction = () => {
                             <Text fw={600} size="lg">{countdown}</Text>
                             {prediction.NextEstimate && (
                                 <Badge variant="light" color="blue" size="sm">
-                                    {prediction.NextEstimate.getHours()}:00
+                                    约 {prediction.NextEstimate.getMonth() + 1}/{prediction.NextEstimate.getDate()} {prediction.NextEstimate.getHours()}:00
                                 </Badge>
                             )}
                         </Group>
