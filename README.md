@@ -97,6 +97,8 @@ Release workflow 会校验：
 
 更新源默认使用 `https://ghfast.top/` 镜像，适合 GitHub 访问不稳定的网络环境；也可以在设置页切换到 GitHub 直连。如果当前更新源检查失败，应用只会提示失败并建议切换源，不会自动回退到另一个源。
 
+测试自动更新的推荐流程见 [自动更新测试指南](docs/auto-update-testing.md)。
+
 ## 技术栈 | Tech Stack
 
 | 层 | Layer | 技术 |
