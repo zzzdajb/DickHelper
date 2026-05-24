@@ -246,3 +246,36 @@ Added a short auto-update testing guide and linked it from README.
 ### Next Steps
 
 - None - task complete
+
+
+## Session 8: 实现 Electron 单例锁
+
+**Date**: 2026-05-25
+**Task**: 实现 Electron 单例锁
+**Branch**: `main`
+
+### Summary
+
+使用 app.requestSingleInstanceLock() 实现单例模式，防止多实例多托盘图标
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `92b71d9` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
