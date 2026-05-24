@@ -9,11 +9,15 @@
 ```
 src/main/
 ├── index.ts        # App lifecycle: window creation, tray, IPC registration
-└── database.ts     # SQLite connection, schema, CRUD, stats queries, import
+├── database.ts     # SQLite connection, schema, CRUD, stats queries, import
+└── updateService.ts # Auto-update source config, updater state, updater events
 
 src/preload/
 ├── index.ts        # contextBridge.exposeInMainWorld — whitelist IPC channels
 └── index.d.ts      # Global Window.electronAPI type declarations
+
+src/shared/
+└── IUpdate.ts      # Cross-process update IPC contract shared by main/preload/renderer
 ```
 
 ---
@@ -46,6 +50,12 @@ src/preload/
 - `OnRecordsUpdated` wraps `ipcRenderer.on` + returns unsubscribe function
 - No `nodeIntegration` — contextIsolation must be `true`
 
+### `src/shared/IUpdate.ts` — Cross-Process Type Contract
+
+- Shared type-only contracts used by main process, preload, and renderer.
+- Use this for IPC payloads/events that must stay identical across all three layers.
+- Do not import renderer types from preload or main. If a type crosses process boundaries, move it to `src/shared/`.
+
 ---
 
 ## Naming Conventions
@@ -55,6 +65,7 @@ src/preload/
 | IPC channel | `domain:action` | `"records:get-all"`, `"records:save"` |
 | Handler function | PascalCase | `RegisterIpcHandlers`, `CreateWindow` |
 | Database class | PascalCase, `Service` suffix | `DatabaseService` |
+| Shared IPC type file | PascalCase with `I` prefix | `src/shared/IUpdate.ts` |
 
 ---
 
@@ -62,5 +73,6 @@ src/preload/
 
 - Main process code lives in `src/main/` — no exceptions
 - Preload code lives in `src/preload/` — no exceptions
+- Cross-process type-only contracts live in `src/shared/`
 - IPC channels follow `domain:action` naming (`records:*` for record CRUD)
 - One class per file — `DatabaseService` handles all DB concerns, `index.ts` handles all app-lifecycle concerns

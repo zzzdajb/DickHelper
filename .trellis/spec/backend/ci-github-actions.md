@@ -111,11 +111,11 @@ publish-release:
 ---
 
 ---
-## Scenario: electron-builder packaging and asset naming
+## Scenario: electron-builder packaging, update metadata, and asset naming
 
 ### 1. Scope / Trigger
 
-Any release workflow that uses `electron-builder` to produce native executables and uploads them as release assets.
+Any release workflow that uses `electron-builder` to produce native executables and uploads them as GitHub Release assets. This includes the auto-update metadata consumed by `electron-updater`.
 
 ### 2. Signatures
 
@@ -127,68 +127,102 @@ directories:
   output: dist
 files:
   - out/**/*
+publish:
+  provider: generic
+  url: https://github.com/zzzdajb/DickHelper/releases/latest/download/
 win:
   target: nsis        # NOT portable — NSIS installs once, launches fast
 mac:
-  target: dmg
+  target:
+    - dmg
+    - zip             # Required for macOS auto-update metadata
 linux:
   target: AppImage
 ```
 
 ### 3. Contracts
 
-- `npx electron-builder --publish=never` — build without publishing to auto-update channels
-- Windows output: `dist/DickHelper Setup X.X.X.exe` (NSIS installer)
-- macOS output: `dist/DickHelper-X.X.X.dmg`
-- Linux output: `dist/DickHelper-X.X.X.AppImage`
-- Asset naming: `dickhelper-$TAG-$PLATFORM.$EXT` (note the `.` before `${ASSET##*.}`)
+- `RELEASE_TAG` must match `^v[0-9]+[.][0-9]+[.][0-9]+$`.
+- `package.json.version` must equal `RELEASE_TAG` without the leading `v`; fail before packaging if it does not.
+- `npx electron-builder --publish=never` — generate packages and updater metadata, but do not let electron-builder upload anything directly.
+- Do **not** rename electron-builder output files for GitHub Release upload. `latest*.yml` references the original output filenames.
+- Windows assets: `dist/*.exe`, `dist/*.exe.blockmap`, `dist/latest.yml`.
+- macOS assets: `dist/*.dmg`, `dist/*.zip`, `dist/*.zip.blockmap`, `dist/latest-mac.yml`.
+- Linux assets: `dist/*.AppImage`, `dist/*.AppImage.blockmap`, `dist/latest-linux.yml`.
+- Publish job uploads every downloaded asset with `gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber --repo "$GH_REPO"`.
 
 ### 4. Asset Collection in Workflow
 
 ```yaml
+- name: Validate package version
+  shell: bash
+  run: |
+    set -euo pipefail
+    RELEASE_VERSION="${RELEASE_TAG#v}"
+    PACKAGE_VERSION=$(node -p "require('./package.json').version")
+    if [[ "$PACKAGE_VERSION" != "$RELEASE_VERSION" ]]; then
+      echo "::error::package.json version ($PACKAGE_VERSION) must match release tag without v ($RELEASE_VERSION)."
+      exit 1
+    fi
+
 - name: Package with electron-builder
   shell: bash
   run: |
     set -euo pipefail
+    shopt -s nullglob
     npx electron-builder --publish=never
+
     mkdir -p release-assets
-    ASSET=""
     if [[ "${{ matrix.os-short }}" == "windows" ]]; then
-      ASSET=$(ls dist/DickHelper*.exe | head -1)
+      assets=(dist/*.exe dist/*.exe.blockmap dist/latest.yml)
     elif [[ "${{ matrix.os-short }}" == "macos" ]]; then
-      ASSET=$(ls dist/DickHelper*.dmg | head -1)
+      assets=(dist/*.dmg dist/*.zip dist/*.zip.blockmap dist/latest-mac.yml)
     else
-      ASSET=$(ls dist/DickHelper*.AppImage | head -1)
+      assets=(dist/*.AppImage dist/*.AppImage.blockmap dist/latest-linux.yml)
     fi
-    cp "$ASSET" "release-assets/dickhelper-${{ env.RELEASE_TAG }}-${{ matrix.os-short }}.${ASSET##*.}"
+    if [ ${#assets[@]} -eq 0 ]; then
+      echo "::error::No release assets found in dist/"
+      ls -la dist/ || true
+      exit 1
+    fi
+    for asset in "${assets[@]}"; do
+      cp "$asset" release-assets/
+    done
 ```
 
 ### 5. Validation & Error Matrix
 
 | Condition | Error |
 |-----------|-------|
-| `files` only contains `out/**/*` | Electron runtime NOT bundled — app won't launch |
+| `RELEASE_TAG=v2.0.4` but `package.json.version=2.0.3` | Workflow exits before packaging; updater would otherwise publish wrong version metadata |
+| `files` excludes runtime dependencies | Packaged app cannot load externalized runtime packages |
 | Using `portable` target on Windows | Single .exe extracts to temp dir on every launch — slow startup |
-| Missing `.` before `${ASSET##*.}` | Output file named `windows.exe` instead of `windows.exe` |
-| Multiple .exe files matched by glob | `head -1` picks first; may pick wrong file (unlikely with clean dist/) |
+| Renaming installers but uploading original `latest*.yml` | Auto-update download fails because metadata points at filenames that are not in the release |
+| Missing `latest.yml` / `latest-mac.yml` / `latest-linux.yml` | Clients cannot discover or validate updates |
+| macOS config omits `zip` target | macOS auto-update metadata cannot point at the zip artifact expected by updater |
 
 ### 6. Tests Required
 
 - Manual: Download each platform asset from release, install/run, verify app launches
 - Manual: Verify `npm run build` produces `out/` directory with main/preload/renderer
+- Manual: Push or dispatch `vX.Y.Z`, verify workflow fails when `package.json.version` is not `X.Y.Z`
+- Manual: Verify GitHub Release contains updater metadata and every artifact referenced by the metadata
+- Manual: Install `vX.Y.Z`, publish `vX.Y.(Z+1)`, verify the app detects the newer version
 
 ### 7. Wrong vs Correct
 
-#### Wrong (missing dot)
+#### Wrong (renaming updater asset)
 ```bash
-cp "$ASSET" "release-assets/dickhelper-$TAG-$PLATFORM${ASSET##*.}"
-# Produces: dickhelper-v2.0.0-windowsexe  (no dot!)
+cp "dist/DickHelper Setup 2.0.4.exe" "release-assets/dickhelper-v2.0.4-windows.exe"
+cp "dist/latest.yml" "release-assets/latest.yml"
+# latest.yml still references "DickHelper Setup 2.0.4.exe", which is not in the release.
 ```
 
-#### Correct
+#### Correct (preserve metadata filenames)
 ```bash
-cp "$ASSET" "release-assets/dickhelper-$TAG-$PLATFORM.${ASSET##*.}"
-# Produces: dickhelper-v2.0.0-windows.exe
+cp "dist/DickHelper Setup 2.0.4.exe" release-assets/
+cp "dist/DickHelper Setup 2.0.4.exe.blockmap" release-assets/
+cp "dist/latest.yml" release-assets/
 ```
 
 ---
