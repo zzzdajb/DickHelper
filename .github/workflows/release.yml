@@ -31,10 +31,13 @@ jobs:
         include:
           - os: windows-latest
             os-short: windows
+            arch: amd64
           - os: macos-latest
             os-short: macos
+            arch: amd64
           - os: ubuntu-latest
             os-short: linux
+            arch: amd64
 
     steps:
       - name: Validate release tag
@@ -110,7 +113,7 @@ jobs:
       - name: Upload release asset artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-${{ env.RELEASE_TAG }}-${{ matrix.os-short }}
+          name: release-${{ env.RELEASE_TAG }}-${{ matrix.os-short }}-${{ matrix.arch }}
           path: release-assets/*
           if-no-files-found: error
           retention-days: 7
