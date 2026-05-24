@@ -11,10 +11,16 @@ import {
     Divider,
     Badge,
     Switch,
+    Progress,
+    Anchor,
+    Loader,
 } from "@mantine/core";
-import { IconDownload, IconUpload, IconDatabase, IconInfoCircle, IconUsers } from "@tabler/icons-react";
+import { IconDownload, IconUpload, IconDatabase, IconInfoCircle, IconUsers, IconRefresh, IconBrandGithub } from "@tabler/icons-react";
 import { DatabaseService } from "../services/DatabaseService";
 import { useRecords } from "../hooks/useRecords";
+import type { IUpdateStatus } from "../types/IRecord";
+
+const GITHUB_URL: string = "https://github.com/zzzdajb/DickHelper";
 
 export const Settings = () => {
     const { records, refresh } = useRecords();
@@ -166,6 +172,8 @@ export const Settings = () => {
                 </Text>
             </Paper>
 
+            <UpdateSection />
+
             <Paper shadow="sm" radius="md" p="lg" withBorder>
                 <Group gap="sm" mb="xs">
                     <IconInfoCircle size={22} />
@@ -179,16 +187,169 @@ export const Settings = () => {
                     </Group>
                     <Divider />
                     <Group justify="space-between">
-                        <Text size="sm" c="dimmed">版本</Text>
-                        <Text size="sm" fw={500}>v2.0.0</Text>
+                        <Text size="sm" c="dimmed">技术栈</Text>
+                        <Text size="sm" fw={500}>Electron + React + Mantine</Text>
                     </Group>
                     <Divider />
                     <Group justify="space-between">
-                        <Text size="sm" c="dimmed">技术栈</Text>
-                        <Text size="sm" fw={500}>Electron + React + Mantine</Text>
+                        <Text size="sm" c="dimmed">GitHub</Text>
+                        <Anchor
+                            size="sm"
+                            fw={500}
+                            onClick={() => DatabaseService.OpenExternal(GITHUB_URL)}
+                            style={{ cursor: "pointer" }}
+                        >
+                            zzzdajb/DickHelper
+                        </Anchor>
                     </Group>
                 </Stack>
             </Paper>
         </Stack>
+    );
+};
+
+const UpdateSection = () => {
+    const [status, setStatus] = useState<IUpdateStatus>({ Status: "idle" });
+    const [version, setVersion] = useState<string>("...");
+    const [useMirror, setUseMirror] = useState<boolean>(false);
+    const [settingLoaded, setSettingLoaded] = useState<boolean>(false);
+
+    useEffect(() => {
+        DatabaseService.GetAppVersion().then((v) => setVersion(v));
+        DatabaseService.GetSetting("update_use_mirror").then((v) => {
+            setUseMirror(v === "true");
+            setSettingLoaded(true);
+        });
+        const cleanup: () => void = DatabaseService.OnUpdateStatus((s) => setStatus(s));
+        return cleanup;
+    }, []);
+
+    const HandleCheckUpdate = async (): Promise<void> => {
+        try {
+            await DatabaseService.CheckForUpdates(useMirror);
+        } catch {
+            // 错误通过 OnUpdateStatus 事件处理
+        }
+    };
+
+    const HandleDownloadUpdate = async (): Promise<void> => {
+        try {
+            await DatabaseService.DownloadUpdate();
+        } catch {
+            // 错误通过 OnUpdateStatus 事件处理
+        }
+    };
+
+    const HandleInstallUpdate = (): void => {
+        DatabaseService.InstallUpdate();
+    };
+
+    const HandleMirrorToggle = async (checked: boolean): Promise<void> => {
+        setUseMirror(checked);
+        await DatabaseService.SetSetting("update_use_mirror", checked ? "true" : "false");
+    };
+
+    return (
+        <Paper shadow="sm" radius="md" p="lg" withBorder>
+            <Group gap="sm" mb="xs">
+                <IconRefresh size={22} />
+                <Title order={4}>软件更新</Title>
+            </Group>
+
+            <Stack gap="sm">
+                <Group justify="space-between">
+                    <Text size="sm" c="dimmed">当前版本</Text>
+                    <Badge variant="light" color="blue">v{version}</Badge>
+                </Group>
+
+                {settingLoaded && (
+                    <Switch
+                        label="使用镜像加速（大陆用户）"
+                        checked={useMirror}
+                        onChange={(e) => HandleMirrorToggle(e.currentTarget.checked)}
+                        size="sm"
+                    />
+                )}
+
+                {status.Status === "idle" && (
+                    <Button variant="light" leftSection={<IconRefresh style={{ width: rem(16), height: rem(16) }} />} onClick={HandleCheckUpdate}>
+                        检查更新
+                    </Button>
+                )}
+
+                {status.Status === "checking" && (
+                    <Group gap="xs">
+                        <Loader size="xs" />
+                        <Text size="sm" c="dimmed">正在检查更新...</Text>
+                    </Group>
+                )}
+
+                {status.Status === "not-available" && (
+                    <Group justify="space-between">
+                        <Text size="sm" c="green">已是最新版本</Text>
+                        <Button variant="subtle" size="xs" onClick={() => setStatus({ Status: "idle" })}>
+                            重新检查
+                        </Button>
+                    </Group>
+                )}
+
+                {status.Status === "available" && (
+                    <Stack gap="xs">
+                        <Text size="sm">
+                            发现新版本：<Badge color="blue" variant="filled">v{status.Version}</Badge>
+                        </Text>
+                        <Group>
+                            <Button variant="filled" color="blue" onClick={HandleDownloadUpdate}>
+                                下载更新
+                            </Button>
+                            <Button
+                                variant="subtle"
+                                size="sm"
+                                leftSection={<IconBrandGithub style={{ width: rem(14), height: rem(14) }} />}
+                                onClick={() => DatabaseService.OpenExternal(`${GITHUB_URL}/releases/latest`)}
+                            >
+                                手动下载
+                            </Button>
+                        </Group>
+                    </Stack>
+                )}
+
+                {status.Status === "downloading" && (
+                    <Stack gap="xs">
+                        <Text size="sm" c="dimmed">正在下载更新... {status.Progress ?? 0}%</Text>
+                        <Progress value={status.Progress ?? 0} animated />
+                    </Stack>
+                )}
+
+                {status.Status === "downloaded" && (
+                    <Stack gap="xs">
+                        <Text size="sm" c="green">
+                            更新已下载完成（v{status.Version}）
+                        </Text>
+                        <Button variant="filled" color="green" onClick={HandleInstallUpdate}>
+                            安装并重启
+                        </Button>
+                    </Stack>
+                )}
+
+                {status.Status === "error" && (
+                    <Stack gap="xs">
+                        <Text size="sm" c="red">更新失败：{status.Error}</Text>
+                        <Group>
+                            <Button variant="light" onClick={HandleCheckUpdate}>
+                                重试
+                            </Button>
+                            <Button
+                                variant="subtle"
+                                leftSection={<IconBrandGithub style={{ width: rem(14), height: rem(14) }} />}
+                                onClick={() => DatabaseService.OpenExternal(`${GITHUB_URL}/releases/latest`)}
+                            >
+                                手动下载
+                            </Button>
+                        </Group>
+                    </Stack>
+                )}
+            </Stack>
+        </Paper>
     );
 };

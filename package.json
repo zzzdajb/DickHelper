@@ -13,6 +13,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
+    "electron-updater": "^6.8.3",
     "recharts": "^3.8.1",
     "sql.js": "^1.14.0"
   },

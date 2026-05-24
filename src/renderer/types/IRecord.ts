@@ -51,3 +51,12 @@ export interface IAppConfig {
     readonly ContributorId: string | null;
     readonly ApiEndpoint: string;
 }
+
+// 自动更新状态
+export interface IUpdateStatus {
+    readonly Status: "idle" | "checking" | "available" | "not-available" | "downloading" | "downloaded" | "error";
+    readonly Version?: string;
+    readonly Progress?: number;
+    readonly Error?: string;
+    readonly ReleaseNotes?: string;
+}

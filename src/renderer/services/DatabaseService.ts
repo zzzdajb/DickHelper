@@ -1,4 +1,4 @@
-import type { IRecord, IRecordRaw, IStats, IDailyCount, IImportResult, ICommunityStats, IAppConfig } from "../types/IRecord";
+import type { IRecord, IRecordRaw, IStats, IDailyCount, IImportResult, ICommunityStats, IAppConfig, IUpdateStatus } from "../types/IRecord";
 
 // 检查 electronAPI 是否可用，不在 Electron 环境时给出明确错误
 function GetApi(): Window["electronAPI"] {
@@ -146,6 +146,38 @@ export class DatabaseService {
 
     public static async SubmitCommunityStats(): Promise<boolean> {
         return GetApi().SubmitCommunityStats();
+    }
+
+    public static async GetSetting(key: string): Promise<string | null> {
+        return GetApi().GetSetting(key);
+    }
+
+    public static async SetSetting(key: string, value: string): Promise<void> {
+        return GetApi().SetSetting(key, value);
+    }
+
+    public static async OpenExternal(url: string): Promise<void> {
+        return GetApi().OpenExternal(url);
+    }
+
+    public static async CheckForUpdates(useMirror: boolean): Promise<unknown> {
+        return GetApi().CheckForUpdates(useMirror);
+    }
+
+    public static async DownloadUpdate(): Promise<void> {
+        return GetApi().DownloadUpdate();
+    }
+
+    public static async InstallUpdate(): Promise<void> {
+        return GetApi().InstallUpdate();
+    }
+
+    public static async GetAppVersion(): Promise<string> {
+        return GetApi().GetAppVersion();
+    }
+
+    public static OnUpdateStatus(callback: (status: IUpdateStatus) => void): () => void {
+        return GetApi().OnUpdateStatus(callback);
     }
 
     private static MapRawToRecord(raw: IRecordRaw): IRecord {

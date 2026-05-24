@@ -26,6 +26,23 @@ const electronAPI = {
     // 社区统计
     GetCommunityStats: (): Promise<unknown> => ipcRenderer.invoke("community:get-stats"),
     SubmitCommunityStats: (): Promise<boolean> => ipcRenderer.invoke("community:submit"),
+    // 设置
+    GetSetting: (key: string): Promise<string | null> => ipcRenderer.invoke("settings:get", key),
+    SetSetting: (key: string, value: string): Promise<void> => ipcRenderer.invoke("settings:set", key, value),
+    // 外部链接
+    OpenExternal: (url: string): Promise<void> => ipcRenderer.invoke("shell:open-external", url),
+    // 自动更新
+    CheckForUpdates: (useMirror: boolean): Promise<unknown> => ipcRenderer.invoke("updater:check", useMirror),
+    DownloadUpdate: (): Promise<void> => ipcRenderer.invoke("updater:download"),
+    InstallUpdate: (): Promise<void> => ipcRenderer.invoke("updater:install"),
+    GetAppVersion: (): Promise<string> => ipcRenderer.invoke("updater:get-version"),
+    OnUpdateStatus: (callback: (status: unknown) => void): (() => void) => {
+        const listener = (...listenerArgs: unknown[]): void => { callback(listenerArgs[1]); };
+        ipcRenderer.on("update-status", listener as Parameters<typeof ipcRenderer.on>[1]);
+        return () => {
+            ipcRenderer.removeListener("update-status", listener as Parameters<typeof ipcRenderer.removeListener>[1]);
+        };
+    },
 };
 
 try {

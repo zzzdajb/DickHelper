@@ -3,6 +3,7 @@ import path from "node:path";
 import { DatabaseService } from "./database";
 import { ConfigService } from "./config";
 import { CommunityService, GetCurrentWeekId } from "./community";
+import { InitUpdater, RegisterUpdateHandlers } from "./updater";
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -194,6 +195,18 @@ function RegisterIpcHandlers(): void {
             weeklyStats.AvgDuration
         );
     });
+
+    // 设置项读写
+    ipcMain.handle("settings:get", (...args) => {
+        const key: string = args[1] as string;
+        return databaseService!.GetSetting(key);
+    });
+
+    ipcMain.handle("settings:set", (...args) => {
+        const key: string = args[1] as string;
+        const value: string = args[2] as string;
+        databaseService!.SetSetting(key, value);
+    });
 }
 
 app.whenReady().then(async () => {
@@ -204,8 +217,12 @@ app.whenReady().then(async () => {
     communityService = new CommunityService(configService.GetConfig().ApiEndpoint);
     console.log("[Main] ConfigService & CommunityService initialized");
     RegisterIpcHandlers();
+    RegisterUpdateHandlers();
     CreateWindow();
     CreateTray();
+    if (!IS_DEV) {
+        InitUpdater();
+    }
     console.log("[Main] Startup complete");
 
     app.on("activate", () => {

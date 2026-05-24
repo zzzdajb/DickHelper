@@ -4,6 +4,11 @@ directories:
   output: dist
 files:
   - out/**/*
+# 此配置用于 electron-updater 自动更新检测，CI 仍使用 --publish=never 手动上传
+publish:
+  provider: github
+  owner: zzzdajb
+  repo: DickHelper
 win:
   target: nsis
 mac:

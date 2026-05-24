@@ -83,7 +83,15 @@ jobs:
             ASSET=$(ls dist/DickHelper*.AppImage | head -1)
           fi
           cp "$ASSET" "release-assets/dickhelper-${{ env.RELEASE_TAG }}-${{ matrix.os-short }}.${ASSET##*.}"
-          echo "Release asset: $(ls -lh release-assets/)"
+
+          # electron-updater 需要 latest*.yml 来检测更新
+          for yml in dist/latest*.yml; do
+            if [ -f "$yml" ]; then
+              cp "$yml" "release-assets/"
+            fi
+          done
+          echo "Release assets:"
+          ls -lh release-assets/
 
       - name: Upload release asset artifact
         uses: actions/upload-artifact@v4
@@ -119,7 +127,7 @@ jobs:
           set -euo pipefail
           shopt -s nullglob
 
-          assets=(release-assets/dickhelper*)
+          assets=(release-assets/dickhelper* release-assets/latest*.yml)
           echo "Found ${#assets[@]} release asset(s):"
           for a in "${assets[@]}"; do
             echo "  - $a ($(du -h "$a" | cut -f1))"
