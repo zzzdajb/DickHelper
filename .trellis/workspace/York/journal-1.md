@@ -279,3 +279,38 @@ Added a short auto-update testing guide and linked it from README.
 ### Next Steps
 
 - None - task complete
+
+
+## Session 9: App icons, monorepo setup, menu bar & star button
+
+**Date**: 2026-05-25
+**Task**: App icons, monorepo setup, menu bar & star button
+**Branch**: `main`
+
+### Summary
+
+Added stopwatch.png as app icon for desktop and tray; set up monorepo with packages/shared/ workspace for pure TypeScript types; hid default Electron menu bar in production; replaced tech stack display with GitHub star button in Settings.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `cae39f3` | (see git log) |
+| `25083e2` | (see git log) |
+| `0c3a7db` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
