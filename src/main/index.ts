@@ -256,7 +256,7 @@ function RegisterIpcHandlers(): void {
         };
 
         // 验证 provider 值，非法值回退到 local
-        const validProviders = ["anthropic", "openai", "ollama", "local"] as const;
+        const validProviders = ["anthropic", "openai", "google", "ollama", "cli", "local"] as const;
         const rawProvider: string = db.GetSetting("ai_provider") ?? "local";
         const provider = (validProviders as readonly string[]).includes(rawProvider)
             ? rawProvider as typeof validProviders[number]
@@ -266,6 +266,8 @@ function RegisterIpcHandlers(): void {
             ApiKey: db.GetSecureSetting("ai_api_key") ?? "",
             OllamaUrl: db.GetSetting("ai_ollama_url") ?? "http://localhost:11434",
             OllamaModel: db.GetSetting("ai_ollama_model") ?? "llama3",
+            GoogleModel: db.GetSetting("ai_google_model") ?? "gemini-2.0-flash",
+            CliCommand: db.GetSetting("ai_cli_command") ?? "",
         };
 
         try {

@@ -1,4 +1,6 @@
-// AI 分析服务：支持 Anthropic / OpenAI / Ollama / 本地规则四种 provider
+// AI 分析服务：支持 Anthropic / OpenAI / Google / Ollama / CLI / 本地规则六种 provider
+
+import { spawn } from "node:child_process";
 
 interface IAiAnalysisData {
     TotalCount: number;
@@ -12,10 +14,12 @@ interface IAiAnalysisData {
 }
 
 interface IAiConfig {
-    Provider: "anthropic" | "openai" | "ollama" | "local";
+    Provider: "anthropic" | "openai" | "google" | "ollama" | "cli" | "local";
     ApiKey: string;
     OllamaUrl: string;
     OllamaModel: string;
+    GoogleModel: string;
+    CliCommand: string;
 }
 
 const WEEKDAY_NAMES: string[] = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
@@ -154,6 +158,89 @@ const AnalyzeWithOllama = async (data: IAiAnalysisData, url: string, model: stri
     return ExtractOllamaText(await response.json());
 };
 
+const ExtractGoogleText = (result: unknown): string => {
+    const body = result as Record<string, unknown> | null;
+    if (body === null || typeof body !== "object") throw new Error("Google API 返回格式异常");
+    const candidates = body.candidates;
+    if (!Array.isArray(candidates) || candidates.length === 0) throw new Error("Google API 返回内容为空");
+    const first = candidates[0] as Record<string, unknown> | undefined;
+    if (first === undefined || typeof first !== "object") throw new Error("Google API 返回格式异常");
+    const content = first.content as Record<string, unknown> | undefined;
+    if (content === undefined || typeof content !== "object") throw new Error("Google API 返回格式异常");
+    const parts = content.parts;
+    if (!Array.isArray(parts) || parts.length === 0) throw new Error("Google API 返回内容为空");
+    const part = parts[0] as Record<string, unknown> | undefined;
+    if (part === undefined || typeof part.text !== "string") throw new Error("Google API 返回格式异常");
+    return part.text;
+};
+
+const AnalyzeWithGoogle = async (data: IAiAnalysisData, apiKey: string, model: string): Promise<string> => {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+    const response = await FetchWithTimeout(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey,
+        },
+        body: JSON.stringify({
+            contents: [{ parts: [{ text: BuildPrompt(data) }] }],
+        }),
+    });
+    if (!response.ok) {
+        throw new Error(`Google API 错误: ${response.status}`);
+    }
+    return ExtractGoogleText(await response.json());
+};
+
+const CLI_TIMEOUT_MS: number = 120_000;
+
+const AnalyzeWithCli = (data: IAiAnalysisData, command: string): Promise<string> => {
+    if (command.trim() === "") {
+        throw new Error("未配置 CLI 命令");
+    }
+
+    const prompt: string = BuildPrompt(data);
+
+    return new Promise<string>((resolve, reject) => {
+        const parts: string[] = command.split(/\s+/);
+        const bin: string = parts[0]!;
+        const args: string[] = parts.slice(1);
+
+        const child = spawn(bin, args, {
+            stdio: ["pipe", "pipe", "pipe"],
+            shell: true,
+            timeout: CLI_TIMEOUT_MS,
+        });
+
+        const stdout: Buffer[] = [];
+        const stderr: Buffer[] = [];
+
+        child.stdout.on("data", (chunk: Buffer) => stdout.push(chunk));
+        child.stderr.on("data", (chunk: Buffer) => stderr.push(chunk));
+
+        child.on("error", (err: Error) => {
+            reject(new Error(`CLI 启动失败: ${err.message}`));
+        });
+
+        child.on("close", (code: number | null) => {
+            const out: string = Buffer.concat(stdout).toString("utf-8").trim();
+            if (code !== 0) {
+                const errMsg: string = Buffer.concat(stderr).toString("utf-8").trim();
+                reject(new Error(`CLI 退出码 ${code ?? "null"}: ${errMsg || out || "无输出"}`));
+                return;
+            }
+            if (out === "") {
+                reject(new Error("CLI 命令无输出"));
+                return;
+            }
+            resolve(out);
+        });
+
+        child.stdin.write(prompt);
+        child.stdin.end();
+    });
+};
+
 const AnalyzeLocally = (data: IAiAnalysisData): string => {
     if (data.TotalCount === 0) {
         return "暂无数据记录，开始记录后即可获得分析洞察。";
@@ -218,8 +305,12 @@ export const Analyze = async (data: IAiAnalysisData, config: IAiConfig): Promise
             return AnalyzeWithAnthropic(data, config.ApiKey);
         case "openai":
             return AnalyzeWithOpenAi(data, config.ApiKey);
+        case "google":
+            return AnalyzeWithGoogle(data, config.ApiKey, config.GoogleModel);
         case "ollama":
             return AnalyzeWithOllama(data, config.OllamaUrl, config.OllamaModel);
+        case "cli":
+            return AnalyzeWithCli(data, config.CliCommand);
         case "local":
             return AnalyzeLocally(data);
     }

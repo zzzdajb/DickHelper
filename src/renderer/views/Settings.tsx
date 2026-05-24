@@ -202,7 +202,9 @@ const PROVIDER_OPTIONS: { value: string; label: string }[] = [
     { value: "local", label: "本地规则分析（无需 API）" },
     { value: "anthropic", label: "Anthropic (Claude)" },
     { value: "openai", label: "OpenAI (GPT)" },
+    { value: "google", label: "Google (Gemini)" },
     { value: "ollama", label: "Ollama（本地模型）" },
+    { value: "cli", label: "本地 CLI 命令" },
 ];
 
 const AiConfigSection = () => {
@@ -210,6 +212,8 @@ const AiConfigSection = () => {
     const [apiKey, setApiKey] = useState<string>("");
     const [ollamaUrl, setOllamaUrl] = useState<string>("http://localhost:11434");
     const [ollamaModel, setOllamaModel] = useState<string>("llama3");
+    const [googleModel, setGoogleModel] = useState<string>("gemini-2.0-flash");
+    const [cliCommand, setCliCommand] = useState<string>("");
     const [saved, setSaved] = useState<boolean>(false);
     const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -218,6 +222,8 @@ const AiConfigSection = () => {
         DatabaseService.GetSetting("ai_api_key").then((v) => { if (v !== null) setApiKey(v); });
         DatabaseService.GetSetting("ai_ollama_url").then((v) => { if (v !== null) setOllamaUrl(v); });
         DatabaseService.GetSetting("ai_ollama_model").then((v) => { if (v !== null) setOllamaModel(v); });
+        DatabaseService.GetSetting("ai_google_model").then((v) => { if (v !== null) setGoogleModel(v); });
+        DatabaseService.GetSetting("ai_cli_command").then((v) => { if (v !== null) setCliCommand(v); });
         return () => {
             if (savedTimerRef.current !== null) clearTimeout(savedTimerRef.current);
         };
@@ -228,13 +234,17 @@ const AiConfigSection = () => {
         await DatabaseService.SetSetting("ai_api_key", apiKey);
         await DatabaseService.SetSetting("ai_ollama_url", ollamaUrl);
         await DatabaseService.SetSetting("ai_ollama_model", ollamaModel);
+        await DatabaseService.SetSetting("ai_google_model", googleModel);
+        await DatabaseService.SetSetting("ai_cli_command", cliCommand);
         setSaved(true);
         if (savedTimerRef.current !== null) clearTimeout(savedTimerRef.current);
         savedTimerRef.current = setTimeout(() => setSaved(false), 2000);
     };
 
-    const showApiKey: boolean = provider === "anthropic" || provider === "openai";
+    const showApiKey: boolean = provider === "anthropic" || provider === "openai" || provider === "google";
     const showOllama: boolean = provider === "ollama";
+    const showGoogle: boolean = provider === "google";
+    const showCli: boolean = provider === "cli";
 
     return (
         <Paper shadow="sm" radius="md" p="lg" withBorder>
@@ -243,7 +253,7 @@ const AiConfigSection = () => {
                 <Title order={4}>AI 分析配置</Title>
             </Group>
             <Text size="sm" c="dimmed" mb="md">
-                选择 AI 服务商用于数据分析，本地规则分析无需配置。
+                选择 AI 服务商用于数据分析，支持云端 API、本地模型和 CLI 工具。
             </Text>
 
             <Stack gap="sm">
@@ -257,9 +267,18 @@ const AiConfigSection = () => {
                 {showApiKey && (
                     <PasswordInput
                         label="API Key"
-                        placeholder={provider === "anthropic" ? "sk-ant-..." : "sk-..."}
+                        placeholder={provider === "anthropic" ? "sk-ant-..." : provider === "google" ? "AIza..." : "sk-..."}
                         value={apiKey}
                         onChange={(e) => setApiKey(e.currentTarget.value)}
+                    />
+                )}
+
+                {showGoogle && (
+                    <TextInput
+                        label="模型名称"
+                        placeholder="gemini-2.0-flash"
+                        value={googleModel}
+                        onChange={(e) => setGoogleModel(e.currentTarget.value)}
                     />
                 )}
 
@@ -278,6 +297,16 @@ const AiConfigSection = () => {
                             onChange={(e) => setOllamaModel(e.currentTarget.value)}
                         />
                     </>
+                )}
+
+                {showCli && (
+                    <TextInput
+                        label="CLI 命令"
+                        description="提示词将通过 stdin 传入，stdout 作为分析结果。例如：claude -p"
+                        placeholder="claude -p"
+                        value={cliCommand}
+                        onChange={(e) => setCliCommand(e.currentTarget.value)}
+                    />
                 )}
 
                 <Group>
