@@ -190,26 +190,44 @@ function RegisterIpcHandlers(): void {
     });
 }
 
-app.whenReady().then(async () => {
-    console.log("[Main] App ready");
-    databaseService = await DatabaseService.create();
-    console.log("[Main] DatabaseService initialized");
-    updateService = new UpdateService(() => mainWindow);
-    RegisterIpcHandlers();
-    CreateWindow();
-    CreateTray();
-    updateService.StartStartupCheck();
-    console.log("[Main] Startup complete");
-
-    app.on("activate", () => {
-        // macOS: 点击 dock 图标时重新创建窗口
-        if (BrowserWindow.getAllWindows().length === 0) {
-            CreateWindow();
-        } else {
-            mainWindow?.show();
+// 单例锁：禁止多个实例，防止多个托盘图标
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+    console.log("[Main] Another instance is running, quitting");
+    app.quit();
+} else {
+    app.on("second-instance", () => {
+        // 当用户再次尝试打开应用时，聚焦已有窗口
+        if (mainWindow) {
+            if (mainWindow.isMinimized()) {
+                mainWindow.restore();
+            }
+            mainWindow.show();
+            mainWindow.focus();
         }
     });
-});
+
+    app.whenReady().then(async () => {
+        console.log("[Main] App ready");
+        databaseService = await DatabaseService.create();
+        console.log("[Main] DatabaseService initialized");
+        updateService = new UpdateService(() => mainWindow);
+        RegisterIpcHandlers();
+        CreateWindow();
+        CreateTray();
+        updateService.StartStartupCheck();
+        console.log("[Main] Startup complete");
+
+        app.on("activate", () => {
+            // macOS: 点击 dock 图标时重新创建窗口
+            if (BrowserWindow.getAllWindows().length === 0) {
+                CreateWindow();
+            } else {
+                mainWindow?.show();
+            }
+        });
+    });
+}
 
 // 所有窗口关闭时退出（除了 macOS）
 app.on("window-all-closed", () => {

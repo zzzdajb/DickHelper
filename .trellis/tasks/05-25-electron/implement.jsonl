@@ -1,0 +1,2 @@
+{"file": ".trellis/spec/backend/logging-guidelines.md", "reason": "Main process uses console.log for logging, follow existing patterns"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "Singleton lock failure handling pattern"}
