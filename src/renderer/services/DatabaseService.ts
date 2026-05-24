@@ -1,4 +1,4 @@
-import type { IRecord, IRecordRaw, IStats, IDailyCount, IImportResult } from "../types/IRecord";
+import type { IRecord, IRecordRaw, IStats, IDailyCount, IImportResult, ICommunityStats, IAppConfig } from "../types/IRecord";
 
 // 检查 electronAPI 是否可用，不在 Electron 环境时给出明确错误
 function GetApi(): Window["electronAPI"] {
@@ -130,6 +130,22 @@ export class DatabaseService {
      */
     public static OnRecordsUpdated(callback: () => void): () => void {
         return GetApi().OnRecordsUpdated(callback);
+    }
+
+    public static async GetConfig(): Promise<IAppConfig> {
+        return GetApi().GetConfig();
+    }
+
+    public static async SetConfig(partial: { CommunityOptIn?: boolean }): Promise<IAppConfig> {
+        return GetApi().SetConfig(partial);
+    }
+
+    public static async GetCommunityStats(): Promise<ICommunityStats | null> {
+        return GetApi().GetCommunityStats();
+    }
+
+    public static async SubmitCommunityStats(): Promise<boolean> {
+        return GetApi().SubmitCommunityStats();
     }
 
     private static MapRawToRecord(raw: IRecordRaw): IRecord {

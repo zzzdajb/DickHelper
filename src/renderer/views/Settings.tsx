@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
     Paper,
     Stack,
@@ -10,16 +10,31 @@ import {
     rem,
     Divider,
     Badge,
+    Switch,
 } from "@mantine/core";
-import { IconDownload, IconUpload, IconDatabase, IconInfoCircle } from "@tabler/icons-react";
+import { IconDownload, IconUpload, IconDatabase, IconInfoCircle, IconUsers } from "@tabler/icons-react";
 import { DatabaseService } from "../services/DatabaseService";
 import { useRecords } from "../hooks/useRecords";
 
 export const Settings = () => {
     const { records, refresh } = useRecords();
     const [importMessage, setImportMessage] = useState<string | null>(null);
+    const [communityOptIn, setCommunityOptIn] = useState<boolean>(false);
+    const [configLoaded, setConfigLoaded] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const importTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        DatabaseService.GetConfig().then((config) => {
+            setCommunityOptIn(config.CommunityOptIn);
+            setConfigLoaded(true);
+        });
+    }, []);
+
+    const HandleOptInToggle = async (checked: boolean): Promise<void> => {
+        setCommunityOptIn(checked);
+        await DatabaseService.SetConfig({ CommunityOptIn: checked });
+    };
 
     const HandleExport = async (): Promise<void> => {
         const allRecords = await DatabaseService.GetRecords();
@@ -126,6 +141,29 @@ export const Settings = () => {
                         {importMessage}
                     </Notification>
                 )}
+            </Paper>
+
+            <Paper shadow="sm" radius="md" p="lg" withBorder>
+                <Group justify="space-between" align="flex-start" mb="xs">
+                    <Group gap="sm">
+                        <IconUsers size={22} />
+                        <Title order={4}>社区统计</Title>
+                    </Group>
+                    {configLoaded && (
+                        <Switch
+                            checked={communityOptIn}
+                            onChange={(e) => HandleOptInToggle(e.currentTarget.checked)}
+                            size="md"
+                        />
+                    )}
+                </Group>
+                <Text size="sm" c="dimmed" mb="xs">
+                    匿名参与社区聚合统计，查看你和社区平均水平的对比。
+                </Text>
+                <Text size="xs" c="dimmed">
+                    开启后仅上报本周次数和平均时长两个数字，不含任何个人信息、时间戳或记录详情。
+                    数据通过随机 ID 匿名提交，无法关联到你的身份。可随时关闭。
+                </Text>
             </Paper>
 
             <Paper shadow="sm" radius="md" p="lg" withBorder>

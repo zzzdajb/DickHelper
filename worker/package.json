@@ -1,0 +1,14 @@
+{
+  "name": "dickhelper-community-worker",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0",
+    "@cloudflare/workers-types": "^4.20250501.0",
+    "typescript": "~5.7.2"
+  }
+}

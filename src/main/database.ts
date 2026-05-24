@@ -134,6 +134,7 @@ export class DatabaseService {
     public GetStats(): {
         TotalCount: number;
         AverageDuration: number;
+        WeeklyAverageDuration: number;
         FrequencyPerWeek: number;
         FrequencyPerMonth: number;
     } {
@@ -150,7 +151,7 @@ export class DatabaseService {
         );
 
         const weekRow = this._queryOne(
-            `SELECT COUNT(*) as count FROM ${TABLE_NAME} WHERE EndTime >= ?`,
+            `SELECT COUNT(*) as count, AVG(Duration) as avgDur FROM ${TABLE_NAME} WHERE EndTime >= ?`,
             [oneWeekAgo.toISOString()]
         );
 
@@ -162,8 +163,23 @@ export class DatabaseService {
         return {
             TotalCount: (totalRow?.count as number) ?? 0,
             AverageDuration: (totalRow?.avgDur as number) ?? 0,
+            WeeklyAverageDuration: (weekRow?.avgDur as number) ?? 0,
             FrequencyPerWeek: (weekRow?.count as number) ?? 0,
             FrequencyPerMonth: (monthRow?.count as number) ?? 0,
+        };
+    }
+
+    // 本周统计：次数和平均时长（仅最近 7 天）
+    public GetWeeklyStats(): { Count: number; AvgDuration: number } {
+        const now = new Date();
+        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const row = this._queryOne(
+            `SELECT COUNT(*) as count, AVG(Duration) as avgDur FROM ${TABLE_NAME} WHERE EndTime >= ?`,
+            [oneWeekAgo.toISOString()]
+        );
+        return {
+            Count: (row?.count as number) ?? 0,
+            AvgDuration: (row?.avgDur as number) ?? 0,
         };
     }
 

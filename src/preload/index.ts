@@ -20,6 +20,12 @@ const electronAPI = {
             ipcRenderer.removeListener("records-updated", listener);
         };
     },
+    // 配置
+    GetConfig: (): Promise<unknown> => ipcRenderer.invoke("config:get"),
+    SetConfig: (partial: { CommunityOptIn?: boolean }): Promise<unknown> => ipcRenderer.invoke("config:set", partial),
+    // 社区统计
+    GetCommunityStats: (): Promise<unknown> => ipcRenderer.invoke("community:get-stats"),
+    SubmitCommunityStats: (): Promise<boolean> => ipcRenderer.invoke("community:submit"),
 };
 
 try {

@@ -1,8 +1,8 @@
 import { useState, useEffect, type ReactNode } from "react";
-import { Paper, Title, SimpleGrid, Stack, Text, Group, Box, Tooltip, ThemeIcon } from "@mantine/core";
-import { IconChartBar, IconClock, IconDroplet, IconHistory } from "@tabler/icons-react";
+import { Paper, Title, SimpleGrid, Stack, Text, Group, Box, Tooltip, ThemeIcon, Progress, Badge } from "@mantine/core";
+import { IconChartBar, IconClock, IconDroplet, IconHistory, IconUsers } from "@tabler/icons-react";
 import { DatabaseService } from "../services/DatabaseService";
-import type { IStats, IDailyCount } from "../types/IRecord";
+import type { IStats, IDailyCount, ICommunityStats } from "../types/IRecord";
 
 const DAYS_IN_WEEK: number = 7;
 const WEEKS_TO_SHOW: number = 4;
@@ -12,10 +12,13 @@ export const StatsChart = () => {
     const [stats, setStats] = useState<IStats>({
         TotalCount: 0,
         AverageDuration: 0,
+        WeeklyAverageDuration: 0,
         FrequencyPerWeek: 0,
         FrequencyPerMonth: 0,
     });
     const [dailyCounts, setDailyCounts] = useState<Map<string, number>>(new Map());
+    const [communityStats, setCommunityStats] = useState<ICommunityStats | null>(null);
+    const [optedIn, setOptedIn] = useState<boolean>(false);
 
     const LoadData = (): void => {
         DatabaseService.GetStats().then(setStats);
@@ -35,8 +38,20 @@ export const StatsChart = () => {
         });
     };
 
+    const LoadCommunityData = (): void => {
+        DatabaseService.GetConfig().then((config) => {
+            setOptedIn(config.CommunityOptIn);
+            if (config.CommunityOptIn) {
+                DatabaseService.SubmitCommunityStats().then(() => {
+                    DatabaseService.GetCommunityStats().then(setCommunityStats);
+                });
+            }
+        });
+    };
+
     useEffect(() => {
         LoadData();
+        LoadCommunityData();
 
         const unsubscribe = DatabaseService.OnRecordsUpdated(() => {
             LoadData();
@@ -219,7 +234,89 @@ export const StatsChart = () => {
                     </Stack>
                 </Group>
             </Paper>
+            {optedIn && communityStats !== null && communityStats.SampleSize > 0 && (
+                <Paper shadow="sm" radius="md" p="lg" withBorder>
+                    <Group justify="space-between" align="flex-start" mb="md">
+                        <Stack gap={2}>
+                            <Group gap="xs">
+                                <IconUsers size={20} color="var(--mantine-color-grape-6)" />
+                                <Title order={4}>社区对比</Title>
+                            </Group>
+                            <Text size="sm" c="dimmed">
+                                你和社区匿名用户的本周对比（基于 {communityStats.SampleSize} 位用户）
+                            </Text>
+                        </Stack>
+                        <Badge variant="light" color="grape" size="sm">匿名聚合</Badge>
+                    </Group>
+
+                    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                        <ComparisonCard
+                            label="本周次数"
+                            myValue={stats.FrequencyPerWeek}
+                            communityValue={communityStats.MedianCount}
+                            unit="次"
+                            color="green"
+                        />
+                        <ComparisonCard
+                            label="本周平均时长"
+                            myValue={stats.WeeklyAverageDuration}
+                            communityValue={communityStats.MedianDuration}
+                            unit="分钟"
+                            color="cyan"
+                            decimals={1}
+                        />
+                    </SimpleGrid>
+                </Paper>
+            )}
+
+            {optedIn && communityStats === null && (
+                <Paper shadow="sm" radius="md" p="md" withBorder>
+                    <Group gap="xs">
+                        <IconUsers size={18} color="var(--mantine-color-dimmed)" />
+                        <Text size="sm" c="dimmed">社区数据加载中，或暂无足够样本...</Text>
+                    </Group>
+                </Paper>
+            )}
         </Stack>
+    );
+};
+
+const ComparisonCard = ({
+    label,
+    myValue,
+    communityValue,
+    unit,
+    color,
+    decimals = 0,
+}: {
+    label: string;
+    myValue: number;
+    communityValue: number;
+    unit: string;
+    color: string;
+    decimals?: number;
+}) => {
+    const max: number = Math.max(myValue, communityValue, 1);
+    const myPercent: number = (myValue / max) * 100;
+    const communityPercent: number = (communityValue / max) * 100;
+    const formatVal = (v: number): string => decimals > 0 ? v.toFixed(decimals) : String(v);
+
+    return (
+        <Paper p="md" radius="md" withBorder>
+            <Text size="sm" fw={500} mb="sm">{label}</Text>
+            <Stack gap="xs">
+                <Group justify="space-between">
+                    <Text size="xs" c="dimmed">你</Text>
+                    <Text size="sm" fw={600} c={color}>{formatVal(myValue)} {unit}</Text>
+                </Group>
+                <Progress value={myPercent} color={color} size="sm" radius="xl" />
+                <Group justify="space-between">
+                    <Text size="xs" c="dimmed">社区中位数</Text>
+                    <Text size="sm" fw={600} c="grape">{formatVal(communityValue)} {unit}</Text>
+                </Group>
+                <Progress value={communityPercent} color="grape" size="sm" radius="xl" />
+            </Stack>
+        </Paper>
     );
 };
 

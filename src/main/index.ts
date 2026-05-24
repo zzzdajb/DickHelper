@@ -1,10 +1,14 @@
 import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage } from "electron";
 import path from "node:path";
 import { DatabaseService } from "./database";
+import { ConfigService } from "./config";
+import { CommunityService, GetCurrentWeekId } from "./community";
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let databaseService: DatabaseService | null = null;
+let configService: ConfigService | null = null;
+let communityService: CommunityService | null = null;
 
 const IS_DEV: boolean = process.env.ELECTRON_RENDERER_URL !== undefined;
 
@@ -159,12 +163,46 @@ function RegisterIpcHandlers(): void {
         }
         return result;
     });
+
+    // 配置相关
+    ipcMain.handle("config:get", () => {
+        return configService!.GetConfig();
+    });
+
+    ipcMain.handle("config:set", (...args) => {
+        const partial = args[1] as { CommunityOptIn?: boolean };
+        return configService!.SetConfig(partial);
+    });
+
+    // 社区统计相关
+    ipcMain.handle("community:get-stats", async () => {
+        const weekId: string = GetCurrentWeekId();
+        return communityService!.GetCommunityStats(weekId);
+    });
+
+    ipcMain.handle("community:submit", async () => {
+        const config = configService!.GetConfig();
+        if (!config.CommunityOptIn || config.ContributorId === null) {
+            return false;
+        }
+        const weeklyStats = databaseService!.GetWeeklyStats();
+        const weekId: string = GetCurrentWeekId();
+        return communityService!.SubmitStats(
+            config.ContributorId,
+            weekId,
+            weeklyStats.Count,
+            weeklyStats.AvgDuration
+        );
+    });
 }
 
 app.whenReady().then(async () => {
     console.log("[Main] App ready");
     databaseService = await DatabaseService.create();
     console.log("[Main] DatabaseService initialized");
+    configService = new ConfigService();
+    communityService = new CommunityService(configService.GetConfig().ApiEndpoint);
+    console.log("[Main] ConfigService & CommunityService initialized");
     RegisterIpcHandlers();
     CreateWindow();
     CreateTray();

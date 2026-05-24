@@ -1,5 +1,5 @@
 // 声明 window.electronAPI 类型，让渲染进程可以直接使用
-import type { IRecordRaw, IStats, IDailyCount, IImportResult } from "../renderer/types/IRecord";
+import type { IRecordRaw, IStats, IDailyCount, IImportResult, ICommunityStats, IAppConfig } from "../renderer/types/IRecord";
 
 interface IImportRecord {
     Id: string;
@@ -20,6 +20,10 @@ declare global {
             GetDailyCounts: (startTimestamp: number, endTimestamp: number) => Promise<IDailyCount[]>;
             ImportRecords: (records: IImportRecord[]) => Promise<IImportResult>;
             OnRecordsUpdated: (callback: () => void) => () => void;
+            GetConfig: () => Promise<IAppConfig>;
+            SetConfig: (partial: { CommunityOptIn?: boolean }) => Promise<IAppConfig>;
+            GetCommunityStats: () => Promise<ICommunityStats | null>;
+            SubmitCommunityStats: () => Promise<boolean>;
         };
     }
 }
