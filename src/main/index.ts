@@ -213,9 +213,17 @@ function RegisterIpcHandlers(): void {
         return databaseService!.GetAllDurations();
     });
 
-    // 设置通道（API Key 使用系统加密存储）
+    // 设置通道（API Key 使用系统加密存储，仅允许白名单内的 key）
+    const ALLOWED_SETTINGS: Set<string> = new Set([
+        "ai_provider", "ai_api_key", "ai_ollama_url", "ai_ollama_model",
+        "ai_google_model", "ai_cli_command",
+    ]);
+
     ipcMain.handle("settings:get", (...args) => {
         const key: string = args[1] as string;
+        if (!ALLOWED_SETTINGS.has(key)) {
+            throw new Error(`不允许的设置项: ${key}`);
+        }
         if (key === "ai_api_key") {
             return databaseService!.GetSecureSetting(key);
         }
@@ -225,6 +233,9 @@ function RegisterIpcHandlers(): void {
     ipcMain.handle("settings:set", (...args) => {
         const key: string = args[1] as string;
         const value: string = args[2] as string;
+        if (!ALLOWED_SETTINGS.has(key)) {
+            throw new Error(`不允许的设置项: ${key}`);
+        }
         if (key === "ai_api_key") {
             databaseService!.SetSecureSetting(key, value);
         } else {

@@ -194,7 +194,9 @@ const AnalyzeWithGoogle = async (data: IAiAnalysisData, apiKey: string, model: s
 
 const CLI_TIMEOUT_MS: number = 120_000;
 
-const AnalyzeWithCli = (data: IAiAnalysisData, command: string): Promise<string> => {
+const MAX_CLI_OUTPUT_BYTES: number = 1_048_576;
+
+const AnalyzeWithCli = async (data: IAiAnalysisData, command: string): Promise<string> => {
     if (command.trim() === "") {
         throw new Error("未配置 CLI 命令");
     }
@@ -208,36 +210,55 @@ const AnalyzeWithCli = (data: IAiAnalysisData, command: string): Promise<string>
 
         const child = spawn(bin, args, {
             stdio: ["pipe", "pipe", "pipe"],
-            shell: true,
             timeout: CLI_TIMEOUT_MS,
         });
 
         const stdout: Buffer[] = [];
         const stderr: Buffer[] = [];
+        let totalBytes: number = 0;
+        let settled: boolean = false;
 
-        child.stdout.on("data", (chunk: Buffer) => stdout.push(chunk));
+        const settle = (fn: () => void): void => {
+            if (settled) return;
+            settled = true;
+            fn();
+        };
+
+        child.stdout.on("data", (chunk: Buffer) => {
+            totalBytes += chunk.length;
+            if (totalBytes > MAX_CLI_OUTPUT_BYTES) {
+                child.kill();
+                settle(() => reject(new Error("CLI 输出超过 1MB 限制")));
+                return;
+            }
+            stdout.push(chunk);
+        });
         child.stderr.on("data", (chunk: Buffer) => stderr.push(chunk));
 
         child.on("error", (err: Error) => {
-            reject(new Error(`CLI 启动失败: ${err.message}`));
+            settle(() => reject(new Error(`CLI 启动失败: ${err.message}`)));
         });
 
         child.on("close", (code: number | null) => {
             const out: string = Buffer.concat(stdout).toString("utf-8").trim();
             if (code !== 0) {
                 const errMsg: string = Buffer.concat(stderr).toString("utf-8").trim();
-                reject(new Error(`CLI 退出码 ${code ?? "null"}: ${errMsg || out || "无输出"}`));
+                settle(() => reject(new Error(`CLI 退出码 ${code ?? "null"}: ${errMsg || out || "无输出"}`)));
                 return;
             }
             if (out === "") {
-                reject(new Error("CLI 命令无输出"));
+                settle(() => reject(new Error("CLI 命令无输出")));
                 return;
             }
-            resolve(out);
+            settle(() => resolve(out));
         });
 
-        child.stdin.write(prompt);
-        child.stdin.end();
+        try {
+            child.stdin.write(prompt);
+            child.stdin.end();
+        } catch {
+            // 进程可能已退出，error/close 事件会处理
+        }
     });
 };
 
