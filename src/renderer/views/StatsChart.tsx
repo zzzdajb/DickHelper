@@ -2,7 +2,7 @@ import { useState, useEffect, type ReactNode } from "react";
 import { Paper, Title, SimpleGrid, Stack, Text, Group, Box, Tooltip, ThemeIcon } from "@mantine/core";
 import { IconChartBar, IconClock, IconDroplet, IconHistory } from "@tabler/icons-react";
 import { DatabaseService } from "../services/DatabaseService";
-import type { IStats, IDailyCount } from "../types/IRecord";
+import type { IStats, IDailyCount } from "@dickhelper/shared";
 
 const DAYS_IN_WEEK: number = 7;
 const WEEKS_TO_SHOW: number = 4;

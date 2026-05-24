@@ -18,6 +18,8 @@ function CreateWindow(): void {
     console.log("[Main] __dirname:", __dirname);
     console.log("[Main] Dev mode:", IS_DEV);
 
+    const iconPath: string = path.join(__dirname, "../../resources/stopwatch.png");
+
     mainWindow = new BrowserWindow({
         width: 960,
         height: 680,
@@ -25,6 +27,7 @@ function CreateWindow(): void {
         minHeight: 600,
         backgroundColor: "#f5f5f5",
         show: false,
+        icon: iconPath,
         webPreferences: {
             preload: preloadPath,
             contextIsolation: true,
@@ -77,10 +80,8 @@ function CreateWindow(): void {
 }
 
 function CreateTray(): void {
-    // 16x16 蓝色方块占位图标 (#2196f3)
-    const icon = nativeImage.createFromDataURL(
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAFklEQVR4nGNQnPaZJMQwqmFUw/DVAACnNaoQK5bsTwAAAABJRU5ErkJggg=="
-    );
+    const iconPath: string = path.join(__dirname, "../../resources/stopwatch.png");
+    const icon: Electron.NativeImage = nativeImage.createFromPath(iconPath);
 
     tray = new Tray(icon);
     tray.setToolTip("牛子小助手");

@@ -1,6 +1,5 @@
 // 声明 window.electronAPI 类型，让渲染进程可以直接使用
-import type { IRecordRaw, IStats, IDailyCount, IImportResult } from "../renderer/types/IRecord";
-import type { IUpdateSettings, IUpdateState, UpdateSource } from "../shared/IUpdate";
+import type { IRecordRaw, IStats, IDailyCount, IImportResult, IUpdateSettings, IUpdateState, UpdateSource } from "@dickhelper/shared";
 
 interface IImportRecord {
     Id: string;

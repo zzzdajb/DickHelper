@@ -13,7 +13,7 @@ import {
 import { IconTrash, IconEraser } from "@tabler/icons-react";
 import { useRecords } from "../hooks/useRecords";
 import { DatabaseService } from "../services/DatabaseService";
-import type { IRecord } from "../types/IRecord";
+import type { IRecord } from "@dickhelper/shared";
 
 const FormatDuration = (durationMinutes: number): string => {
     const minutes: number = Math.floor(durationMinutes);

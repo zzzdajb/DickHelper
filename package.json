@@ -1,6 +1,7 @@
 {
   "name": "dickhelper",
   "private": true,
+  "workspaces": ["packages/shared"],
   "version": "2.0.4",
   "type": "module",
   "main": "./out/main/index.js",

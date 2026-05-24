@@ -1,0 +1,2 @@
+{"file": ".trellis/spec/backend", "reason": "Check backend import path updates and database type dedup"}
+{"file": ".trellis/spec/frontend", "reason": "Check frontend import path updates"}

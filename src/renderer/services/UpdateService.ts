@@ -1,4 +1,4 @@
-import type { IUpdateSettings, IUpdateState, UpdateSource } from "../types/IUpdate";
+import type { IUpdateSettings, IUpdateState, UpdateSource } from "@dickhelper/shared";
 
 function GetApi(): Window["electronAPI"] {
     const api: Window["electronAPI"] | undefined = window.electronAPI;

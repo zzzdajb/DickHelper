@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { UpdateService } from "../services/UpdateService";
-import type { IUpdateState } from "../types/IUpdate";
+import type { IUpdateState } from "@dickhelper/shared";
 
 export const useUpdateState = (): { UpdateState: IUpdateState | null } => {
     const [updateState, setUpdateState] = useState<IUpdateState | null>(null);

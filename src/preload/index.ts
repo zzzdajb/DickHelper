@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from "electron";
-import type { IUpdateSettings, IUpdateState, UpdateSource } from "../shared/IUpdate";
+import type { IUpdateSettings, IUpdateState, UpdateSource } from "@dickhelper/shared";
 
 console.log("[Preload] Script loading...");
 

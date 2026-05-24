@@ -2,6 +2,7 @@
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "ES2022",
+    "paths": { "@dickhelper/shared": ["./packages/shared/src/index.ts"] },
     "lib": ["ES2023"],
     "module": "ESNext",
     "skipLibCheck": true,
@@ -20,7 +21,7 @@
     "noUncheckedSideEffectImports": true
   },
   "include": [
-    "src/shared/**/*.ts",
+    "packages/shared/src/**/*.ts",
     "src/main/**/*.ts",
     "src/preload/**/*.ts",
     "electron.vite.config.ts"

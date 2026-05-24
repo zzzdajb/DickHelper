@@ -6,7 +6,6 @@ export interface IRecord {
     readonly Notes?: string;
 }
 
-// 从 SQLite 读取时的原始数据（日期为 ISO 字符串）
 export interface IRecordRaw {
     readonly Id: string;
     readonly StartTime: string;
@@ -15,7 +14,6 @@ export interface IRecordRaw {
     readonly Notes: string | null;
 }
 
-// 统计数据结构
 export interface IStats {
     readonly TotalCount: number;
     readonly AverageDuration: number;
@@ -23,13 +21,11 @@ export interface IStats {
     readonly FrequencyPerMonth: number;
 }
 
-// 每日计数（用于热力图）
 export interface IDailyCount {
     readonly Date: string;
     readonly Count: number;
 }
 
-// 导入结果
 export interface IImportResult {
     readonly Imported: number;
     readonly Skipped: number;

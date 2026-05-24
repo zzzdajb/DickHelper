@@ -1,0 +1,8 @@
+{
+  "name": "@dickhelper/shared",
+  "version": "2.0.4",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts"
+}

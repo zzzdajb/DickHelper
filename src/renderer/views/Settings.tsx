@@ -28,7 +28,7 @@ import { DatabaseService } from "../services/DatabaseService";
 import { UpdateService } from "../services/UpdateService";
 import { useRecords } from "../hooks/useRecords";
 import { useUpdateState } from "../hooks/useUpdateState";
-import type { UpdateSource, UpdateStatus } from "../types/IUpdate";
+import type { UpdateSource, UpdateStatus } from "@dickhelper/shared";
 
 const GetUpdateStatusText = (status: UpdateStatus | undefined): string => {
     switch (status) {

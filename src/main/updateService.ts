@@ -8,7 +8,7 @@ import electronUpdater, {
 import { CancellationToken } from "builder-util-runtime";
 import fs from "node:fs";
 import path from "node:path";
-import type { IUpdateSettings, IUpdateState, UpdateSource, UpdateStatus } from "../shared/IUpdate";
+import type { IUpdateSettings, IUpdateState, UpdateSource, UpdateStatus } from "@dickhelper/shared";
 
 interface IUpdateConfig {
     Source: UpdateSource;

@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { app } from "electron";
 import { randomUUID } from "node:crypto";
+import type { IDailyCount, IImportResult } from "@dickhelper/shared";
 
 // 从 SQLite 读取的原始记录类型
 interface IDbRecord {
@@ -11,17 +12,6 @@ interface IDbRecord {
     EndTime: string;
     Duration: number;
     Notes: string | null;
-}
-
-interface IDailyCount {
-    Date: string;
-    Count: number;
-}
-
-interface IImportResult {
-    Imported: number;
-    Skipped: number;
-    Rejected: number;
 }
 
 const TABLE_NAME = "Records";
