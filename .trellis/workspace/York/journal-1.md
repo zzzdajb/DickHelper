@@ -213,3 +213,36 @@ Implemented electron-updater based update checks with user-confirmed downloads, 
 ### Next Steps
 
 - None - task complete
+
+
+## Session 7: Auto update testing docs
+
+**Date**: 2026-05-24
+**Task**: Auto update testing docs
+**Branch**: `main`
+
+### Summary
+
+Added a short auto-update testing guide and linked it from README.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `716556e` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

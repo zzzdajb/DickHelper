@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 6
+- **Total Sessions**: 7
 - **Last Active**: 2026-05-24
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~215 | Active |
+| `journal-1.md` | ~248 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 7 | 2026-05-24 | Auto update testing docs | `716556e` | `main` |
 | 6 | 2026-05-24 | Add Electron auto update | `7c5b756`, `62e073e`, `0f03e7e` | `main` |
 | 5 | 2026-05-23 | 修复热力图时区、release asset 扩展名、切换 NSIS、删除冗余 CI、同步文档 | `327b536`, `2f7e089`, `34dd596` | `main` |
 | 4 | 2026-05-23 | Electron前端UI美化与导入导出功能迁移 | `37ac507` | `main` |
