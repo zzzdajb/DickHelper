@@ -72,7 +72,6 @@ export const Settings = () => {
     const updateProgress: number = UpdateState?.DownloadProgress ?? 0;
     const isChecking: boolean = UpdateState?.IsChecking === true;
     const isDownloading: boolean = UpdateState?.IsDownloading === true;
-    const isBusy: boolean = isChecking || isDownloading;
 
     const HandleExport = async (): Promise<void> => {
         const allRecords = await DatabaseService.GetRecords();
@@ -221,7 +220,6 @@ export const Settings = () => {
                         <SegmentedControl
                             value={updateSource}
                             onChange={HandleSourceChange}
-                            disabled={isBusy}
                             data={[
                                 { label: "ghfast 镜像", value: "mirror" },
                                 { label: "GitHub 直连", value: "github" },

@@ -5,6 +5,7 @@ import electronUpdater, {
     type UpdateDownloadedEvent,
     type UpdateInfo,
 } from "electron-updater";
+import { CancellationToken } from "builder-util-runtime";
 import fs from "node:fs";
 import path from "node:path";
 import type { IUpdateSettings, IUpdateState, UpdateSource, UpdateStatus } from "../shared/IUpdate";
@@ -24,6 +25,8 @@ export class UpdateService {
     private readonly _getMainWindow: () => BrowserWindow | null;
     private _source: UpdateSource;
     private _state: IUpdateState;
+    private _downloadCancellationToken: CancellationToken | null = null;
+    private _downloadOperationId: number = 0;
 
     public constructor(getMainWindow: () => BrowserWindow | null) {
         const { autoUpdater } = electronUpdater;
@@ -54,6 +57,7 @@ export class UpdateService {
 
     public SetSource(source: string): IUpdateSettings {
         const nextSource = this.ParseSource(source);
+        this.CancelDownload();
         this._source = nextSource;
         this.SaveConfig();
         this.ConfigureFeedUrl();
@@ -124,13 +128,24 @@ export class UpdateService {
             ErrorMessage: null,
         });
 
+        const operationId = ++this._downloadOperationId;
+        const cancellationToken = new CancellationToken();
+        this._downloadCancellationToken = cancellationToken;
+
         try {
-            await this._autoUpdater.downloadUpdate();
+            await this._autoUpdater.downloadUpdate(cancellationToken);
         } catch (error) {
-            this.UpdateState({
-                Status: "error",
-                ErrorMessage: this.FormatError(error),
-            });
+            if (operationId === this._downloadOperationId && !this.IsCancellationError(error)) {
+                this.UpdateState({
+                    Status: "error",
+                    ErrorMessage: this.FormatError(error),
+                });
+            }
+        } finally {
+            if (operationId === this._downloadOperationId) {
+                cancellationToken.dispose();
+                this._downloadCancellationToken = null;
+            }
         }
 
         return this.GetState();
@@ -199,6 +214,10 @@ export class UpdateService {
         });
 
         this._autoUpdater.on("error", (error: Error) => {
+            if (this.IsCancellationError(error)) {
+                return;
+            }
+
             this.UpdateState({
                 Status: "error",
                 ErrorMessage: this.FormatError(error),
@@ -285,11 +304,26 @@ export class UpdateService {
         return DEFAULT_SOURCE;
     }
 
+    private CancelDownload(): void {
+        if (this._downloadCancellationToken === null) {
+            return;
+        }
+
+        this._downloadOperationId++;
+        this._downloadCancellationToken.cancel();
+        this._downloadCancellationToken.dispose();
+        this._downloadCancellationToken = null;
+    }
+
     private FormatError(error: unknown): string {
         if (error instanceof Error && error.message.trim().length > 0) {
             return `${error.message}。可在设置中切换更新源后重试。`;
         }
 
         return "检查更新失败。可在设置中切换更新源后重试。";
+    }
+
+    private IsCancellationError(error: unknown): boolean {
+        return error instanceof Error && error.message === "cancelled";
     }
 }
