@@ -7,9 +7,9 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![Mantine](https://img.shields.io/badge/Mantine-7-339AF0.svg)](https://mantine.dev/)
 
-一个简单、高效、易用的打飞机记录工具，帮助你科学管理✈️生活。
+一个简单、高效、易用的打飞机记录工具。
 
-An easy-to-use masturbation management recording tool, now as a cross-platform desktop app.
+An easy-to-use masturbation management recording tool.
 
 <img width="944" height="615" alt="image" src="https://github.com/user-attachments/assets/124fe82c-088e-4b3f-995e-321a693aaf3f" />
 
@@ -21,7 +21,7 @@ An easy-to-use masturbation management recording tool, now as a cross-platform d
 
 ## v2 重构完成 | v2 Rewrite Complete
 
-DickHelper v2 已从旧版 Web 应用完全重写为 **Electron 桌面应用**。使用更现代的技术栈，修复了旧版数据模型的 bug，体验更流畅。
+DickHelper v2 已从旧版 Web 应用重写为 **Electron 桌面应用**。使用更现代的技术栈，修复了旧版数据模型的 bug，体验更流畅。
 
 - **数据迁移**: v2 支持从旧版导出的 JSON 文件导入数据（自动识别旧格式并映射字段，按 UUID 去重）
 
@@ -65,34 +65,15 @@ npm install
 npm run dev
 ```
 
-`npm run dev` 会同时启动：
-- Vite dev server（React 渲染进程热重载）
-- Electron 主进程（自动打开桌面窗口）
-
-### 构建生产版本 | Build for Production
-
-```bash
-# 构建可分发安装包 | Build distributable package
-npm run build
-```
-
-构建输出在 `out/` 目录：
-- `out/main/` — Electron 主进程
-- `out/preload/` — 预加载脚本
-- `out/renderer/` — React 渲染进程（静态文件）
-
-> 自动更新和安装包打包（electron-builder）暂未配置，后续版本添加。
-
 ## 技术栈 | Tech Stack
 
-| 层 | Layer | 技术 | Technology |
-|----|-------|------|------------|
-| 桌面框架 | Desktop Shell | Electron 35 | — |
-| UI 框架 | UI Framework | React 19.1 | — |
-| 语言 | Language | TypeScript 5.7 (strict) | — |
-| 构建 | Build | electron-vite + Vite 6 | — |
-| 组件库 | UI Library | Mantine 7 | — |
-| 数据库 | Database | SQLite via sql.js (WASM) | — |
+| 层 | Layer | 技术 |
+|----|-------|------|
+| 桌面框架 | Desktop Shell | Electron 35 |
+| UI 框架 | UI Framework | React 19.1 |
+| 语言 | Language | TypeScript 5.7 (strict) |
+| 组件库 | UI Library | Mantine 7 |
+| 数据库 | Database | SQLite via sql.js (WASM) |
 
 ## 数据迁移 | Data Migration
 
@@ -103,7 +84,7 @@ npm run build
 3. v2 自动识别旧格式，将 `startTime` 映射为 `EndTime`，按 UUID 跳过重复记录
 4. 导入完成后显示结果：成功 / 跳过重复 / 拒绝无效
 
-详细说明见 [迁移文档](docs/migration-guide.md)
+详细见 [迁移文档](docs/migration-guide.md)
 
 ---
 
