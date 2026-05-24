@@ -178,3 +178,38 @@ Fixed Electron startup white screen by correcting renderer electronAPI access an
 ### Next Steps
 
 - None - task complete
+
+
+## Session 6: Add Electron auto update
+
+**Date**: 2026-05-24
+**Task**: Add Electron auto update
+**Branch**: `main`
+
+### Summary
+
+Implemented electron-updater based update checks with user-confirmed downloads, ghfast/GitHub source selection, release metadata publishing, version-tag validation, docs, specs, and review fixes.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `7c5b756` | (see git log) |
+| `62e073e` | (see git log) |
+| `0f03e7e` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
