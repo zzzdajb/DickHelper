@@ -51,3 +51,21 @@ export interface IAppConfig {
     readonly ContributorId: string | null;
     readonly ApiEndpoint: string;
 }
+
+// 小时分布（用于雷达图）
+export interface IHourlyCount {
+    readonly Hour: number;
+    readonly Count: number;
+}
+
+// 星期分布（用于柱状图）
+export interface IWeekdayCount {
+    readonly Weekday: number;
+    readonly Count: number;
+}
+
+// 月度计数（用于趋势图）
+export interface IMonthlyCount {
+    readonly Month: string;
+    readonly Count: number;
+}

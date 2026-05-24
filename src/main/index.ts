@@ -3,6 +3,7 @@ import path from "node:path";
 import { DatabaseService } from "./database";
 import { ConfigService } from "./config";
 import { CommunityService, GetCurrentWeekId } from "./community";
+import { Analyze as AiAnalyze } from "./ai-service";
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -193,6 +194,89 @@ function RegisterIpcHandlers(): void {
             weeklyStats.Count,
             weeklyStats.AvgDuration
         );
+    });
+
+    // 图表数据通道
+    ipcMain.handle("charts:hourly-distribution", () => {
+        return databaseService!.GetHourlyDistribution();
+    });
+
+    ipcMain.handle("charts:weekday-distribution", () => {
+        return databaseService!.GetWeekdayDistribution();
+    });
+
+    ipcMain.handle("charts:monthly-trend", () => {
+        return databaseService!.GetMonthlyTrend();
+    });
+
+    ipcMain.handle("charts:duration-distribution", () => {
+        return databaseService!.GetAllDurations();
+    });
+
+    // 设置通道（API Key 使用系统加密存储）
+    ipcMain.handle("settings:get", (...args) => {
+        const key: string = args[1] as string;
+        if (key === "ai_api_key") {
+            return databaseService!.GetSecureSetting(key);
+        }
+        return databaseService!.GetSetting(key);
+    });
+
+    ipcMain.handle("settings:set", (...args) => {
+        const key: string = args[1] as string;
+        const value: string = args[2] as string;
+        if (key === "ai_api_key") {
+            databaseService!.SetSecureSetting(key, value);
+        } else {
+            databaseService!.SetSetting(key, value);
+        }
+    });
+
+    // AI 分析通道：主进程聚合数据并调用 AI
+    ipcMain.handle("ai:analyze", async () => {
+        const db = databaseService!;
+        const stats = db.GetStats();
+        const hourly = db.GetHourlyDistribution();
+        const weekday = db.GetWeekdayDistribution();
+        const monthly = db.GetMonthlyTrend();
+        const durations = db.GetAllDurations();
+
+        const sorted = [...durations].sort((a, b) => a - b);
+        const mid: number = Math.floor(sorted.length / 2);
+        const median: number = sorted.length === 0
+            ? 0
+            : sorted.length % 2 !== 0
+                ? sorted[mid]!
+                : (sorted[mid - 1]! + sorted[mid]!) / 2;
+        const durationStats = {
+            Min: sorted[0] ?? 0,
+            Max: sorted[sorted.length - 1] ?? 0,
+            Avg: stats.AverageDuration,
+            Median: median,
+        };
+
+        // 验证 provider 值，非法值回退到 local
+        const validProviders = ["anthropic", "openai", "ollama", "local"] as const;
+        const rawProvider: string = db.GetSetting("ai_provider") ?? "local";
+        const provider = (validProviders as readonly string[]).includes(rawProvider)
+            ? rawProvider as typeof validProviders[number]
+            : "local";
+        const config = {
+            Provider: provider,
+            ApiKey: db.GetSecureSetting("ai_api_key") ?? "",
+            OllamaUrl: db.GetSetting("ai_ollama_url") ?? "http://localhost:11434",
+            OllamaModel: db.GetSetting("ai_ollama_model") ?? "llama3",
+        };
+
+        try {
+            return await AiAnalyze(
+                { ...stats, HourlyDistribution: hourly, WeekdayDistribution: weekday, MonthlyTrend: monthly, DurationStats: durationStats },
+                config
+            );
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "分析失败";
+            throw new Error(message.length > 200 ? message.slice(0, 200) + "..." : message);
+        }
     });
 }
 

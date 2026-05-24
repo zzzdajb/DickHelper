@@ -1,4 +1,4 @@
-import type { IRecord, IRecordRaw, IStats, IDailyCount, IImportResult, ICommunityStats, IAppConfig } from "../types/IRecord";
+import type { IRecord, IRecordRaw, IStats, IDailyCount, IImportResult, ICommunityStats, IAppConfig, IHourlyCount, IWeekdayCount, IMonthlyCount } from "../types/IRecord";
 
 // 检查 electronAPI 是否可用，不在 Electron 环境时给出明确错误
 function GetApi(): Window["electronAPI"] {
@@ -123,6 +123,34 @@ export class DatabaseService {
             })),
         };
         return JSON.stringify(exportData, null, 2);
+    }
+
+    public static async GetHourlyDistribution(): Promise<IHourlyCount[]> {
+        return GetApi().GetHourlyDistribution();
+    }
+
+    public static async GetWeekdayDistribution(): Promise<IWeekdayCount[]> {
+        return GetApi().GetWeekdayDistribution();
+    }
+
+    public static async GetMonthlyTrend(): Promise<IMonthlyCount[]> {
+        return GetApi().GetMonthlyTrend();
+    }
+
+    public static async GetDurationDistribution(): Promise<number[]> {
+        return GetApi().GetDurationDistribution();
+    }
+
+    public static async GetSetting(key: string): Promise<string | null> {
+        return GetApi().GetSetting(key);
+    }
+
+    public static async SetSetting(key: string, value: string): Promise<void> {
+        return GetApi().SetSetting(key, value);
+    }
+
+    public static async RequestAiAnalysis(): Promise<string> {
+        return GetApi().RequestAiAnalysis();
     }
 
     /**

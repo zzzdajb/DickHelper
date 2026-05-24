@@ -1,7 +1,7 @@
 import initSqlJs, { type Database, type SqlJsStatic, type BindParams, type ParamsObject } from "sql.js";
 import fs from "node:fs";
 import path from "node:path";
-import { app } from "electron";
+import { app, safeStorage } from "electron";
 import { randomUUID } from "node:crypto";
 
 // 从 SQLite 读取的原始记录类型
@@ -290,6 +290,7 @@ export class DatabaseService {
         const counts: number[] = new Array(7).fill(0) as number[];
         for (const row of rows) {
             const d = new Date((row as { EndTime: string }).EndTime);
+            // JS getDay(): 0=周日，转换为 0=周一
             const day: number = (d.getDay() + 6) % 7;
             counts[day]!++;
         }
@@ -336,6 +337,31 @@ export class DatabaseService {
     public SetSetting(key: string, value: string): void {
         this._db.run(`INSERT OR REPLACE INTO Settings (Key, Value) VALUES (?, ?)`, [key, value]);
         this._save();
+    }
+
+    /** 写入敏感设置项（使用系统密钥链加密） */
+    public SetSecureSetting(key: string, value: string): void {
+        if (value === "" || !safeStorage.isEncryptionAvailable()) {
+            this.SetSetting(key, value);
+            return;
+        }
+        const encrypted: string = safeStorage.encryptString(value).toString("base64");
+        this.SetSetting(key, `enc:${encrypted}`);
+    }
+
+    /** 读取敏感设置项（自动解密） */
+    public GetSecureSetting(key: string): string | null {
+        const raw = this.GetSetting(key);
+        if (raw === null) return null;
+        if (raw.startsWith("enc:") && safeStorage.isEncryptionAvailable()) {
+            try {
+                return safeStorage.decryptString(Buffer.from(raw.slice(4), "base64"));
+            } catch {
+                return null;
+            }
+        }
+        // 兼容未加密的旧数据
+        return raw;
     }
 
     public Close(): void {
