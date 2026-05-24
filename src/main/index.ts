@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage } from "electron";
+import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, shell } from "electron";
 import path from "node:path";
 import { DatabaseService } from "./database";
 import { UpdateService } from "./updateService";
@@ -34,6 +34,11 @@ function CreateWindow(): void {
             nodeIntegration: false,
         },
     });
+
+    // 隐藏菜单栏（仅在开发模式下显示）
+    if (!IS_DEV) {
+        mainWindow.setMenuBarVisibility(false);
+    }
 
     mainWindow.once("ready-to-show", () => {
         console.log("[Main] Window ready-to-show");
@@ -188,6 +193,10 @@ function RegisterIpcHandlers(): void {
     ipcMain.handle("updates:install", () => {
         isQuitting = true;
         updateService!.InstallUpdate();
+    });
+
+    ipcMain.handle("shell:open-external", (_event, url: string) => {
+        return shell.openExternal(url);
     });
 }
 

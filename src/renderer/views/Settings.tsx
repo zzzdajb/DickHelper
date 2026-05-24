@@ -21,6 +21,7 @@ import {
     IconInfoCircle,
     IconRefresh,
     IconRocket,
+    IconStar,
     IconUpload,
     IconWorld,
 } from "@tabler/icons-react";
@@ -309,10 +310,15 @@ export const Settings = () => {
                         <Text size="sm" fw={500}>v{currentVersion}</Text>
                     </Group>
                     <Divider />
-                    <Group justify="space-between">
-                        <Text size="sm" c="dimmed">技术栈</Text>
-                        <Text size="sm" fw={500}>Electron + React + Mantine</Text>
-                    </Group>
+                    <Button
+                        variant="light"
+                        color="yellow"
+                        fullWidth
+                        leftSection={<IconStar style={{ width: rem(16), height: rem(16) }} />}
+                        onClick={() => { void window.electronAPI.OpenExternal("https://github.com/zzzdajb/DickHelper"); }}
+                    >
+                        喜欢这个应用？去 GitHub 给项目点个 Star
+                    </Button>
                 </Stack>
             </Paper>
         </Stack>

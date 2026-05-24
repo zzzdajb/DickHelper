@@ -34,6 +34,7 @@ const electronAPI = {
             ipcRenderer.removeListener("updates:state-changed", listener);
         };
     },
+    OpenExternal: (url: string): Promise<void> => ipcRenderer.invoke("shell:open-external", url),
 };
 
 try {

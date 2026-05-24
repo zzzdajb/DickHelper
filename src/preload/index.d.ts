@@ -27,6 +27,7 @@ declare global {
             InstallUpdate: () => Promise<void>;
             OnRecordsUpdated: (callback: () => void) => () => void;
             OnUpdateStateChanged: (callback: (state: IUpdateState) => void) => () => void;
+            OpenExternal: (url: string) => Promise<void>;
         };
     }
 }
