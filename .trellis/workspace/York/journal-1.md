@@ -233,7 +233,7 @@ Added a short auto-update testing guide and linked it from README.
 
 | Hash | Message |
 |------|---------|
-| `716556e` | (see git log) |
+| `0fe18b3` | (see git log) |
 
 ### Testing
 
