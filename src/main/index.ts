@@ -174,25 +174,41 @@ function RegisterIpcHandlers(): void {
         return configService!.SetConfig(partial);
     });
 
-    // 社区统计相关
+    // 社区统计：优先返回本地缓存，缓存过期时才请求远端
     ipcMain.handle("community:get-stats", async () => {
+        const cached = configService!.GetCachedCommunityStats();
+        if (cached !== null) {
+            return { WeekId: cached.WeekId, MedianCount: cached.MedianCount, MedianDuration: cached.MedianDuration, SampleSize: cached.SampleSize };
+        }
         const weekId: string = GetCurrentWeekId();
-        return communityService!.GetCommunityStats(weekId);
+        const result = await communityService!.GetCommunityStats(weekId);
+        if (result !== null) {
+            configService!.SetCachedCommunityStats(result);
+        }
+        return result;
     });
 
+    // 社区提交：6 小时内只提交一次
     ipcMain.handle("community:submit", async () => {
         const config = configService!.GetConfig();
         if (!config.CommunityOptIn || config.ContributorId === null) {
             return false;
         }
+        if (!configService!.ShouldSubmit()) {
+            return true;
+        }
         const weeklyStats = databaseService!.GetWeeklyStats();
         const weekId: string = GetCurrentWeekId();
-        return communityService!.SubmitStats(
+        const ok: boolean = await communityService!.SubmitStats(
             config.ContributorId,
             weekId,
             weeklyStats.Count,
             weeklyStats.AvgDuration
         );
+        if (ok) {
+            configService!.RecordSubmitTime();
+        }
+        return ok;
     });
 }
 

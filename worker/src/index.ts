@@ -12,7 +12,7 @@ interface ISubmitPayload {
 }
 
 const CORS_HEADERS: Record<string, string> = {
-    "Access-Control-Allow-Origin": "null",
+    "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
 };
@@ -58,11 +58,28 @@ async function HandleSubmit(request: Request, env: Env): Promise<Response> {
         return JsonResponse({ error: "Invalid payload" }, 400);
     }
 
+    // 防刷：同一 contributor 60 秒内只允许一次提交
+    const lastUpdate = await env.DB.prepare(
+        `SELECT updated_at FROM stats WHERE contributor_id = ? ORDER BY updated_at DESC LIMIT 1`
+    ).bind(payload.ContributorId).first<{ updated_at: string }>();
+
+    if (lastUpdate !== null) {
+        const elapsed: number = Date.now() - new Date(lastUpdate.updated_at + "Z").getTime();
+        if (elapsed < 60_000) {
+            return JsonResponse({ error: "Rate limited, retry after 60s" }, 429);
+        }
+    }
+
     // 每个 contributorId + weekId 只保留一条，重复提交覆盖
     await env.DB.prepare(
         `INSERT OR REPLACE INTO stats (contributor_id, week_id, count, avg_duration, updated_at)
          VALUES (?, ?, ?, ?, datetime('now'))`
     ).bind(payload.ContributorId, payload.WeekId, payload.Count, payload.AvgDuration).run();
+
+    // 惰性清理：删除 26 周（半年）前的数据
+    await env.DB.prepare(
+        `DELETE FROM stats WHERE week_id < ?`
+    ).bind(WeekIdNWeeksAgo(26)).run();
 
     return JsonResponse({ ok: true });
 }
@@ -122,6 +139,14 @@ function FilterOutliers(values: number[]): number[] {
     const lower: number = q1 - 1.5 * iqr;
     const upper: number = q3 + 1.5 * iqr;
     return sorted.filter((v) => v >= lower && v <= upper);
+}
+
+function WeekIdNWeeksAgo(n: number): string {
+    const d = new Date(Date.now() - n * 7 * 86400_000);
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const weekNo: number = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400_000 + 1) / 7);
+    return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, "0")}`;
 }
 
 function JsonResponse(data: unknown, status: number = 200): Response {

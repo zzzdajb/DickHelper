@@ -42,9 +42,9 @@ export const StatsChart = () => {
         DatabaseService.GetConfig().then((config) => {
             setOptedIn(config.CommunityOptIn);
             if (config.CommunityOptIn) {
-                DatabaseService.SubmitCommunityStats().then(() => {
-                    DatabaseService.GetCommunityStats().then(setCommunityStats);
-                });
+                // 并行：立即获取缓存/远端数据，后台静默提交
+                DatabaseService.GetCommunityStats().then(setCommunityStats);
+                DatabaseService.SubmitCommunityStats();
             }
         });
     };
