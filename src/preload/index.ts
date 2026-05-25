@@ -35,6 +35,10 @@ const electronAPI = {
         };
     },
     OpenExternal: (url: string): Promise<void> => ipcRenderer.invoke("shell:open-external", url),
+    GetConfig: (): Promise<unknown> => ipcRenderer.invoke("config:get"),
+    SetConfig: (partial: { CommunityOptIn?: boolean }): Promise<unknown> => ipcRenderer.invoke("config:set", partial),
+    GetCommunityStats: (): Promise<unknown> => ipcRenderer.invoke("community:get-stats"),
+    SubmitCommunityStats: (): Promise<boolean> => ipcRenderer.invoke("community:submit"),
 };
 
 try {

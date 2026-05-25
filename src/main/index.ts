@@ -1,11 +1,15 @@
 import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, shell } from "electron";
 import path from "node:path";
 import { DatabaseService } from "./database";
+import { ConfigService } from "./config";
+import { CommunityService, GetCurrentWeekId } from "./community";
 import { UpdateService } from "./updateService";
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let databaseService: DatabaseService | null = null;
+let configService: ConfigService | null = null;
+let communityService: CommunityService | null = null;
 let updateService: UpdateService | null = null;
 let isQuitting: boolean = false;
 
@@ -170,6 +174,53 @@ function RegisterIpcHandlers(): void {
         return result;
     });
 
+    // 配置相关
+    ipcMain.handle("config:get", () => {
+        return configService!.GetConfig();
+    });
+
+    ipcMain.handle("config:set", (...args) => {
+        const partial = args[1] as { CommunityOptIn?: boolean };
+        return configService!.SetConfig(partial);
+    });
+
+    // 社区统计：优先返回本地缓存，缓存过期时才请求远端
+    ipcMain.handle("community:get-stats", async () => {
+        const cached = configService!.GetCachedCommunityStats();
+        if (cached !== null) {
+            return { WeekId: cached.WeekId, MedianCount: cached.MedianCount, MedianDuration: cached.MedianDuration, SampleSize: cached.SampleSize };
+        }
+        const weekId: string = GetCurrentWeekId();
+        const result = await communityService!.GetCommunityStats(weekId);
+        if (result !== null) {
+            configService!.SetCachedCommunityStats(result);
+        }
+        return result;
+    });
+
+    // 社区提交：6 小时内只提交一次
+    ipcMain.handle("community:submit", async () => {
+        const config = configService!.GetConfig();
+        if (!config.CommunityOptIn || config.ContributorId === null) {
+            return false;
+        }
+        if (!configService!.ShouldSubmit()) {
+            return true;
+        }
+        const weeklyStats = databaseService!.GetWeeklyStats();
+        const weekId: string = GetCurrentWeekId();
+        const ok: boolean = await communityService!.SubmitStats(
+            config.ContributorId,
+            weekId,
+            weeklyStats.Count,
+            weeklyStats.AvgDuration
+        );
+        if (ok) {
+            configService!.RecordSubmitTime();
+        }
+        return ok;
+    });
+
     ipcMain.handle("updates:get-state", () => {
         return updateService!.GetState();
     });
@@ -196,6 +247,10 @@ function RegisterIpcHandlers(): void {
     });
 
     ipcMain.handle("shell:open-external", (_event, url: string) => {
+        const parsed: URL = new URL(url);
+        if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+            throw new Error(`不允许的协议: ${parsed.protocol}`);
+        }
         return shell.openExternal(url);
     });
 }
@@ -207,7 +262,6 @@ if (!gotTheLock) {
     app.quit();
 } else {
     app.on("second-instance", () => {
-        // 当用户再次尝试打开应用时，聚焦已有窗口
         if (mainWindow) {
             if (mainWindow.isMinimized()) {
                 mainWindow.restore();
@@ -221,6 +275,9 @@ if (!gotTheLock) {
         console.log("[Main] App ready");
         databaseService = await DatabaseService.create();
         console.log("[Main] DatabaseService initialized");
+        configService = new ConfigService();
+        communityService = new CommunityService(configService.GetConfig().ApiEndpoint);
+        console.log("[Main] ConfigService & CommunityService initialized");
         updateService = new UpdateService(() => mainWindow);
         RegisterIpcHandlers();
         CreateWindow();
@@ -229,7 +286,6 @@ if (!gotTheLock) {
         console.log("[Main] Startup complete");
 
         app.on("activate", () => {
-            // macOS: 点击 dock 图标时重新创建窗口
             if (BrowserWindow.getAllWindows().length === 0) {
                 CreateWindow();
             } else {

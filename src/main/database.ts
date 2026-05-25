@@ -45,6 +45,12 @@ export class DatabaseService {
                 Notes     TEXT
             )
         `);
+        db.run(`
+            CREATE TABLE IF NOT EXISTS Settings (
+                Key   TEXT PRIMARY KEY,
+                Value TEXT NOT NULL
+            )
+        `);
         return new DatabaseService(db, dbPath);
     }
 
@@ -118,6 +124,7 @@ export class DatabaseService {
     public GetStats(): {
         TotalCount: number;
         AverageDuration: number;
+        WeeklyAverageDuration: number;
         FrequencyPerWeek: number;
         FrequencyPerMonth: number;
     } {
@@ -134,7 +141,7 @@ export class DatabaseService {
         );
 
         const weekRow = this._queryOne(
-            `SELECT COUNT(*) as count FROM ${TABLE_NAME} WHERE EndTime >= ?`,
+            `SELECT COUNT(*) as count, AVG(Duration) as avgDur FROM ${TABLE_NAME} WHERE EndTime >= ?`,
             [oneWeekAgo.toISOString()]
         );
 
@@ -146,8 +153,23 @@ export class DatabaseService {
         return {
             TotalCount: (totalRow?.count as number) ?? 0,
             AverageDuration: (totalRow?.avgDur as number) ?? 0,
+            WeeklyAverageDuration: (weekRow?.avgDur as number) ?? 0,
             FrequencyPerWeek: (weekRow?.count as number) ?? 0,
             FrequencyPerMonth: (monthRow?.count as number) ?? 0,
+        };
+    }
+
+    // 本周统计：次数和平均时长（仅最近 7 天）
+    public GetWeeklyStats(): { Count: number; AvgDuration: number } {
+        const now = new Date();
+        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const row = this._queryOne(
+            `SELECT COUNT(*) as count, AVG(Duration) as avgDur FROM ${TABLE_NAME} WHERE EndTime >= ?`,
+            [oneWeekAgo.toISOString()]
+        );
+        return {
+            Count: (row?.count as number) ?? 0,
+            AvgDuration: (row?.avgDur as number) ?? 0,
         };
     }
 
@@ -239,6 +261,71 @@ export class DatabaseService {
         const skipped = totalValid - imported.length;
 
         return { Imported: imported.length, Skipped: skipped, Rejected: rejected };
+    }
+
+    /** 按小时统计次数（本地时区，0-23） */
+    public GetHourlyDistribution(): { Hour: number; Count: number }[] {
+        const rows = this._queryAll(`SELECT EndTime FROM ${TABLE_NAME}`);
+        const counts: number[] = new Array(24).fill(0) as number[];
+        for (const row of rows) {
+            const d = new Date((row as { EndTime: string }).EndTime);
+            counts[d.getHours()]!++;
+        }
+        return counts.map((count, hour) => ({ Hour: hour, Count: count }));
+    }
+
+    /** 按星期统计次数（0=周一 到 6=周日） */
+    public GetWeekdayDistribution(): { Weekday: number; Count: number }[] {
+        const rows = this._queryAll(`SELECT EndTime FROM ${TABLE_NAME}`);
+        const counts: number[] = new Array(7).fill(0) as number[];
+        for (const row of rows) {
+            const d = new Date((row as { EndTime: string }).EndTime);
+            const day: number = (d.getDay() + 6) % 7;
+            counts[day]!++;
+        }
+        return counts.map((count, day) => ({ Weekday: day, Count: count }));
+    }
+
+    /** 按月统计次数（最近 12 个月） */
+    public GetMonthlyTrend(): { Month: string; Count: number }[] {
+        const now = new Date();
+        const startDate = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+        const rows = this._queryAll(
+            `SELECT EndTime FROM ${TABLE_NAME} WHERE EndTime >= ?`,
+            [startDate.toISOString()]
+        );
+        const countMap = new Map<string, number>();
+        for (const row of rows) {
+            const d = new Date((row as { EndTime: string }).EndTime);
+            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+            countMap.set(key, (countMap.get(key) ?? 0) + 1);
+        }
+        const result: { Month: string; Count: number }[] = [];
+        const cursor = new Date(startDate);
+        while (cursor <= now) {
+            const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}`;
+            result.push({ Month: key, Count: countMap.get(key) ?? 0 });
+            cursor.setMonth(cursor.getMonth() + 1);
+        }
+        return result;
+    }
+
+    /** 获取所有记录的持续时长（分钟） */
+    public GetAllDurations(): number[] {
+        const rows = this._queryAll(`SELECT Duration FROM ${TABLE_NAME}`);
+        return rows.map((row) => (row as { Duration: number }).Duration);
+    }
+
+    /** 读取设置项 */
+    public GetSetting(key: string): string | null {
+        const row = this._queryOne(`SELECT Value FROM Settings WHERE Key = ?`, [key]);
+        return row !== undefined ? (row.Value as string) : null;
+    }
+
+    /** 写入设置项 */
+    public SetSetting(key: string, value: string): void {
+        this._db.run(`INSERT OR REPLACE INTO Settings (Key, Value) VALUES (?, ?)`, [key, value]);
+        this._save();
     }
 
     public Close(): void {
