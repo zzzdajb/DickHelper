@@ -5,7 +5,7 @@ import { BrowserWindow, ipcMain, app, shell } from "electron";
 // 注意：owner/repo 在 electron-builder.yml 和 src/renderer/views/Settings.tsx 中也有引用
 const GITHUB_OWNER: string = "zzzdajb";
 const GITHUB_REPO: string = "DickHelper";
-const GITHUB_MIRROR: string = "https://ghfast.com/";
+const GITHUB_MIRROR: string = "https://ghfast.top/";
 
 const ALLOWED_EXTERNAL_HOSTS: ReadonlySet<string> = new Set(["github.com"]);
 
