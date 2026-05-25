@@ -314,3 +314,36 @@ Added stopwatch.png as app icon for desktop and tray; set up monorepo with packa
 ### Next Steps
 
 - None - task complete
+
+
+## Session 10: PR 35 review and timeout troubleshooting rule
+
+**Date**: 2026-05-25
+**Task**: PR 35 review and timeout troubleshooting rule
+**Branch**: `main`
+
+### Summary
+
+Reviewed PR #35, posted review, pushed a simplified prediction-page commit to the PR branch, and recorded the timeout proxy/source troubleshooting rule in Trellis guides.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `f5fd463` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
