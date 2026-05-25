@@ -23,6 +23,7 @@ These guides help you **ask the right questions before coding**.
 |-------|---------|-------------|
 | [Code Reuse Thinking Guide](./code-reuse-thinking-guide.md) | Identify patterns and reduce duplication | When you notice repeated patterns |
 | [Cross-Layer Thinking Guide](./cross-layer-thinking-guide.md) | Think through data flow across layers | Features spanning multiple layers |
+| [Environment Troubleshooting Guide](./environment-troubleshooting-guide.md) | Prioritize proxy/network/source checks for timeouts | When any command times out or stalls on remote work |
 
 ---
 
@@ -46,6 +47,15 @@ These guides help you **ask the right questions before coding**.
 - [ ] **You're creating a new utility/helper function** ← Search first!
 
 → Read [Code Reuse Thinking Guide](./code-reuse-thinking-guide.md)
+
+### When to Think About Environment Problems
+
+- [ ] **Any command times out**
+- [ ] Dependency installation stalls or hangs
+- [ ] A build/download step waits on GitHub, npm, CDN, or other remote sources
+- [ ] Verbose logs show fetch, registry, asset, proxy, TLS, or connection activity
+
+→ Read [Environment Troubleshooting Guide](./environment-troubleshooting-guide.md)
 
 ---
 
