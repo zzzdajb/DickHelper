@@ -31,10 +31,13 @@ jobs:
         include:
           - os: windows-latest
             os-short: windows
+            arch: amd64
           - os: macos-latest
             os-short: macos
+            arch: amd64
           - os: ubuntu-latest
             os-short: linux
+            arch: amd64
 
     steps:
       - name: Validate release tag
@@ -57,6 +60,17 @@ jobs:
           node-version: 18
           cache: npm
 
+      - name: Validate package version
+        shell: bash
+        run: |
+          set -euo pipefail
+          RELEASE_VERSION="${RELEASE_TAG#v}"
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          if [[ "$PACKAGE_VERSION" != "$RELEASE_VERSION" ]]; then
+            echo "::error::package.json version ($PACKAGE_VERSION) must match release tag without v ($RELEASE_VERSION)."
+            exit 1
+          fi
+
       - name: Install dependencies
         run: npm install
 
@@ -70,25 +84,36 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          shopt -s nullglob
           npx electron-builder --publish=never
 
           # Collect output artifacts into release-assets
           mkdir -p release-assets
-          ASSET=""
+          assets=()
           if [[ "${{ matrix.os-short }}" == "windows" ]]; then
-            ASSET=$(ls dist/DickHelper*.exe | head -1)
+            assets=(dist/*.exe dist/*.exe.blockmap dist/latest.yml)
           elif [[ "${{ matrix.os-short }}" == "macos" ]]; then
-            ASSET=$(ls dist/DickHelper*.dmg | head -1)
+            assets=(dist/*.dmg dist/*.zip dist/*.zip.blockmap dist/latest-mac.yml)
           else
-            ASSET=$(ls dist/DickHelper*.AppImage | head -1)
+            assets=(dist/*.AppImage dist/*.AppImage.blockmap dist/latest-linux.yml)
           fi
-          cp "$ASSET" "release-assets/dickhelper-${{ env.RELEASE_TAG }}-${{ matrix.os-short }}.${ASSET##*.}"
+
+          if [ ${#assets[@]} -eq 0 ]; then
+            echo "::error::No release assets found in dist/"
+            ls -la dist/ || true
+            exit 1
+          fi
+
+          for asset in "${assets[@]}"; do
+            cp "$asset" release-assets/
+          done
+
           echo "Release asset: $(ls -lh release-assets/)"
 
       - name: Upload release asset artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-${{ env.RELEASE_TAG }}-${{ matrix.os-short }}
+          name: release-${{ env.RELEASE_TAG }}-${{ matrix.os-short }}-${{ matrix.arch }}
           path: release-assets/*
           if-no-files-found: error
           retention-days: 7
@@ -119,7 +144,7 @@ jobs:
           set -euo pipefail
           shopt -s nullglob
 
-          assets=(release-assets/dickhelper*)
+          assets=(release-assets/*)
           echo "Found ${#assets[@]} release asset(s):"
           for a in "${assets[@]}"; do
             echo "  - $a ($(du -h "$a" | cut -f1))"

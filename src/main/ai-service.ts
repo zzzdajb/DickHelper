@@ -211,6 +211,7 @@ const AnalyzeWithCli = async (data: IAiAnalysisData, command: string): Promise<s
         const child = spawn(bin, args, {
             stdio: ["pipe", "pipe", "pipe"],
             timeout: CLI_TIMEOUT_MS,
+            shell: true,
         });
 
         const stdout: Buffer[] = [];

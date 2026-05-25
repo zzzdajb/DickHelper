@@ -278,7 +278,7 @@ function RegisterIpcHandlers(): void {
             OllamaUrl: db.GetSetting("ai_ollama_url") ?? "http://localhost:11434",
             OllamaModel: db.GetSetting("ai_ollama_model") ?? "llama3",
             GoogleModel: db.GetSetting("ai_google_model") ?? "gemini-2.0-flash",
-            CliCommand: db.GetSetting("ai_cli_command") ?? "",
+            CliCommand: db.GetSetting("ai_cli_command") ?? "claude -p",
         };
 
         try {

@@ -213,7 +213,7 @@ const AiConfigSection = () => {
     const [ollamaUrl, setOllamaUrl] = useState<string>("http://localhost:11434");
     const [ollamaModel, setOllamaModel] = useState<string>("llama3");
     const [googleModel, setGoogleModel] = useState<string>("gemini-2.0-flash");
-    const [cliCommand, setCliCommand] = useState<string>("");
+    const [cliCommand, setCliCommand] = useState<string>("claude -p");
     const [saved, setSaved] = useState<boolean>(false);
     const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
