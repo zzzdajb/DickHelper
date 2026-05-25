@@ -1,7 +1,9 @@
 import { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, shell } from "electron";
 import path from "node:path";
 import { DatabaseService } from "./database";
+import { Analyze as AiAnalyze, type IAiConfig } from "./ai-service";
 import { UpdateService } from "./updateService";
+import type { IHourlyCount, IMonthlyCount, IWeekdayCount } from "@dickhelper/shared";
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -10,6 +12,90 @@ let updateService: UpdateService | null = null;
 let isQuitting: boolean = false;
 
 const IS_DEV: boolean = process.env.ELECTRON_RENDERER_URL !== undefined;
+const ALLOWED_AI_SETTING_KEYS: Set<string> = new Set([
+    "ai_provider",
+    "ai_api_key",
+    "ai_api_endpoint",
+    "ai_model",
+]);
+
+interface IAiDurationStats {
+    Min: number;
+    Max: number;
+    Avg: number;
+    Median: number;
+}
+
+interface IAiAnalysisData {
+    TotalCount: number;
+    AverageDuration: number;
+    FrequencyPerWeek: number;
+    FrequencyPerMonth: number;
+    HourlyDistribution: IHourlyCount[];
+    WeekdayDistribution: IWeekdayCount[];
+    MonthlyTrend: IMonthlyCount[];
+    DurationStats: IAiDurationStats;
+}
+
+function BuildMedian(values: number[]): number {
+    if (values.length === 0) {
+        return 0;
+    }
+
+    const sortedValues: number[] = [...values].sort((a, b) => a - b);
+    const middleIndex: number = Math.floor(sortedValues.length / 2);
+
+    if (sortedValues.length % 2 !== 0) {
+        return sortedValues[middleIndex]!;
+    }
+
+    return (sortedValues[middleIndex - 1]! + sortedValues[middleIndex]!) / 2;
+}
+
+function BuildAiAnalysisData(): IAiAnalysisData {
+    if (!databaseService) {
+        throw new Error("数据库尚未初始化。");
+    }
+
+    const stats = databaseService.GetStats();
+    const hourlyDistribution = databaseService.GetHourlyDistribution();
+    const weekdayDistribution = databaseService.GetWeekdayDistribution();
+    const monthlyTrend = databaseService.GetMonthlyTrend();
+    const durations = databaseService.GetAllDurations();
+    const sortedDurations = [...durations].sort((a, b) => a - b);
+
+    return {
+        TotalCount: stats.TotalCount,
+        AverageDuration: stats.AverageDuration,
+        FrequencyPerWeek: stats.FrequencyPerWeek,
+        FrequencyPerMonth: stats.FrequencyPerMonth,
+        HourlyDistribution: hourlyDistribution,
+        WeekdayDistribution: weekdayDistribution,
+        MonthlyTrend: monthlyTrend,
+        DurationStats: {
+            Min: sortedDurations[0] ?? 0,
+            Max: sortedDurations[sortedDurations.length - 1] ?? 0,
+            Avg: stats.AverageDuration,
+            Median: BuildMedian(sortedDurations),
+        },
+    };
+}
+
+function BuildAiConfig(): IAiConfig {
+    if (!databaseService) {
+        throw new Error("数据库尚未初始化。");
+    }
+
+    const rawProvider = databaseService.GetSetting("ai_provider");
+    const provider: "openai" | "local" = rawProvider === "openai" ? "openai" : "local";
+
+    return {
+        Provider: provider,
+        ApiKey: databaseService.GetSetting("ai_api_key") ?? "",
+        ApiEndpoint: databaseService.GetSetting("ai_api_endpoint") ?? "https://api.openai.com/v1/chat/completions",
+        Model: databaseService.GetSetting("ai_model") ?? "gpt-4o-mini",
+    };
+}
 
 // 创建窗口时不显示，等 ready-to-show 再显示，避免白屏闪烁
 function CreateWindow(): void {
@@ -168,6 +254,42 @@ function RegisterIpcHandlers(): void {
             mainWindow?.webContents.send("records-updated");
         }
         return result;
+    });
+
+    ipcMain.handle("charts:hourly-distribution", () => {
+        return databaseService!.GetHourlyDistribution();
+    });
+
+    ipcMain.handle("charts:weekday-distribution", () => {
+        return databaseService!.GetWeekdayDistribution();
+    });
+
+    ipcMain.handle("charts:monthly-trend", () => {
+        return databaseService!.GetMonthlyTrend();
+    });
+
+    ipcMain.handle("charts:duration-distribution", () => {
+        return databaseService!.GetAllDurations();
+    });
+
+    ipcMain.handle("settings:get", (_event, key: unknown) => {
+        if (typeof key !== "string" || !ALLOWED_AI_SETTING_KEYS.has(key)) {
+            throw new Error(`不允许的设置项: ${String(key)}`);
+        }
+
+        return databaseService!.GetSetting(key);
+    });
+
+    ipcMain.handle("settings:set", (_event, key: unknown, value: unknown) => {
+        if (typeof key !== "string" || typeof value !== "string" || !ALLOWED_AI_SETTING_KEYS.has(key)) {
+            throw new Error(`不允许的设置项: ${String(key)}`);
+        }
+
+        databaseService!.SetSetting(key, value);
+    });
+
+    ipcMain.handle("ai:analyze", async () => {
+        return AiAnalyze(BuildAiAnalysisData(), BuildAiConfig());
     });
 
     ipcMain.handle("updates:get-state", () => {

@@ -31,3 +31,18 @@ export interface IImportResult {
     readonly Skipped: number;
     readonly Rejected: number;
 }
+
+export interface IHourlyCount {
+    readonly Hour: number;
+    readonly Count: number;
+}
+
+export interface IWeekdayCount {
+    readonly Weekday: number;
+    readonly Count: number;
+}
+
+export interface IMonthlyCount {
+    readonly Month: string;
+    readonly Count: number;
+}

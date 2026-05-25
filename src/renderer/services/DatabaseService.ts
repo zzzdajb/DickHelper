@@ -1,4 +1,13 @@
-import type { IRecord, IRecordRaw, IStats, IDailyCount, IImportResult } from "@dickhelper/shared";
+import type {
+    IRecord,
+    IRecordRaw,
+    IStats,
+    IDailyCount,
+    IImportResult,
+    IHourlyCount,
+    IWeekdayCount,
+    IMonthlyCount,
+} from "@dickhelper/shared";
 
 // 检查 electronAPI 是否可用，不在 Electron 环境时给出明确错误
 function GetApi(): Window["electronAPI"] {
@@ -58,6 +67,34 @@ export class DatabaseService {
 
     public static async GetDailyCounts(startDate: Date, endDate: Date): Promise<IDailyCount[]> {
         return GetApi().GetDailyCounts(startDate.getTime(), endDate.getTime());
+    }
+
+    public static async GetHourlyDistribution(): Promise<IHourlyCount[]> {
+        return GetApi().GetHourlyDistribution();
+    }
+
+    public static async GetWeekdayDistribution(): Promise<IWeekdayCount[]> {
+        return GetApi().GetWeekdayDistribution();
+    }
+
+    public static async GetMonthlyTrend(): Promise<IMonthlyCount[]> {
+        return GetApi().GetMonthlyTrend();
+    }
+
+    public static async GetDurationDistribution(): Promise<number[]> {
+        return GetApi().GetDurationDistribution();
+    }
+
+    public static async GetSetting(key: string): Promise<string | null> {
+        return GetApi().GetSetting(key);
+    }
+
+    public static async SetSetting(key: string, value: string): Promise<void> {
+        return GetApi().SetSetting(key, value);
+    }
+
+    public static async RequestAiAnalysis(): Promise<string> {
+        return GetApi().RequestAiAnalysis();
     }
 
     /**
@@ -125,9 +162,6 @@ export class DatabaseService {
         return JSON.stringify(exportData, null, 2);
     }
 
-    /**
-     * 注册数据更新回调，返回取消监听的函数
-     */
     public static OnRecordsUpdated(callback: () => void): () => void {
         return GetApi().OnRecordsUpdated(callback);
     }

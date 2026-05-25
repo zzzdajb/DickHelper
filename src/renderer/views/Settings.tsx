@@ -1,21 +1,24 @@
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     Alert,
-    Paper,
-    Stack,
-    Title,
-    Button,
-    Group,
-    Text,
-    Notification,
-    Progress,
-    rem,
-    Divider,
     Badge,
+    Button,
+    Divider,
+    Group,
+    Notification,
+    Paper,
+    PasswordInput,
+    Progress,
+    Select,
     SegmentedControl,
+    Stack,
+    Text,
+    TextInput,
+    Title,
 } from "@mantine/core";
 import {
     IconAlertCircle,
+    IconBrain,
     IconDatabase,
     IconDownload,
     IconInfoCircle,
@@ -30,6 +33,11 @@ import { UpdateService } from "../services/UpdateService";
 import { useRecords } from "../hooks/useRecords";
 import { useUpdateState } from "../hooks/useUpdateState";
 import type { UpdateSource, UpdateStatus } from "@dickhelper/shared";
+
+const AI_PROVIDER_OPTIONS: { value: string; label: string }[] = [
+    { value: "local", label: "本地规则分析" },
+    { value: "openai", label: "OpenAI 兼容接口" },
+];
 
 const GetUpdateStatusText = (status: UpdateStatus | undefined): string => {
     switch (status) {
@@ -142,7 +150,7 @@ export const Settings = () => {
                     设置
                 </Title>
                 <Text size="sm" c="dimmed">
-                    管理数据导入导出，并查看应用信息。
+                    管理数据导入导出、AI 分析配置，并查看应用信息。
                 </Text>
             </Stack>
 
@@ -157,22 +165,14 @@ export const Settings = () => {
                     </Badge>
                 </Group>
                 <Text size="sm" c="dimmed" mb="md">
-                    导出或导入您的记录数据，支持新旧格式兼容
+                    导出或导入您的记录数据，支持新旧格式兼容。
                 </Text>
 
                 <Group>
-                    <Button
-                        variant="outline"
-                        leftSection={<IconDownload style={{ width: rem(16), height: rem(16) }} />}
-                        onClick={HandleExport}
-                    >
+                    <Button variant="outline" leftSection={<IconDownload size={16} />} onClick={HandleExport}>
                         导出记录
                     </Button>
-                    <Button
-                        variant="outline"
-                        leftSection={<IconUpload style={{ width: rem(16), height: rem(16) }} />}
-                        onClick={() => fileInputRef.current?.click()}
-                    >
+                    <Button variant="outline" leftSection={<IconUpload size={16} />} onClick={() => fileInputRef.current?.click()}>
                         导入记录
                     </Button>
                     <input
@@ -197,6 +197,8 @@ export const Settings = () => {
                 )}
             </Paper>
 
+            <AiConfigSection />
+
             <Paper shadow="sm" radius="md" p="lg" withBorder>
                 <Group justify="space-between" align="flex-start" mb="xs">
                     <Group gap="sm">
@@ -220,7 +222,9 @@ export const Settings = () => {
                         <Text size="sm" c="dimmed">更新源</Text>
                         <SegmentedControl
                             value={updateSource}
-                            onChange={HandleSourceChange}
+                            onChange={(value) => {
+                                HandleSourceChange(value);
+                            }}
                             data={[
                                 { label: "ghfast 镜像", value: "mirror" },
                                 { label: "GitHub 直连", value: "github" },
@@ -262,7 +266,7 @@ export const Settings = () => {
                     <Group>
                         <Button
                             variant="outline"
-                            leftSection={<IconRefresh style={{ width: rem(16), height: rem(16) }} />}
+                            leftSection={<IconRefresh size={16} />}
                             onClick={HandleCheckUpdate}
                             loading={isChecking}
                             disabled={isDownloading}
@@ -272,7 +276,7 @@ export const Settings = () => {
 
                         {UpdateState?.IsUpdateAvailable === true && (
                             <Button
-                                leftSection={<IconDownload style={{ width: rem(16), height: rem(16) }} />}
+                                leftSection={<IconDownload size={16} />}
                                 onClick={HandleDownloadUpdate}
                                 loading={isDownloading}
                             >
@@ -283,7 +287,7 @@ export const Settings = () => {
                         {UpdateState?.IsUpdateDownloaded === true && (
                             <Button
                                 color="green"
-                                leftSection={<IconRocket style={{ width: rem(16), height: rem(16) }} />}
+                                leftSection={<IconRocket size={16} />}
                                 onClick={HandleInstallUpdate}
                             >
                                 重启安装
@@ -314,7 +318,7 @@ export const Settings = () => {
                         variant="light"
                         color="yellow"
                         fullWidth
-                        leftSection={<IconStar style={{ width: rem(16), height: rem(16) }} />}
+                        leftSection={<IconStar size={16} />}
                         onClick={() => { void window.electronAPI.OpenExternal("https://github.com/zzzdajb/DickHelper"); }}
                     >
                         喜欢这个应用？去 GitHub 给项目点个 Star
@@ -322,5 +326,131 @@ export const Settings = () => {
                 </Stack>
             </Paper>
         </Stack>
+    );
+};
+
+const AiConfigSection = () => {
+    const [provider, setProvider] = useState<string>("local");
+    const [apiEndpoint, setApiEndpoint] = useState<string>("https://api.openai.com/v1/chat/completions");
+    const [apiKey, setApiKey] = useState<string>("");
+    const [model, setModel] = useState<string>("gpt-4o-mini");
+    const [saved, setSaved] = useState<boolean>(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
+    const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        const LoadSettings = async (): Promise<void> => {
+            const [providerSetting, endpointSetting, apiKeySetting, modelSetting] = await Promise.all([
+                DatabaseService.GetSetting("ai_provider"),
+                DatabaseService.GetSetting("ai_api_endpoint"),
+                DatabaseService.GetSetting("ai_api_key"),
+                DatabaseService.GetSetting("ai_model"),
+            ]);
+
+            setProvider(providerSetting === "openai" ? "openai" : "local");
+            if (endpointSetting !== null) {
+                setApiEndpoint(endpointSetting);
+            }
+            if (apiKeySetting !== null) {
+                setApiKey(apiKeySetting);
+            }
+            if (modelSetting !== null) {
+                setModel(modelSetting);
+            }
+        };
+
+        void LoadSettings();
+        return () => {
+            if (savedTimerRef.current !== null) {
+                clearTimeout(savedTimerRef.current);
+            }
+        };
+    }, []);
+
+    const HandleSave = async (): Promise<void> => {
+        try {
+            await DatabaseService.SetSetting("ai_provider", provider);
+            await DatabaseService.SetSetting("ai_api_endpoint", apiEndpoint);
+            await DatabaseService.SetSetting("ai_api_key", apiKey);
+            await DatabaseService.SetSetting("ai_model", model);
+            setSaveError(null);
+            setSaved(true);
+            if (savedTimerRef.current !== null) {
+                clearTimeout(savedTimerRef.current);
+            }
+            savedTimerRef.current = setTimeout(() => {
+                setSaved(false);
+            }, 2000);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error);
+            setSaved(false);
+            setSaveError(message);
+        }
+    };
+
+    const showApiFields: boolean = provider === "openai";
+
+    return (
+        <Paper shadow="sm" radius="md" p="lg" withBorder>
+            <Group gap="sm" mb="xs">
+                <IconBrain size={22} />
+                <Title order={4}>AI 分析配置</Title>
+            </Group>
+            <Text size="sm" c="dimmed" mb="md">
+                本地规则分析是默认选项，不需要 API。切换到 OpenAI 兼容接口后可以配置地址、密钥和模型。
+            </Text>
+
+            <Stack gap="sm">
+                <Select
+                    label="分析方式"
+                    data={AI_PROVIDER_OPTIONS}
+                    value={provider}
+                    onChange={(value) => {
+                        setProvider(value ?? "local");
+                    }}
+                />
+
+                {showApiFields && (
+                    <>
+                        <TextInput
+                            label="API 地址"
+                            description="支持本地 HTTP 地址或任何 OpenAI Chat Completions 兼容端点。"
+                            placeholder="https://api.openai.com/v1/chat/completions"
+                            value={apiEndpoint}
+                            onChange={(e) => setApiEndpoint(e.currentTarget.value)}
+                        />
+                        <PasswordInput
+                            label="API Key"
+                            placeholder="sk-..."
+                            value={apiKey}
+                            onChange={(e) => setApiKey(e.currentTarget.value)}
+                        />
+                        <TextInput
+                            label="模型名称"
+                            placeholder="gpt-4o-mini"
+                            value={model}
+                            onChange={(e) => setModel(e.currentTarget.value)}
+                        />
+                    </>
+                )}
+
+                <Group align="center">
+                    <Button variant="filled" color="blue" onClick={HandleSave}>
+                        保存配置
+                    </Button>
+                    {saved && (
+                        <Text size="sm" c="green">
+                            已保存
+                        </Text>
+                    )}
+                </Group>
+
+                {saveError !== null && (
+                    <Alert color="red" icon={<IconAlertCircle size={18} />} title="保存失败">
+                        {saveError}
+                    </Alert>
+                )}
+            </Stack>
+        </Paper>
     );
 };
