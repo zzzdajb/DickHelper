@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 28
-- **Last Active**: 2026-06-01
+- **Total Sessions**: 29
+- **Last Active**: 2026-06-02
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~1006 | Active |
+| `journal-1.md` | ~1039 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 29 | 2026-06-02 | 移动端遥测排查与调试日志 | `6114976` | `main` |
 | 28 | 2026-06-01 | 遥测系统实现 | `e6e1605` | `main` |
 | 27 | 2026-06-01 | 安卓端 LLM 自慰评价功能 | `ac64180` | `main` |
 | 26 | 2026-05-31 | 统一预测算法并接入桌面与移动端 | `202ba97`, `561099b`, `c7d4280` | `main` |

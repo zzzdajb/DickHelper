@@ -1004,3 +1004,36 @@ Fixed registration not syncing historical data: added full history sync via batc
 ### Next Steps
 
 - None - task complete
+
+
+## Session 29: 移动端遥测排查与调试日志
+
+**Date**: 2026-06-02
+**Task**: 移动端遥测排查与调试日志
+**Branch**: `main`
+
+### Summary
+
+定位 Android 遥测 0 记录的高概率根因，确认移动端裸 crypto.randomUUID 存在风险，并提交了移动端遥测调试日志入口与更稳固的 UUID 生成路径。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `6114976` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
