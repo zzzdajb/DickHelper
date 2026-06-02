@@ -19,8 +19,9 @@ export default function SettingsScreen() {
     const { records, refresh } = useRecords();
     const { updateState, setUpdateSource, checkForUpdates, downloadUpdate, installUpdate, openInstallPermissionSettings } =
         useMobileUpdateState();
-    const { enabled: telemetryEnabled, toggle: telemetryToggle, osLabel, appVersion } = useTelemetry();
+    const { enabled: telemetryEnabled, toggle: telemetryToggle, osLabel, appVersion, debugInfo } = useTelemetry();
     const [telemetryConfirmVisible, setTelemetryConfirmVisible] = useState<boolean>(false);
+    const [telemetryDebugVisible, setTelemetryDebugVisible] = useState<boolean>(false);
     const [busy, setBusy] = useState<boolean>(false);
     const [message, setMessage] = useState<string | null>(null);
     const [syncAddress, setSyncAddress] = useState<string>("");
@@ -466,6 +467,15 @@ export default function SettingsScreen() {
                         上报数据：操作系统（{osLabel}）、应用版本（{appVersion}）
                     </Text>
                 )}
+
+                <List.Item
+                    title="上报日志"
+                    description="仅排查问题时需要"
+                    left={(props) => <List.Icon {...props} icon="text-box-search-outline" />}
+                    right={(props) => <List.Icon {...props} icon="chevron-right" />}
+                    onPress={() => setTelemetryDebugVisible(true)}
+                    style={styles.telemetryDebugEntry}
+                />
             </Surface>
 
             <Surface style={styles.aboutSurface} elevation={0}>
@@ -511,6 +521,52 @@ export default function SettingsScreen() {
                         <Button textColor="#dc2626" onPress={HandleConfirmTelemetryDisable}>确认关闭</Button>
                     </Dialog.Actions>
                 </Dialog>
+
+                <Dialog visible={telemetryDebugVisible} onDismiss={() => setTelemetryDebugVisible(false)}>
+                    <Dialog.Title>遥测上报日志</Dialog.Title>
+                    <Dialog.Content>
+                        <View style={styles.telemetryDebugContent}>
+                            <View style={styles.telemetryDebugBlock}>
+                                <Text variant="labelMedium" style={styles.telemetryDebugLabel}>
+                                    当前 UUID
+                                </Text>
+                                <Text variant="bodyMedium" style={styles.telemetryDebugValue}>
+                                    {debugInfo.uuid ?? "未生成"}
+                                </Text>
+                            </View>
+
+                            <View style={styles.telemetryDebugBlock}>
+                                <Text variant="labelMedium" style={styles.telemetryDebugLabel}>
+                                    上次尝试时间
+                                </Text>
+                                <Text variant="bodyMedium" style={styles.telemetryDebugValue}>
+                                    {FormatTelemetryDebugTime(debugInfo.lastAttemptAt)}
+                                </Text>
+                            </View>
+
+                            <View style={styles.telemetryDebugBlock}>
+                                <Text variant="labelMedium" style={styles.telemetryDebugLabel}>
+                                    上次成功时间
+                                </Text>
+                                <Text variant="bodyMedium" style={styles.telemetryDebugValue}>
+                                    {FormatTelemetryDebugTime(debugInfo.lastSuccessAt)}
+                                </Text>
+                            </View>
+
+                            <View style={styles.telemetryDebugBlock}>
+                                <Text variant="labelMedium" style={styles.telemetryDebugLabel}>
+                                    最近错误
+                                </Text>
+                                <Text variant="bodyMedium" style={styles.telemetryDebugValue}>
+                                    {debugInfo.lastErrorText ?? "无"}
+                                </Text>
+                            </View>
+                        </View>
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button onPress={() => setTelemetryDebugVisible(false)}>关闭</Button>
+                    </Dialog.Actions>
+                </Dialog>
             </Portal>
 
             <Snackbar visible={message !== null} onDismiss={() => setMessage(null)} duration={3200}>
@@ -518,6 +574,19 @@ export default function SettingsScreen() {
             </Snackbar>
         </ScrollView>
     );
+}
+
+function FormatTelemetryDebugTime(value: string | null): string {
+    if (value === null) {
+        return "无";
+    }
+
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+        return value;
+    }
+
+    return FormatDateTime(parsed);
 }
 
 function GetUpdateStatusText(status: MobileUpdateStatus): string {
@@ -683,5 +752,20 @@ const styles = StyleSheet.create({
     telemetryHint: {
         color: "#64748b",
         marginTop: 4,
+    },
+    telemetryDebugEntry: {
+        paddingHorizontal: 0,
+    },
+    telemetryDebugContent: {
+        gap: 12,
+    },
+    telemetryDebugBlock: {
+        gap: 4,
+    },
+    telemetryDebugLabel: {
+        color: "#64748b",
+    },
+    telemetryDebugValue: {
+        color: "#0f172a",
     },
 });
