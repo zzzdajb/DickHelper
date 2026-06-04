@@ -11,20 +11,18 @@
 
 A simple, efficient, **cross-platform** masturbation recording tool.
 
-<img width="944" height="671" alt="image" src="https://github.com/user-attachments/assets/4706c1a7-77a2-4ccf-a902-936dd5a616e4" />
+<img width="1656" height="1176" alt="image" src="https://github.com/user-attachments/assets/c3ac129e-9da4-4702-9d89-7ffdc8a3beda" />
+
+<img width="1656" height="1176" alt="image" src="https://github.com/user-attachments/assets/6b2c525d-8594-47fa-9ef8-293a6f811565" />
 
 ---
 ## 移动端MVP开发完成 | Mobile MVP Released
 
 牛子小助手安卓版本现已上线，功能基本开发完毕，但是由于目前项目是**桌面优先**的策略，移动端在部分功能上可能**有所落后**，还请谅解。
 
-The Android version of DickHelper is now available. Core features are largely complete. However, as the project follows a **desktop-first** strategy, some mobile features may **lag behind** — your understanding is appreciated.
-
 下载地址 | Download: https://github.com/zzzdajb/DickHelper/releases/tag/mobile-v0.0.3
 
-移动端现已支持LAN同步功能，您可以在任意设备上自由的记录您的体验，无需担心数据合并问题。
-
-The mobile version now supports LAN sync. You can freely record your experience on any device without worrying about data merging issues.
+移动端现已支持LAN同步功能，您现在可以在任意设备上自由的记录您的体验。
 
 ---
 
@@ -32,20 +30,15 @@ The mobile version now supports LAN sync. You can freely record your experience 
 
 和全球所有牛子小助手的用户进行时长和次数比拼吧！
 
-Compete with DickHelper users worldwide in duration and count rankings!
-
 该项目部署于Cloudflare Workers，受限于免费服务质量，可能存在不稳定的情况，还请谅解。
-
-This project is deployed on Cloudflare Workers. Due to the limitations of the free tier, instability may occur — your understanding is appreciated.
 
 ---
 
 ## 特点 | Features
 
-- 🔒 **数据本地存储**: SQLite 数据库，本地存储，无需担心隐私泄露 | **Local Storage**: SQLite database, all data stored locally
-- 📊 **统计看板**: 总次数、平均时长、周/月频率统计 + 发射日历热力图 | **Statistics**: Total count, avg duration, weekly/monthly frequency + heatmap calendar
-- ⏱️ **计时器**: 开始/暂停/继续/停止，精确记录每次时长 | **Timer**: Start/pause/resume/stop with precise duration tracking
-- 📋 **历史记录**: 浏览、搜索、删除单条或清空全部 | **History**: Browse, delete individual records or clear all
+- 🔒 **隐私至上**: SQLite 数据库，本地存储，最大程度确保数据 安全 
+- 📊 **统计看板**: 多种统计图表 + 发射日历热力图，轻松掌握自身状态 
+- 📋 **历史记录**: 轻松浏览、搜索历史记录，历史数据永不丢失
 
 ---
 
