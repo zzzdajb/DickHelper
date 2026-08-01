@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "renderer 与 mobile 改动的质量门槛"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "main 进程与 core 包改动的质量门槛"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "验证桌面/移动/AI 三条路径的口径与时区基准确实一致，无残留的独立实现"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "验证字段重命名无残留、无 any 兜底"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "验证窗口天数与计数逻辑确实只剩一份实现"}

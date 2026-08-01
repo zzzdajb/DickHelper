@@ -1,0 +1,7 @@
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "核心诉求：同一窗口语义的三份重复实现下沉到 packages/core 作为单一真相源"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "改动横跨 main / renderer / core / shared / mobile 五层，需保证口径与字段命名一致"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "IStats 与 IAiAnalysisData 字段重命名为 Last7DayCount / Last30DayCount"}
+{"file": ".trellis/spec/frontend/code-style.md", "reason": "renderer 与 mobile 的代码风格约定"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "StatCard 两张卡的 title/description 改为常量渲染"}
+{"file": ".trellis/spec/frontend/mobile-implementation.md", "reason": "mobile stats.tsx 的 CalculateMetrics 改调共享计数函数、MetricTile 文案改常量渲染"}
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "database.ts GetStats() 的 SQL 窗口边界参数改为取自 core 的窗口起点函数"}
