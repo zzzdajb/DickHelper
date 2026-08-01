@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { ActivityIndicator, Button, Surface, Text, useTheme } from "react-native-paper";
 import type { IRecord } from "@dickhelper/shared";
-import { BuildAnalysisData, Analyze } from "@dickhelper/core";
+import { BuildAnalysisData, Analyze, CountInWindow, LAST_7_DAYS, LAST_30_DAYS } from "@dickhelper/core";
 import type { IAiConfig } from "@dickhelper/core";
 import { useRecords } from "../../src/hooks/useRecords";
 import { useMobileDatabaseService } from "../../src/hooks/useMobileDatabaseService";
@@ -19,27 +19,17 @@ const DEFAULT_MODEL = "gpt-4o-mini";
 function CalculateMetrics(records: IRecord[]): {
     readonly total: number;
     readonly averageDuration: number;
-    readonly recentWeek: number;
-    readonly recentMonth: number;
+    readonly last7DayCount: number;
+    readonly last30DayCount: number;
     readonly latestEndTime: Date | null;
 } {
     const now = new Date();
-    const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
     let totalDuration = 0;
-    let recentWeek = 0;
-    let recentMonth = 0;
     let latestEndTime: Date | null = null;
 
     for (const record of records) {
         totalDuration += record.Duration;
-        if (record.EndTime >= weekStart) {
-            recentWeek++;
-        }
-        if (record.EndTime >= monthStart) {
-            recentMonth++;
-        }
         if (latestEndTime === null || record.EndTime > latestEndTime) {
             latestEndTime = record.EndTime;
         }
@@ -48,8 +38,8 @@ function CalculateMetrics(records: IRecord[]): {
     return {
         total: records.length,
         averageDuration: records.length > 0 ? totalDuration / records.length : 0,
-        recentWeek,
-        recentMonth,
+        last7DayCount: CountInWindow(records, now, LAST_7_DAYS),
+        last30DayCount: CountInWindow(records, now, LAST_30_DAYS),
         latestEndTime,
     };
 }
@@ -128,13 +118,13 @@ export default function StatsScreen() {
                             accentColor={theme.colors.secondary}
                         />
                         <MetricTile
-                            title="近 7 天"
-                            value={String(metrics.recentWeek)}
+                            title={`近 ${LAST_7_DAYS} 天`}
+                            value={String(metrics.last7DayCount)}
                             accentColor={theme.colors.tertiary}
                         />
                         <MetricTile
-                            title="近 30 天"
-                            value={String(metrics.recentMonth)}
+                            title={`近 ${LAST_30_DAYS} 天`}
+                            value={String(metrics.last30DayCount)}
                             accentColor={theme.colors.error}
                         />
                     </View>

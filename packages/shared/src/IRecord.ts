@@ -21,8 +21,8 @@ export interface IRecordRaw {
 export interface IStats {
     readonly TotalCount: number;
     readonly AverageDuration: number;
-    readonly FrequencyPerWeek: number;
-    readonly FrequencyPerMonth: number;
+    readonly Last7DayCount: number;
+    readonly Last30DayCount: number;
 }
 
 export interface IDailyCount {

@@ -1,4 +1,5 @@
 import type { IAiAnalysisData } from "./ai.types";
+import { LAST_7_DAYS, LAST_30_DAYS } from "../statsWindow";
 
 const WEEKDAY_NAMES: readonly string[] = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
 
@@ -12,8 +13,8 @@ export function BuildPrompt(data: IAiAnalysisData): string {
 统计概览：
 - 总次数：${data.TotalCount}
 - 平均时长：${data.AverageDuration.toFixed(1)} 分钟
-- 本周频率：${data.FrequencyPerWeek} 次
-- 本月频率：${data.FrequencyPerMonth} 次
+- 近 ${LAST_7_DAYS} 天：${data.Last7DayCount} 次
+- 近 ${LAST_30_DAYS} 天：${data.Last30DayCount} 次
 
 高峰时段（前 3）：
 ${hourlyPeaks.map((item) => `- ${item.Hour}:00：${item.Count} 次`).join("\n")}

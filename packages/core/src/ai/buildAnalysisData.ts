@@ -1,16 +1,14 @@
 import type { IRecord } from "@dickhelper/shared";
 import type { IAiAnalysisData } from "./ai.types";
-
-const DAY_MS = 86_400_000;
-const WEEK_MS = 7 * DAY_MS;
+import { CountInWindow, LAST_7_DAYS, LAST_30_DAYS } from "../statsWindow";
 
 export function BuildAnalysisData(records: readonly IRecord[]): IAiAnalysisData {
     if (records.length === 0) {
         return {
             TotalCount: 0,
             AverageDuration: 0,
-            FrequencyPerWeek: 0,
-            FrequencyPerMonth: 0,
+            Last7DayCount: 0,
+            Last30DayCount: 0,
             HourlyDistribution: BuildEmptyHourlyDistribution(),
             WeekdayDistribution: BuildEmptyWeekdayDistribution(),
             MonthlyTrend: [],
@@ -24,40 +22,28 @@ export function BuildAnalysisData(records: readonly IRecord[]): IAiAnalysisData 
     const weekdayMap = new Map<number, number>();
     const monthlyMap = new Map<string, number>();
 
+    // 分布一律按本地时区切分，与 database.ts 的桌面端图表保持同一基准；用户看的是自己墙上的钟
     for (const record of records) {
         durations.push(record.Duration);
 
-        const hour = record.EndTime.getUTCHours();
+        const hour = record.EndTime.getHours();
         hourlyMap.set(hour, (hourlyMap.get(hour) ?? 0) + 1);
 
-        const weekday = (record.EndTime.getUTCDay() + 6) % 7; // Monday=0, Sunday=6
+        const weekday = (record.EndTime.getDay() + 6) % 7; // Monday=0, Sunday=6
         weekdayMap.set(weekday, (weekdayMap.get(weekday) ?? 0) + 1);
 
-        const monthKey = `${record.EndTime.getUTCFullYear()}-${String(record.EndTime.getUTCMonth() + 1).padStart(2, "0")}`;
+        const monthKey = `${record.EndTime.getFullYear()}-${String(record.EndTime.getMonth() + 1).padStart(2, "0")}`;
         monthlyMap.set(monthKey, (monthlyMap.get(monthKey) ?? 0) + 1);
     }
 
     const sortedDurations = [...durations].sort((a, b) => a - b);
     const totalDuration = Sum(durations);
-    const weekStart = new Date(now.getTime() - WEEK_MS);
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    let recentWeek = 0;
-    let recentMonth = 0;
-    for (const record of records) {
-        if (record.EndTime >= weekStart) {
-            recentWeek++;
-        }
-        if (record.EndTime >= monthStart) {
-            recentMonth++;
-        }
-    }
 
     return {
         TotalCount: records.length,
         AverageDuration: totalDuration / records.length,
-        FrequencyPerWeek: recentWeek,
-        FrequencyPerMonth: recentMonth,
+        Last7DayCount: CountInWindow(records, now, LAST_7_DAYS),
+        Last30DayCount: CountInWindow(records, now, LAST_30_DAYS),
         HourlyDistribution: BuildHourlyDistribution(hourlyMap),
         WeekdayDistribution: BuildWeekdayDistribution(weekdayMap),
         MonthlyTrend: BuildMonthlyTrend(monthlyMap),

@@ -1,4 +1,5 @@
 import type { IAiAnalysisData } from "./ai.types";
+import { LAST_7_DAYS } from "../statsWindow";
 
 const WEEKDAY_NAMES: readonly string[] = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
 
@@ -28,13 +29,13 @@ export function AnalyzeLocally(data: IAiAnalysisData): string {
         insights.push(`星期分布最活跃的是${WEEKDAY_NAMES[peakDay.Weekday] ?? "?"}，共有 ${peakDay.Count} 次。`);
     }
 
-    const weeklyCount = data.FrequencyPerWeek;
-    if (weeklyCount <= 3) {
-        insights.push(`本周频率约 ${weeklyCount} 次，整体偏平稳。`);
-    } else if (weeklyCount <= 7) {
-        insights.push(`本周频率约 ${weeklyCount} 次，处于中等水平。`);
+    const last7DayCount = data.Last7DayCount;
+    if (last7DayCount <= 3) {
+        insights.push(`近 ${LAST_7_DAYS} 天 ${last7DayCount} 次，整体偏平稳。`);
+    } else if (last7DayCount <= 7) {
+        insights.push(`近 ${LAST_7_DAYS} 天 ${last7DayCount} 次，处于中等水平。`);
     } else {
-        insights.push(`本周频率约 ${weeklyCount} 次，频率偏高，建议适当控制。`);
+        insights.push(`近 ${LAST_7_DAYS} 天 ${last7DayCount} 次，频率偏高，建议适当控制。`);
     }
 
     insights.push(`持续时长范围约 ${data.DurationStats.Min.toFixed(1)} - ${data.DurationStats.Max.toFixed(1)} 分钟。`);

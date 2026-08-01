@@ -85,6 +85,41 @@ After implementation:
 
 ---
 
+## Timezone Baseline Must Be Uniform Across Packages
+
+Records are stored as ISO 8601 **UTC** strings, but every user-facing统计 must be
+sliced by **local** time — the user reads their own wall clock. `src/main/database.ts`
+states this contract in comments, but `packages/core` is a separate package that no
+backend spec covers, so a rewrite there silently drifted to `getUTC*`.
+
+### Rules
+
+- Any code deriving an **hour / weekday / calendar month** from a record uses local
+  getters (`getHours`, `getDay`, `getFullYear` + `getMonth`) — never `getUTC*`
+- UTC belongs only at the storage boundary (the ISO string) and in `leaderboardAggregation.ts`,
+  which pins UTC+8 **on purpose** so all users are compared on the same day boundary
+- Rolling-window counts compare absolute instants, so they are timezone-free — prefer
+  them over calendar boundaries when the metric is a frequency
+- Window length, window start, and window counting live in one place
+  (`packages/core/src/statsWindow.ts`); UI copy renders the day count from the same
+  constant so wording cannot drift from behavior
+
+### Checklist: after touching any stats aggregation
+
+- [ ] `grep -rn "getUTC" packages/core/src` returns only intentional UTC+8 leaderboard code
+- [ ] Tests pin a **non-zero-offset** timezone (`cross-env TZ=Asia/Shanghai`) — pinning UTC
+      makes this whole class of bug untestable
+- [ ] Test fixtures construct **local** times (`new Date(y, m, d, h)`), not UTC literals —
+      a UTC literal read by a UTC getter cancels out and the assertion passes for the wrong reason
+
+**Real-world example**: `BuildAnalysisData` was rewritten to replace desktop SQLite
+aggregation and switched to `getUTCHours`. Under UTC+8 the AI analysis reported peak
+hours 8 hours off, e.g. telling a user whose real peak was 23:00 that it was 15:00.
+Six green tests covered the function — but `CreateRecordAtHour` built records from UTC
+literals, so the fixture and the implementation cancelled each other out.
+
+---
+
 ## Cross-Platform Template Consistency
 
 In Trellis, command templates (e.g., `record-session.md`) exist in **multiple platforms** with identical or near-identical content. This is a cross-layer boundary.

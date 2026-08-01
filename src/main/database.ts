@@ -10,6 +10,7 @@ import type {
     IMonthlyCount,
     IWeekdayCount,
 } from "@dickhelper/shared";
+import { GetWindowStart, LAST_7_DAYS, LAST_30_DAYS } from "@dickhelper/core";
 
 // 从 SQLite 读取的原始记录类型
 interface IDbRecord {
@@ -192,36 +193,34 @@ export class DatabaseService {
     public GetStats(): {
         TotalCount: number;
         AverageDuration: number;
-        FrequencyPerWeek: number;
-        FrequencyPerMonth: number;
+        Last7DayCount: number;
+        Last30DayCount: number;
     } {
         const now = new Date();
 
-        // 本周开始（7天前）
-        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-
-        // 本月开始
-        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        // 窗口起点取自 core，与移动端和 AI 分析共用同一份天数与边界定义
+        const last7Start = GetWindowStart(now, LAST_7_DAYS);
+        const last30Start = GetWindowStart(now, LAST_30_DAYS);
 
         const totalRow = this._queryOne(
             `SELECT COUNT(*) as count, AVG(Duration) as avgDur FROM ${TABLE_NAME} WHERE Deleted = 0`
         );
 
-        const weekRow = this._queryOne(
+        const last7Row = this._queryOne(
             `SELECT COUNT(*) as count FROM ${TABLE_NAME} WHERE EndTime >= ? AND Deleted = 0`,
-            [oneWeekAgo.toISOString()]
+            [last7Start.toISOString()]
         );
 
-        const monthRow = this._queryOne(
+        const last30Row = this._queryOne(
             `SELECT COUNT(*) as count FROM ${TABLE_NAME} WHERE EndTime >= ? AND Deleted = 0`,
-            [monthStart.toISOString()]
+            [last30Start.toISOString()]
         );
 
         return {
             TotalCount: (totalRow?.count as number) ?? 0,
             AverageDuration: (totalRow?.avgDur as number) ?? 0,
-            FrequencyPerWeek: (weekRow?.count as number) ?? 0,
-            FrequencyPerMonth: (monthRow?.count as number) ?? 0,
+            Last7DayCount: (last7Row?.count as number) ?? 0,
+            Last30DayCount: (last30Row?.count as number) ?? 0,
         };
     }
 
