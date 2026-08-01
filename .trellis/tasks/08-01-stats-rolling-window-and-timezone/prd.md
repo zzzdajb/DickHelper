@@ -91,16 +91,18 @@
 
 ## Acceptance Criteria
 
-- [ ] `npm run check` 全绿（typecheck ×3 + lint + test:core + mobile:export）
-- [ ] `packages/core` 测试在钉死的非零时区下运行，`ai.test.ts` 辅助函数使用本地时间构造
-- [ ] 在 UTC+8 环境下，一条本地 00:30 的记录，其 `HourlyDistribution` 落在 slot 0（旧实现下会落在 slot 16）
-- [ ] 全仓搜索 `FrequencyPerWeek` / `FrequencyPerMonth` 无残留
-- [ ] 全仓搜索 UI 层硬编码的「7 天」「30 天」字面量无残留（天数均由常量渲染）
-- [ ] `packages/core/src/ai/buildAnalysisData.ts` 中无 `getUTC` 前缀调用
-- [ ] 桌面端统计页：「近 30 天」数值 ≥ 改动前的「本月次数」，越靠近月初差值越大；「近 7 天」数值不变
-- [ ] 移动端统计页两张 MetricTile 与桌面端同名卡片口径一致
-- [ ] 窗口计数函数有直接的单元测试覆盖（含边界：恰好落在窗口起点的记录计入）
-- [ ] 两个提交可独立回退，回退口径调整不会连带回退时区修复
+- [x] `npm run check` 全绿（typecheck ×3 + lint + test:core + mobile:export），退出码 0
+- [x] `packages/core` 测试在 `TZ=Asia/Shanghai` 下运行，`ai.test.ts` 辅助函数使用本地时间构造
+- [x] 在 UTC+8 环境下，本地 00:00 的记录落在 slot 0；**实测将实现改回 `getUTCHours` 后测试变红**（`actual: 0, expected: 1`），确认测试具备区分力
+- [x] 全仓搜索 `FrequencyPerWeek` / `FrequencyPerMonth` 无残留
+- [x] 全仓搜索 UI 层硬编码的「7 天」「30 天」字面量无残留（天数均由常量渲染）
+- [x] `packages/core/src/ai/buildAnalysisData.ts` 中无 `getUTC` 前缀调用（全包仅剩 `leaderboardAggregation.ts` 的故意 UTC+8）
+- [x] 「近 30 天」≥ 旧「本月次数」：以 8 月 1 日、每日一条的数据实测，旧口径 **1**、新口径 **31**
+- [x] 移动端与桌面端共用同一常量与同一边界定义
+- [x] `statsWindow.test.ts` 覆盖窗口计数（含边界：恰好落在起点计入、早 1 毫秒不计入）
+- [x] 两个提交可独立回退：`git revert --no-commit` 口径提交后，`getHours()` 与 TZ 钉定均保留
+
+未由我端到端驱动的部分：桌面端应用未实际启动查看渲染结果。已间接验证 —— 构建通过、`滚动窗口，非自然月` 文案存在于产物、`LAST_7_DAYS = 7` / `LAST_30_DAYS = 30` 常量定义在包内且被模板引用，无 ReferenceError 风险。
 
 ## Definition of Done
 
@@ -170,6 +172,18 @@
 - 记录 `EndTime` 以 ISO UTC 字符串存于 SQLite TEXT 列（`database.ts:62,153`），本地窗口起点经 `toISOString()` 后与之做字典序比较是正确的，此处无需改动
 - `packages/core` 测试用 `tsx` 直跑三个文件，无测试框架（`packages/core/package.json`）
 - 钉 TZ 对 `prediction.test.ts` / `recordImportExport.test.ts` 同样有稳定性收益
+
+### 实施中发现的额外事实
+
+- `packages/core/src/leaderboardAggregation.ts:14` 存在**第三种**时区约定：硬编码 UTC+8。这是**故意的** —— 排行榜要让所有用户按同一天界比较 —— 不属于本次缺陷，已在 spec 中注明，避免后人当成漏改
+- 渲染进程新增了从 `@dickhelper/core` 导入运行时值。实测无膨胀：`useOnlineService.ts`、`PredictionService.ts`、`OnlineView.tsx` 早已这样做，改动前后 renderer 包均为 2.1M
+- `StatsChart.tsx` 的趋势图标题硬编码「近 90 天」，而旁边就有 `TREND_DAYS = 90` 常量 —— 与本次修复的是同一类文案漂移，但属独立问题，未处理
+
+### 自检中修正的三处偏差
+
+1. `database.ts` 局部变量仍叫 `monthStart`（实为 30 天前）、移动端仍叫 `recentWeek/recentMonth` —— 与本次「消除日历语义暗示」的决策自相矛盾，已改为 `last7Start/last30Start`、`last7DayCount/last30DayCount`
+2. 验收标准要求的 `statsWindow` 单元测试最初遗漏，仅在临时脚本中验证过，已补 `packages/core/test/statsWindow.test.ts`
+3. 新测试首次运行即抓出作者的算错：第 0～30 天共 31 条落在窗口内（第 30 天那条恰好在起点、按设计计入），断言误写为 30
 
 ### 需求收敛过程
 
