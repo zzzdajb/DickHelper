@@ -1037,3 +1037,38 @@ Fixed registration not syncing historical data: added full history sync via batc
 ### Next Steps
 
 - None - task complete
+
+
+## Session 30: 统计口径改滚动窗口 + core 时区基准修复
+
+**Date**: 2026-08-01
+**Task**: 统计口径改滚动窗口 + core 时区基准修复
+**Branch**: `fix/stats-rolling-window`
+
+### Summary
+
+grilling 收敛出 7 项决策后实施。统计卡片「本月次数」标题/副标题/实现三者矛盾，统一为滚动 30 天（8月1日实测 1 → 31）；窗口天数、起点、计数三层下沉 packages/core/statsWindow.ts，界面文案由常量渲染；字段更名 FrequencyPerMonth → Last30DayCount。顺带修复 core 时区基准飘到 UTC 导致 AI 高峰时段偏移 8 小时——六条绿色测试因夹具与实现同号相消而未拦住，改夹具为本地时间构造后回归保护白拿，已实测旧实现下测试变红。教训写入 cross-layer 指南。PR #42。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `6f3b0ba` | (see git log) |
+| `3fce8b9` | (see git log) |
+| `f8f99a3` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
