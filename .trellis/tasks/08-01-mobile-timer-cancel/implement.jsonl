@@ -1,0 +1,5 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file": ".trellis/spec/frontend/mobile-implementation.md", "reason": "移动端代码归属边界"}
+{"file": ".trellis/spec/frontend/code-style.md", "reason": "C# 风格 TypeScript：Handle 前缀、显式返回类型、禁止过早抽象"}
+{"file": ".trellis/spec/frontend/hook-guidelines.md", "reason": "改动点之一是自定义 Hook useTimer 的对外契约"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "记录页按钮区改动，需遵循组件与交互约定"}

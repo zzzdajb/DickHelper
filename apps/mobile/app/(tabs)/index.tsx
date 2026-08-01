@@ -43,6 +43,12 @@ export default function RecordScreen() {
         timer.pause();
     };
 
+    const HandleCancel = (): void => {
+        timer.cancel();
+        setNotes("");
+        setMessage("已取消，本次未保存");
+    };
+
     const HandleStop = async (): Promise<void> => {
         const result = timer.stop();
         if (result === null) {
@@ -127,6 +133,14 @@ export default function RecordScreen() {
                         >
                             结束并保存
                         </Button>
+                        <Button
+                            mode="text"
+                            disabled={saving}
+                            onPress={HandleCancel}
+                            style={styles.cancelButton}
+                        >
+                            取消本次计时
+                        </Button>
                     </>
                 )}
             </View>
@@ -200,6 +214,10 @@ const styles = StyleSheet.create({
     },
     primaryButtonContent: {
         height: 56,
+    },
+    // 没有二次确认框，与主操作区拉开的这段距离是防误触的唯一防线
+    cancelButton: {
+        marginTop: 24,
     },
     notesInput: {
         backgroundColor: "#ffffff",

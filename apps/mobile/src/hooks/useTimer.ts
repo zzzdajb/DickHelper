@@ -31,6 +31,7 @@ export interface IUseTimerResult {
     readonly pause: () => void;
     readonly resume: () => void;
     readonly stop: () => ITimerStopResult | null;
+    readonly cancel: () => void;
 }
 
 export function useTimer(): IUseTimerResult {
@@ -96,15 +97,21 @@ export function useTimer(): IUseTimerResult {
         setIsPaused(false);
     }, [isPaused, isRecording]);
 
-    const stop = useCallback((): ITimerStopResult | null => {
+    // 结束计时的唯一清理路径，任何新增的终止动作都必须走这里，否则屏幕会一直常亮
+    const ResetTimerState = useCallback((): void => {
         ClearTimer();
-        // 放在分支之前，正常结束与提前返回两条路径都会释放
         ReleaseKeepAwake();
+        setIsRecording(false);
+        setIsPaused(false);
+        setElapsedSeconds(0);
+        startTimeRef.current = null;
+        accumulatedPauseRef.current = 0;
+        lastPauseTimeRef.current = null;
+    }, [ClearTimer]);
 
+    const stop = useCallback((): ITimerStopResult | null => {
         if (startTimeRef.current === null) {
-            setIsRecording(false);
-            setIsPaused(false);
-            setElapsedSeconds(0);
+            ResetTimerState();
             return null;
         }
 
@@ -119,15 +126,15 @@ export function useTimer(): IUseTimerResult {
             durationMinutes,
         };
 
-        setIsRecording(false);
-        setIsPaused(false);
-        setElapsedSeconds(0);
-        startTimeRef.current = null;
-        accumulatedPauseRef.current = 0;
-        lastPauseTimeRef.current = null;
+        ResetTimerState();
 
         return result;
-    }, [ClearTimer]);
+    }, [ResetTimerState]);
+
+    // 取消只做清理，不计算也不返回本次结果
+    const cancel = useCallback((): void => {
+        ResetTimerState();
+    }, [ResetTimerState]);
 
     useEffect(() => {
         return () => {
@@ -144,5 +151,6 @@ export function useTimer(): IUseTimerResult {
         pause,
         resume,
         stop,
+        cancel,
     };
 }
