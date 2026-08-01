@@ -1105,3 +1105,36 @@ grilling 收敛出 7 项决策后实施。统计卡片「本月次数」标题/�
 ### Next Steps
 
 - None - task complete
+
+
+## Session 32: 移动端三改动：屏幕常亮 / 可取消计时 / 黑夜模式
+
+**Date**: 2026-08-01
+**Task**: 移动端三改动：屏幕常亮 / 可取消计时 / 黑夜模式
+**Branch**: `main`
+
+### Summary
+
+由一次 grilling 会话收敛出 10 个决策点，拆为 3 个 Trellis 任务顺序执行（常亮→取消→黑夜模式，黑夜模式排最后以免给记录页配两遍色）。常亮用命令式 API 绑定计时状态而非组件挂载；取消按需求方要求不做二次确认，防线全押在按钮位置与视觉分量上；黑夜模式跟随系统、slate 冷灰镜像配色、样式表改为按主题生成，并新增 lint 规则禁止移动端硬编码颜色作为漏改的编译期防线。实施中修正了 PRD 三处盲区：MD3 深色继承的紫调色槽、settings/_layout.tsx 遗漏、userInterfaceStyle 实为空配置。三处盲区同源——初稿靠搜索色值字面量划范围，看不见不含字面量的颜色来源。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `752391a` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
