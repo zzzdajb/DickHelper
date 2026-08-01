@@ -1072,3 +1072,36 @@ grilling 收敛出 7 项决策后实施。统计卡片「本月次数」标题/�
 ### Next Steps
 
 - None - task complete
+
+
+## Session 31: 图表周期文案改为常量渲染
+
+**Date**: 2026-08-01
+**Task**: 图表周期文案改为常量渲染
+**Branch**: `fix/stats-chart-period-constants`
+
+### Summary
+
+延续 PR #42 的文案漂移清理。StatsChart 三处硬编码周期数字：90 天两处是同文件漂移（TREND_DAYS 已存在但文案没接上）；「最近 12 个月」是跨进程漂移，与 database.ts 的 getMonth() - 11 分处两个进程毫无关联，属「本月次数」缺陷的未爆版本。MONTHLY_TREND_MONTHS 下沉 core，两侧各自导入；TREND_DAYS 仅渲染进程用故留本地。IPC 签名不变。已用临时改常量为 6 的实验证实两侧同源。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `837f9dc` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
