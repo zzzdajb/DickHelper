@@ -24,16 +24,17 @@ export function BuildAnalysisData(records: readonly IRecord[]): IAiAnalysisData 
     const weekdayMap = new Map<number, number>();
     const monthlyMap = new Map<string, number>();
 
+    // 分布一律按本地时区切分，与 database.ts 的桌面端图表保持同一基准；用户看的是自己墙上的钟
     for (const record of records) {
         durations.push(record.Duration);
 
-        const hour = record.EndTime.getUTCHours();
+        const hour = record.EndTime.getHours();
         hourlyMap.set(hour, (hourlyMap.get(hour) ?? 0) + 1);
 
-        const weekday = (record.EndTime.getUTCDay() + 6) % 7; // Monday=0, Sunday=6
+        const weekday = (record.EndTime.getDay() + 6) % 7; // Monday=0, Sunday=6
         weekdayMap.set(weekday, (weekdayMap.get(weekday) ?? 0) + 1);
 
-        const monthKey = `${record.EndTime.getUTCFullYear()}-${String(record.EndTime.getUTCMonth() + 1).padStart(2, "0")}`;
+        const monthKey = `${record.EndTime.getFullYear()}-${String(record.EndTime.getMonth() + 1).padStart(2, "0")}`;
         monthlyMap.set(monthKey, (monthlyMap.get(monthKey) ?? 0) + 1);
     }
 

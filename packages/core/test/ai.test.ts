@@ -35,7 +35,7 @@ RunTest("BuildAnalysisData returns zeroed stats for empty records", () => {
 });
 
 RunTest("BuildAnalysisData handles single record", () => {
-    const now = new Date("2026-05-15T14:30:00.000Z");
+    const now = new Date(2026, 4, 15, 14, 30, 0);
     const records: IRecord[] = [
         {
             Id: "single-1",
@@ -54,7 +54,7 @@ RunTest("BuildAnalysisData handles single record", () => {
     assert.equal(result.DurationStats.Avg, 30);
     assert.equal(result.DurationStats.Median, 30);
 
-    // The record's EndTime is at hour 14 (UTC), so that slot should be 1
+    // The record's EndTime is at local hour 14, so that slot should be 1
     const hour14 = result.HourlyDistribution.find((h) => h.Hour === 14);
     assert.ok(hour14 !== undefined);
     assert.equal(hour14.Count, 1);
@@ -65,7 +65,7 @@ RunTest("BuildAnalysisData handles single record", () => {
 });
 
 RunTest("BuildAnalysisData handles multiple records with varied durations", () => {
-    const baseTime = new Date("2026-05-10T10:00:00.000Z");
+    const baseTime = new Date(2026, 4, 10, 10, 0, 0);
     const records: IRecord[] = [
         CreateRecordWithDuration("r1", baseTime, 20),
         CreateRecordWithDuration("r2", new Date(baseTime.getTime() + DAY_MS), 40),
@@ -84,7 +84,7 @@ RunTest("BuildAnalysisData handles multiple records with varied durations", () =
 });
 
 RunTest("BuildAnalysisData computes median correctly for even count", () => {
-    const baseTime = new Date("2026-05-10T10:00:00.000Z");
+    const baseTime = new Date(2026, 4, 10, 10, 0, 0);
     const records: IRecord[] = [
         CreateRecordWithDuration("r1", baseTime, 10),
         CreateRecordWithDuration("r2", new Date(baseTime.getTime() + DAY_MS), 20),
@@ -123,7 +123,7 @@ RunTest("AnalyzeLocally returns empty-state message for no data", () => {
 });
 
 RunTest("AnalyzeLocally produces insights for populated data", () => {
-    const baseTime = new Date("2026-05-10T10:00:00.000Z");
+    const baseTime = new Date(2026, 4, 10, 10, 0, 0);
     const records: IRecord[] = [
         CreateRecordWithDuration("r1", baseTime, 15),
         CreateRecordWithDuration("r2", new Date(baseTime.getTime() + DAY_MS), 20),
@@ -140,7 +140,7 @@ RunTest("AnalyzeLocally produces insights for populated data", () => {
 // --- BuildPrompt tests ---
 
 RunTest("BuildPrompt includes key data sections", () => {
-    const baseTime = new Date("2026-05-10T10:00:00.000Z");
+    const baseTime = new Date(2026, 4, 10, 10, 0, 0);
     const records: IRecord[] = [
         CreateRecordWithDuration("r1", baseTime, 15),
         CreateRecordWithDuration("r2", new Date(baseTime.getTime() + DAY_MS), 20),
@@ -183,8 +183,9 @@ function CreateRecordWithDuration(id: string, endTime: Date, durationMinutes: nu
     };
 }
 
+// 一律构造本地时间：分布统计按本地时区切分，用 UTC 字面量会让断言与实现同号相消、测不出时区错位
 function CreateRecordAtHour(id: string, hour: number): IRecord {
-    const endTime = new Date(`2026-05-15T${String(hour).padStart(2, "0")}:00:00.000Z`);
+    const endTime = new Date(2026, 4, 15, hour, 0, 0);
     return {
         Id: id,
         StartTime: new Date(endTime.getTime() - 15 * 60 * 1000),
