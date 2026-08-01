@@ -1,12 +1,14 @@
 import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { Button, Surface, Text, TextInput, useTheme, Snackbar } from "react-native-paper";
+import { Button, Surface, Text, TextInput, Snackbar } from "react-native-paper";
+import { useAppTheme, type AppTheme } from "../../src/theme";
 import { useMobileDatabaseService } from "../../src/hooks/useMobileDatabaseService";
 import { useTimer } from "../../src/hooks/useTimer";
 import { FormatElapsedSeconds } from "../../src/utils/formatters";
 
 export default function RecordScreen() {
-    const theme = useTheme();
+    const theme = useAppTheme();
+    const styles = useMemo(() => CreateStyles(theme), [theme]);
     const database = useMobileDatabaseService();
     const timer = useTimer();
     const [notes, setNotes] = useState<string>("");
@@ -163,63 +165,66 @@ export default function RecordScreen() {
     );
 }
 
-const styles = StyleSheet.create({
-    scrollContent: {
-        flexGrow: 1,
-        padding: 16,
-        gap: 20,
-    },
-    header: {
-        gap: 8,
-    },
-    title: {
-        color: "#0f766e",
-        fontWeight: "700",
-    },
-    subtitle: {
-        color: "#475569",
-    },
-    timerSurface: {
-        alignItems: "center",
-        justifyContent: "center",
-        alignSelf: "center",
-        width: 280,
-        height: 280,
-        borderRadius: 140,
-        borderWidth: 1,
-        backgroundColor: "#ffffff",
-        padding: 24,
-    },
-    statusText: {
-        color: "#475569",
-        marginBottom: 8,
-    },
-    timerText: {
-        color: "#0f766e",
-        fontWeight: "700",
-        textAlign: "center",
-    },
-    captionText: {
-        color: "#64748b",
-        marginTop: 8,
-    },
-    actions: {
-        gap: 12,
-    },
-    actionButton: {
-        borderRadius: 12,
-    },
-    actionButtonContent: {
-        height: 52,
-    },
-    primaryButtonContent: {
-        height: 56,
-    },
-    // 没有二次确认框，与主操作区拉开的这段距离是防误触的唯一防线
-    cancelButton: {
-        marginTop: 24,
-    },
-    notesInput: {
-        backgroundColor: "#ffffff",
-    },
-});
+// 样式表吃进主题算出来，颜色才能跟随深浅色切换，同时仍集中在文件底部一处
+function CreateStyles(theme: AppTheme) {
+    return StyleSheet.create({
+        scrollContent: {
+            flexGrow: 1,
+            padding: 16,
+            gap: 20,
+        },
+        header: {
+            gap: 8,
+        },
+        title: {
+            color: theme.colors.primary,
+            fontWeight: "700",
+        },
+        subtitle: {
+            color: theme.colors.onSurfaceVariant,
+        },
+        timerSurface: {
+            alignItems: "center",
+            justifyContent: "center",
+            alignSelf: "center",
+            width: 280,
+            height: 280,
+            borderRadius: 140,
+            borderWidth: 1,
+            backgroundColor: theme.colors.surface,
+            padding: 24,
+        },
+        statusText: {
+            color: theme.colors.onSurfaceVariant,
+            marginBottom: 8,
+        },
+        timerText: {
+            color: theme.colors.primary,
+            fontWeight: "700",
+            textAlign: "center",
+        },
+        captionText: {
+            color: theme.colors.textMuted,
+            marginTop: 8,
+        },
+        actions: {
+            gap: 12,
+        },
+        actionButton: {
+            borderRadius: 12,
+        },
+        actionButtonContent: {
+            height: 52,
+        },
+        primaryButtonContent: {
+            height: 56,
+        },
+        // 没有二次确认框，与主操作区拉开的这段距离是防误触的唯一防线
+        cancelButton: {
+            marginTop: 24,
+        },
+        notesInput: {
+            backgroundColor: theme.colors.surface,
+        },
+    });
+}

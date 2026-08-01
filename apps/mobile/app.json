@@ -8,7 +8,7 @@
     "platforms": [
       "android"
     ],
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "backgroundColor": "#f8fafc",
     "primaryColor": "#0f766e",
     "icon": "./assets/icon.png",
@@ -25,7 +25,8 @@
       "expo-sqlite",
       "expo-sharing",
       "expo-status-bar",
-      "./plugins/withCleartextTraffic.js"
+      "./plugins/withCleartextTraffic.js",
+      "./plugins/withAndroidNightColors.js"
     ]
   }
 }

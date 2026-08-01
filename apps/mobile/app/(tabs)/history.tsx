@@ -1,13 +1,15 @@
 import { useMemo, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
-import { Button, Dialog, Divider, IconButton, Portal, Snackbar, Surface, Text, useTheme } from "react-native-paper";
+import { Button, Dialog, Divider, IconButton, Portal, Snackbar, Surface, Text } from "react-native-paper";
 import type { IRecord } from "@dickhelper/shared";
+import { useAppTheme, type AppTheme } from "../../src/theme";
 import { useMobileDatabaseService } from "../../src/hooks/useMobileDatabaseService";
 import { useRecords } from "../../src/hooks/useRecords";
 import { FormatDateTime, FormatDurationMinutes } from "../../src/utils/formatters";
 
 export default function HistoryScreen() {
-    const theme = useTheme();
+    const theme = useAppTheme();
+    const styles = useMemo(() => CreateStyles(theme), [theme]);
     const database = useMobileDatabaseService();
     const { records, loading, error, refresh } = useRecords();
     const [selectedRecord, setSelectedRecord] = useState<IRecord | null>(null);
@@ -132,68 +134,71 @@ export default function HistoryScreen() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-        gap: 16,
-    },
-    header: {
-        gap: 8,
-    },
-    title: {
-        color: "#0f766e",
-        fontWeight: "700",
-    },
-    subtitle: {
-        color: "#475569",
-    },
-    stateText: {
-        color: "#64748b",
-    },
-    emptySurface: {
-        borderRadius: 12,
-        padding: 20,
-        backgroundColor: "#ffffff",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 8,
-        minHeight: 180,
-    },
-    emptyTitle: {
-        color: "#0f172a",
-    },
-    emptySubtitle: {
-        color: "#64748b",
-        textAlign: "center",
-    },
-    listContent: {
-        gap: 12,
-        paddingBottom: 12,
-    },
-    itemSurface: {
-        borderRadius: 12,
-        backgroundColor: "#ffffff",
-        padding: 16,
-    },
-    itemRow: {
-        flexDirection: "row",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-        gap: 12,
-    },
-    itemTextBlock: {
-        flex: 1,
-        gap: 6,
-    },
-    itemTime: {
-        color: "#0f172a",
-    },
-    itemDuration: {
-        color: "#0f766e",
-        fontWeight: "700",
-    },
-    itemNotes: {
-        color: "#475569",
-    },
-});
+// 样式表吃进主题算出来，颜色才能跟随深浅色切换，同时仍集中在文件底部一处
+function CreateStyles(theme: AppTheme) {
+    return StyleSheet.create({
+        container: {
+            flex: 1,
+            padding: 16,
+            gap: 16,
+        },
+        header: {
+            gap: 8,
+        },
+        title: {
+            color: theme.colors.primary,
+            fontWeight: "700",
+        },
+        subtitle: {
+            color: theme.colors.onSurfaceVariant,
+        },
+        stateText: {
+            color: theme.colors.textMuted,
+        },
+        emptySurface: {
+            borderRadius: 12,
+            padding: 20,
+            backgroundColor: theme.colors.surface,
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            minHeight: 180,
+        },
+        emptyTitle: {
+            color: theme.colors.onSurface,
+        },
+        emptySubtitle: {
+            color: theme.colors.textMuted,
+            textAlign: "center",
+        },
+        listContent: {
+            gap: 12,
+            paddingBottom: 12,
+        },
+        itemSurface: {
+            borderRadius: 12,
+            backgroundColor: theme.colors.surface,
+            padding: 16,
+        },
+        itemRow: {
+            flexDirection: "row",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: 12,
+        },
+        itemTextBlock: {
+            flex: 1,
+            gap: 6,
+        },
+        itemTime: {
+            color: theme.colors.onSurface,
+        },
+        itemDuration: {
+            color: theme.colors.primary,
+            fontWeight: "700",
+        },
+        itemNotes: {
+            color: theme.colors.onSurfaceVariant,
+        },
+    });
+}

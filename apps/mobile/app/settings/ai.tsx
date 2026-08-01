@@ -1,7 +1,8 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Button, SegmentedButtons, Snackbar, Surface, Text, TextInput } from "react-native-paper";
 import { useFocusEffect } from "expo-router";
+import { useAppTheme, type AppTheme } from "../../src/theme";
 import { useMobileDatabaseService } from "../../src/hooks/useMobileDatabaseService";
 
 const AI_PROVIDER_KEY = "ai_provider";
@@ -13,6 +14,8 @@ const DEFAULT_API_ENDPOINT = "https://api.openai.com/v1/chat/completions";
 const DEFAULT_MODEL = "gpt-4o-mini";
 
 export default function AiSettingsScreen() {
+    const theme = useAppTheme();
+    const styles = useMemo(() => CreateStyles(theme), [theme]);
     const database = useMobileDatabaseService();
     const [provider, setProvider] = useState<"local" | "openai">("local");
     const [apiEndpoint, setApiEndpoint] = useState<string>(DEFAULT_API_ENDPOINT);
@@ -153,42 +156,45 @@ export default function AiSettingsScreen() {
     );
 }
 
-const styles = StyleSheet.create({
-    scrollContent: {
-        flexGrow: 1,
-        padding: 16,
-        gap: 16,
-    },
-    header: {
-        gap: 8,
-    },
-    title: {
-        color: "#0f766e",
-        fontWeight: "700",
-    },
-    subtitle: {
-        color: "#475569",
-    },
-    stateText: {
-        color: "#64748b",
-    },
-    sectionSurface: {
-        borderRadius: 12,
-        backgroundColor: "#ffffff",
-        padding: 16,
-        gap: 12,
-    },
-    sectionTitle: {
-        color: "#0f172a",
-        fontWeight: "700",
-    },
-    segmentedButtons: {
-        marginTop: 4,
-    },
-    textInput: {
-        backgroundColor: "#ffffff",
-    },
-    saveButton: {
-        borderRadius: 12,
-    },
-});
+// 样式表吃进主题算出来，颜色才能跟随深浅色切换，同时仍集中在文件底部一处
+function CreateStyles(theme: AppTheme) {
+    return StyleSheet.create({
+        scrollContent: {
+            flexGrow: 1,
+            padding: 16,
+            gap: 16,
+        },
+        header: {
+            gap: 8,
+        },
+        title: {
+            color: theme.colors.primary,
+            fontWeight: "700",
+        },
+        subtitle: {
+            color: theme.colors.onSurfaceVariant,
+        },
+        stateText: {
+            color: theme.colors.textMuted,
+        },
+        sectionSurface: {
+            borderRadius: 12,
+            backgroundColor: theme.colors.surface,
+            padding: 16,
+            gap: 12,
+        },
+        sectionTitle: {
+            color: theme.colors.onSurface,
+            fontWeight: "700",
+        },
+        segmentedButtons: {
+            marginTop: 4,
+        },
+        textInput: {
+            backgroundColor: theme.colors.surface,
+        },
+        saveButton: {
+            borderRadius: 12,
+        },
+    });
+}

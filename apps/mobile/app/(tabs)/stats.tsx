@@ -1,9 +1,10 @@
 import { useCallback, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { ActivityIndicator, Button, Surface, Text, useTheme } from "react-native-paper";
+import { ActivityIndicator, Button, Surface, Text } from "react-native-paper";
 import type { IRecord } from "@dickhelper/shared";
 import { BuildAnalysisData, Analyze, CountInWindow, LAST_7_DAYS, LAST_30_DAYS } from "@dickhelper/core";
 import type { IAiConfig } from "@dickhelper/core";
+import { useAppTheme, type AppTheme } from "../../src/theme";
 import { useRecords } from "../../src/hooks/useRecords";
 import { useMobileDatabaseService } from "../../src/hooks/useMobileDatabaseService";
 import { FormatDurationMinutes, FormatDateTime } from "../../src/utils/formatters";
@@ -45,7 +46,8 @@ function CalculateMetrics(records: IRecord[]): {
 }
 
 export default function StatsScreen() {
-    const theme = useTheme();
+    const theme = useAppTheme();
+    const styles = useMemo(() => CreateStyles(theme), [theme]);
     const database = useMobileDatabaseService();
     const { records, loading, error } = useRecords();
     const metrics = useMemo(() => CalculateMetrics(records), [records]);
@@ -195,6 +197,9 @@ function MetricTile(props: {
     readonly value: string;
     readonly accentColor: string;
 }) {
+    const theme = useAppTheme();
+    const styles = useMemo(() => CreateStyles(theme), [theme]);
+
     return (
         <Surface style={styles.metricTile} elevation={1}>
             <Text variant="labelLarge" style={styles.metricTitle}>
@@ -207,94 +212,97 @@ function MetricTile(props: {
     );
 }
 
-const styles = StyleSheet.create({
-    scrollContent: {
-        flexGrow: 1,
-        padding: 16,
-        gap: 16,
-    },
-    header: {
-        gap: 8,
-    },
-    title: {
-        color: "#0f766e",
-        fontWeight: "700",
-    },
-    subtitle: {
-        color: "#475569",
-    },
-    stateText: {
-        color: "#64748b",
-    },
-    grid: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "space-between",
-        rowGap: 12,
-    },
-    metricTile: {
-        width: "48%",
-        minHeight: 120,
-        borderRadius: 12,
-        padding: 16,
-        backgroundColor: "#ffffff",
-        justifyContent: "space-between",
-    },
-    metricTitle: {
-        color: "#64748b",
-    },
-    metricValue: {
-        fontWeight: "700",
-        marginTop: 8,
-    },
-    noteSurface: {
-        borderRadius: 12,
-        padding: 16,
-        backgroundColor: "#ffffff",
-        gap: 8,
-    },
-    noteTitle: {
-        color: "#475569",
-    },
-    noteValue: {
-        color: "#0f172a",
-    },
-    aiSurface: {
-        borderRadius: 12,
-        backgroundColor: "#ffffff",
-        padding: 16,
-        gap: 12,
-    },
-    aiTitle: {
-        color: "#0f172a",
-        fontWeight: "700",
-    },
-    aiSubtitle: {
-        color: "#475569",
-    },
-    aiButton: {
-        borderRadius: 12,
-        alignSelf: "flex-start",
-    },
-    aiLoadingRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-    },
-    aiLoadingText: {
-        color: "#64748b",
-    },
-    aiErrorText: {
-        color: "#dc2626",
-    },
-    aiResultSurface: {
-        borderRadius: 10,
-        backgroundColor: "#f8fafc",
-        padding: 12,
-        gap: 8,
-    },
-    aiResultText: {
-        color: "#0f172a",
-        lineHeight: 22,
-    },
-});
+// 样式表吃进主题算出来，颜色才能跟随深浅色切换，同时仍集中在文件底部一处
+function CreateStyles(theme: AppTheme) {
+    return StyleSheet.create({
+        scrollContent: {
+            flexGrow: 1,
+            padding: 16,
+            gap: 16,
+        },
+        header: {
+            gap: 8,
+        },
+        title: {
+            color: theme.colors.primary,
+            fontWeight: "700",
+        },
+        subtitle: {
+            color: theme.colors.onSurfaceVariant,
+        },
+        stateText: {
+            color: theme.colors.textMuted,
+        },
+        grid: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            rowGap: 12,
+        },
+        metricTile: {
+            width: "48%",
+            minHeight: 120,
+            borderRadius: 12,
+            padding: 16,
+            backgroundColor: theme.colors.surface,
+            justifyContent: "space-between",
+        },
+        metricTitle: {
+            color: theme.colors.textMuted,
+        },
+        metricValue: {
+            fontWeight: "700",
+            marginTop: 8,
+        },
+        noteSurface: {
+            borderRadius: 12,
+            padding: 16,
+            backgroundColor: theme.colors.surface,
+            gap: 8,
+        },
+        noteTitle: {
+            color: theme.colors.onSurfaceVariant,
+        },
+        noteValue: {
+            color: theme.colors.onSurface,
+        },
+        aiSurface: {
+            borderRadius: 12,
+            backgroundColor: theme.colors.surface,
+            padding: 16,
+            gap: 12,
+        },
+        aiTitle: {
+            color: theme.colors.onSurface,
+            fontWeight: "700",
+        },
+        aiSubtitle: {
+            color: theme.colors.onSurfaceVariant,
+        },
+        aiButton: {
+            borderRadius: 12,
+            alignSelf: "flex-start",
+        },
+        aiLoadingRow: {
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+        },
+        aiLoadingText: {
+            color: theme.colors.textMuted,
+        },
+        aiErrorText: {
+            color: theme.colors.error,
+        },
+        aiResultSurface: {
+            borderRadius: 10,
+            backgroundColor: theme.colors.background,
+            padding: 12,
+            gap: 8,
+        },
+        aiResultText: {
+            color: theme.colors.onSurface,
+            lineHeight: 22,
+        },
+    });
+}

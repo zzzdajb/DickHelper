@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Button, Dialog, List, Portal, ProgressBar, SegmentedButtons, Snackbar, Surface, Switch, Text, TextInput } from "react-native-paper";
 import * as DocumentPicker from "expo-document-picker";
@@ -6,6 +6,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import { useRouter } from "expo-router";
 import type { IMobileUpdateState, MobileUpdateStatus } from "../../src/types/MobileUpdate";
+import { useAppTheme, type AppTheme } from "../../src/theme";
 import { useMobileDatabaseService } from "../../src/hooks/useMobileDatabaseService";
 import { useMobileUpdateState } from "../../src/hooks/useMobileUpdateState";
 import { useRecords } from "../../src/hooks/useRecords";
@@ -14,6 +15,8 @@ import { FormatDateTime } from "../../src/utils/formatters";
 import { SyncWithDesktop } from "../../src/services/MobileSyncService";
 
 export default function SettingsScreen() {
+    const theme = useAppTheme();
+    const styles = useMemo(() => CreateStyles(theme), [theme]);
     const router = useRouter();
     const database = useMobileDatabaseService();
     const { records, refresh } = useRecords();
@@ -498,7 +501,7 @@ export default function SettingsScreen() {
 
             <Portal>
                 <Dialog visible={syncDialogVisible} onDismiss={() => setSyncDialogVisible(false)}>
-                    <Dialog.Title style={{ color: syncDialogSuccess ? "#16a34a" : "#dc2626" }}>
+                    <Dialog.Title style={{ color: syncDialogSuccess ? theme.colors.success : theme.colors.error }}>
                         {syncDialogSuccess ? "同步成功" : "同步失败"}
                     </Dialog.Title>
                     <Dialog.Content>
@@ -518,7 +521,7 @@ export default function SettingsScreen() {
                     </Dialog.Content>
                     <Dialog.Actions>
                         <Button onPress={() => setTelemetryConfirmVisible(false)}>取消</Button>
-                        <Button textColor="#dc2626" onPress={HandleConfirmTelemetryDisable}>确认关闭</Button>
+                        <Button textColor={theme.colors.error} onPress={HandleConfirmTelemetryDisable}>确认关闭</Button>
                     </Dialog.Actions>
                 </Dialog>
 
@@ -639,133 +642,136 @@ function BuildUpdateResultMessage(state: IMobileUpdateState): string {
     }
 }
 
-const styles = StyleSheet.create({
-    scrollContent: {
-        flexGrow: 1,
-        padding: 16,
-        gap: 16,
-    },
-    header: {
-        gap: 8,
-    },
-    title: {
-        color: "#0f766e",
-        fontWeight: "700",
-    },
-    subtitle: {
-        color: "#475569",
-    },
-    sectionSurface: {
-        borderRadius: 12,
-        backgroundColor: "#ffffff",
-        padding: 16,
-        gap: 16,
-    },
-    sectionTitle: {
-        color: "#0f172a",
-        fontWeight: "700",
-    },
-    sectionSubtitle: {
-        color: "#475569",
-        lineHeight: 20,
-    },
-    updateHeader: {
-        gap: 8,
-    },
-    factRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-        gap: 12,
-    },
-    factLabel: {
-        color: "#64748b",
-        flexShrink: 0,
-    },
-    factValue: {
-        color: "#0f172a",
-        flex: 1,
-        textAlign: "right",
-    },
-    errorText: {
-        color: "#dc2626",
-    },
-    segmentedButtons: {
-        marginTop: 4,
-    },
-    progressBar: {
-        marginTop: 4,
-    },
-    actionRow: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        gap: 12,
-    },
-    actionButton: {
-        borderRadius: 12,
-    },
-    permissionButton: {
-        alignSelf: "flex-start",
-        marginLeft: -8,
-    },
-    updateDetailSurface: {
-        borderRadius: 10,
-        backgroundColor: "#f8fafc",
-        padding: 12,
-        gap: 6,
-    },
-    detailLabel: {
-        color: "#64748b",
-    },
-    detailValue: {
-        color: "#0f172a",
-    },
-    notesText: {
-        color: "#334155",
-        lineHeight: 22,
-        marginTop: 4,
-    },
-    aboutSurface: {
-        borderRadius: 12,
-        backgroundColor: "#ffffff",
-        padding: 16,
-        gap: 6,
-    },
-    aboutLabel: {
-        color: "#64748b",
-    },
-    aboutText: {
-        color: "#0f172a",
-    },
-    aboutHint: {
-        color: "#64748b",
-        marginTop: 4,
-    },
-    textInput: {
-        backgroundColor: "#ffffff",
-    },
-    telemetryRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    telemetryHint: {
-        color: "#64748b",
-        marginTop: 4,
-    },
-    telemetryDebugEntry: {
-        paddingHorizontal: 0,
-    },
-    telemetryDebugContent: {
-        gap: 12,
-    },
-    telemetryDebugBlock: {
-        gap: 4,
-    },
-    telemetryDebugLabel: {
-        color: "#64748b",
-    },
-    telemetryDebugValue: {
-        color: "#0f172a",
-    },
-});
+// 样式表吃进主题算出来，颜色才能跟随深浅色切换，同时仍集中在文件底部一处
+function CreateStyles(theme: AppTheme) {
+    return StyleSheet.create({
+        scrollContent: {
+            flexGrow: 1,
+            padding: 16,
+            gap: 16,
+        },
+        header: {
+            gap: 8,
+        },
+        title: {
+            color: theme.colors.primary,
+            fontWeight: "700",
+        },
+        subtitle: {
+            color: theme.colors.onSurfaceVariant,
+        },
+        sectionSurface: {
+            borderRadius: 12,
+            backgroundColor: theme.colors.surface,
+            padding: 16,
+            gap: 16,
+        },
+        sectionTitle: {
+            color: theme.colors.onSurface,
+            fontWeight: "700",
+        },
+        sectionSubtitle: {
+            color: theme.colors.onSurfaceVariant,
+            lineHeight: 20,
+        },
+        updateHeader: {
+            gap: 8,
+        },
+        factRow: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: 12,
+        },
+        factLabel: {
+            color: theme.colors.textMuted,
+            flexShrink: 0,
+        },
+        factValue: {
+            color: theme.colors.onSurface,
+            flex: 1,
+            textAlign: "right",
+        },
+        errorText: {
+            color: theme.colors.error,
+        },
+        segmentedButtons: {
+            marginTop: 4,
+        },
+        progressBar: {
+            marginTop: 4,
+        },
+        actionRow: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 12,
+        },
+        actionButton: {
+            borderRadius: 12,
+        },
+        permissionButton: {
+            alignSelf: "flex-start",
+            marginLeft: -8,
+        },
+        updateDetailSurface: {
+            borderRadius: 10,
+            backgroundColor: theme.colors.background,
+            padding: 12,
+            gap: 6,
+        },
+        detailLabel: {
+            color: theme.colors.textMuted,
+        },
+        detailValue: {
+            color: theme.colors.onSurface,
+        },
+        notesText: {
+            color: theme.colors.textBody,
+            lineHeight: 22,
+            marginTop: 4,
+        },
+        aboutSurface: {
+            borderRadius: 12,
+            backgroundColor: theme.colors.surface,
+            padding: 16,
+            gap: 6,
+        },
+        aboutLabel: {
+            color: theme.colors.textMuted,
+        },
+        aboutText: {
+            color: theme.colors.onSurface,
+        },
+        aboutHint: {
+            color: theme.colors.textMuted,
+            marginTop: 4,
+        },
+        textInput: {
+            backgroundColor: theme.colors.surface,
+        },
+        telemetryRow: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+        },
+        telemetryHint: {
+            color: theme.colors.textMuted,
+            marginTop: 4,
+        },
+        telemetryDebugEntry: {
+            paddingHorizontal: 0,
+        },
+        telemetryDebugContent: {
+            gap: 12,
+        },
+        telemetryDebugBlock: {
+            gap: 4,
+        },
+        telemetryDebugLabel: {
+            color: theme.colors.textMuted,
+        },
+        telemetryDebugValue: {
+            color: theme.colors.onSurface,
+        },
+    });
+}

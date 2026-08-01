@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { Surface, Text, useTheme } from "react-native-paper";
+import { Surface, Text } from "react-native-paper";
 import { AnalyzePrediction } from "@dickhelper/core";
+import { useAppTheme, type AppTheme } from "../../src/theme";
 import { useRecords } from "../../src/hooks/useRecords";
 import { FormatDateTime, FormatRelativeDays } from "../../src/utils/formatters";
 
@@ -98,7 +99,8 @@ function GetTileValue(value: number | null): string {
 }
 
 export default function PredictionScreen() {
-    const theme = useTheme();
+    const theme = useAppTheme();
+    const styles = useMemo(() => CreateStyles(theme), [theme]);
     const { records, loading, error } = useRecords();
     const prediction = useMemo(() => AnalyzePrediction(records), [records]);
 
@@ -196,6 +198,9 @@ function MetricTile(props: {
     readonly value: string;
     readonly accentColor: string;
 }) {
+    const theme = useAppTheme();
+    const styles = useMemo(() => CreateStyles(theme), [theme]);
+
     return (
         <Surface style={styles.metricTile} elevation={1}>
             <Text variant="labelLarge" style={styles.metricTitle}>
@@ -208,68 +213,71 @@ function MetricTile(props: {
     );
 }
 
-const styles = StyleSheet.create({
-    scrollContent: {
-        flexGrow: 1,
-        padding: 16,
-        gap: 16,
-    },
-    header: {
-        gap: 8,
-    },
-    title: {
-        color: "#0f766e",
-        fontWeight: "700",
-    },
-    subtitle: {
-        color: "#475569",
-    },
-    stateText: {
-        color: "#64748b",
-    },
-    heroSurface: {
-        borderRadius: 12,
-        padding: 20,
-        backgroundColor: "#ffffff",
-        gap: 10,
-        borderWidth: 1,
-    },
-    heroLabel: {
-        color: "#64748b",
-    },
-    heroValue: {
-        fontWeight: "700",
-    },
-    heroText: {
-        color: "#334155",
-        lineHeight: 22,
-    },
-    heroRange: {
-        color: "#0f172a",
-        fontWeight: "700",
-        lineHeight: 22,
-    },
-    heroCaption: {
-        color: "#64748b",
-    },
-    grid: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "space-between",
-        rowGap: 12,
-    },
-    metricTile: {
-        width: "48%",
-        minHeight: 112,
-        borderRadius: 12,
-        padding: 16,
-        backgroundColor: "#ffffff",
-        justifyContent: "space-between",
-    },
-    metricTitle: {
-        color: "#64748b",
-    },
-    metricValue: {
-        marginTop: 8,
-    },
-});
+// 样式表吃进主题算出来，颜色才能跟随深浅色切换，同时仍集中在文件底部一处
+function CreateStyles(theme: AppTheme) {
+    return StyleSheet.create({
+        scrollContent: {
+            flexGrow: 1,
+            padding: 16,
+            gap: 16,
+        },
+        header: {
+            gap: 8,
+        },
+        title: {
+            color: theme.colors.primary,
+            fontWeight: "700",
+        },
+        subtitle: {
+            color: theme.colors.onSurfaceVariant,
+        },
+        stateText: {
+            color: theme.colors.textMuted,
+        },
+        heroSurface: {
+            borderRadius: 12,
+            padding: 20,
+            backgroundColor: theme.colors.surface,
+            gap: 10,
+            borderWidth: 1,
+        },
+        heroLabel: {
+            color: theme.colors.textMuted,
+        },
+        heroValue: {
+            fontWeight: "700",
+        },
+        heroText: {
+            color: theme.colors.textBody,
+            lineHeight: 22,
+        },
+        heroRange: {
+            color: theme.colors.onSurface,
+            fontWeight: "700",
+            lineHeight: 22,
+        },
+        heroCaption: {
+            color: theme.colors.textMuted,
+        },
+        grid: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            rowGap: 12,
+        },
+        metricTile: {
+            width: "48%",
+            minHeight: 112,
+            borderRadius: 12,
+            padding: 16,
+            backgroundColor: theme.colors.surface,
+            justifyContent: "space-between",
+        },
+        metricTitle: {
+            color: theme.colors.textMuted,
+        },
+        metricValue: {
+            marginTop: 8,
+        },
+    });
+}

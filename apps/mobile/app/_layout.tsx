@@ -1,20 +1,23 @@
-import { Suspense } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { Suspense, useMemo } from "react";
+import { ActivityIndicator, StyleSheet, useColorScheme, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { SQLiteProvider } from "expo-sqlite";
 import { Stack } from "expo-router";
 import { PaperProvider, Text } from "react-native-paper";
-import { appTheme } from "../src/theme";
+import { darkTheme, lightTheme, useAppTheme, type AppTheme } from "../src/theme";
 import { InitializeDatabase } from "../src/services/MobileDatabaseService";
 import { useMobileUpdateState } from "../src/hooks/useMobileUpdateState";
 import { useTelemetry } from "../src/hooks/useTelemetry";
 
 function AppLoadingScreen() {
+    const theme = useAppTheme();
+    const styles = useMemo(() => CreateStyles(theme), [theme]);
+
     return (
         <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={appTheme.colors.primary} />
+            <ActivityIndicator size="large" color={theme.colors.primary} />
             <Text variant="bodyMedium" style={styles.loadingText}>
                 正在准备数据库
             </Text>
@@ -36,11 +39,16 @@ function TelemetryBootstrap() {
 }
 
 export default function RootLayout() {
+    // GestureHandlerRootView 是 PaperProvider 的父级，取不到 useTheme，只能直接读系统深浅色
+    const colorScheme = useColorScheme();
+    const theme = colorScheme === "dark" ? darkTheme : lightTheme;
+    const styles = useMemo(() => CreateStyles(theme), [theme]);
+
     return (
         <GestureHandlerRootView style={styles.root}>
             <SafeAreaProvider>
-                <PaperProvider theme={appTheme}>
-                    <StatusBar style="dark" />
+                <PaperProvider theme={theme}>
+                    <StatusBar style="auto" />
                     <Suspense fallback={<AppLoadingScreen />}>
                         <SQLiteProvider databaseName="dickhelper.db" onInit={InitializeDatabase} useSuspense>
                             <MobileUpdateBootstrap />
@@ -48,7 +56,7 @@ export default function RootLayout() {
                             <Stack
                                 screenOptions={{
                                     contentStyle: {
-                                        backgroundColor: appTheme.colors.background,
+                                        backgroundColor: theme.colors.background,
                                     },
                                 }}
                             >
@@ -63,19 +71,21 @@ export default function RootLayout() {
     );
 }
 
-const styles = StyleSheet.create({
-    root: {
-        flex: 1,
-        backgroundColor: appTheme.colors.background,
-    },
-    loadingContainer: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 12,
-        backgroundColor: appTheme.colors.background,
-    },
-    loadingText: {
-        color: appTheme.colors.onSurfaceVariant,
-    },
-});
+function CreateStyles(theme: AppTheme) {
+    return StyleSheet.create({
+        root: {
+            flex: 1,
+            backgroundColor: theme.colors.background,
+        },
+        loadingContainer: {
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12,
+            backgroundColor: theme.colors.background,
+        },
+        loadingText: {
+            color: theme.colors.onSurfaceVariant,
+        },
+    });
+}

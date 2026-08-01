@@ -1,36 +1,39 @@
 import { useRouter, Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { IconButton } from "react-native-paper";
-import { appTheme } from "../../src/theme";
+import { useAppTheme } from "../../src/theme";
 
 function SettingsButton() {
     const router = useRouter();
+    const theme = useAppTheme();
 
     return (
         <IconButton
             icon="cog-outline"
             onPress={() => router.push("/settings")}
-            iconColor={appTheme.colors.onSurface}
+            iconColor={theme.colors.onSurface}
             accessibilityLabel="打开设置"
         />
     );
 }
 
 export default function TabsLayout() {
+    const theme = useAppTheme();
+
     return (
         <Tabs
             screenOptions={{
                 headerTitleAlign: "center",
                 headerShadowVisible: false,
                 headerStyle: {
-                    backgroundColor: appTheme.colors.background,
+                    backgroundColor: theme.colors.background,
                 },
                 headerRight: () => <SettingsButton />,
-                tabBarActiveTintColor: appTheme.colors.primary,
-                tabBarInactiveTintColor: appTheme.colors.onSurfaceVariant,
+                tabBarActiveTintColor: theme.colors.primary,
+                tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
                 tabBarStyle: {
-                    backgroundColor: appTheme.colors.surface,
-                    borderTopColor: appTheme.colors.outline,
+                    backgroundColor: theme.colors.surface,
+                    borderTopColor: theme.colors.outline,
                 },
             }}
         >
