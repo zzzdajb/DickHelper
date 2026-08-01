@@ -13,6 +13,7 @@ export {
     SETTINGS_VALUE_COLUMN_NAME,
 } from "./schema";
 export { ExportRecordsToJson, GetRecordIdStatistics, ParseImportJson } from "./recordImportExport";
+export { LAST_7_DAYS, LAST_30_DAYS, GetWindowStart, CountInWindow } from "./statsWindow";
 export {
     registerLeaderboard,
     rerollNickname,

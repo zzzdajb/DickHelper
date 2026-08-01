@@ -31,6 +31,7 @@ import {
 } from "recharts";
 import { DatabaseService } from "../services/DatabaseService";
 import type { IDailyCount, IHourlyCount, IMonthlyCount, IStats, IWeekdayCount } from "@dickhelper/shared";
+import { LAST_7_DAYS, LAST_30_DAYS } from "@dickhelper/core";
 
 const DAYS_IN_WEEK: number = 7;
 const WEEKS_TO_SHOW: number = 4;
@@ -86,8 +87,8 @@ export const StatsChart = () => {
     const [stats, setStats] = useState<IStats>({
         TotalCount: 0,
         AverageDuration: 0,
-        FrequencyPerWeek: 0,
-        FrequencyPerMonth: 0,
+        Last7DayCount: 0,
+        Last30DayCount: 0,
     });
     const [dailyCounts, setDailyCounts] = useState<Map<string, number>>(new Map());
     const [trendData, setTrendData] = useState<{ Date: string; Count: number }[]>([]);
@@ -262,16 +263,16 @@ export const StatsChart = () => {
                     color="cyan"
                 />
                 <StatCard
-                    title="本周次数"
-                    value={stats.FrequencyPerWeek}
-                    description="最近 7 天"
+                    title={`近 ${LAST_7_DAYS} 天`}
+                    value={stats.Last7DayCount}
+                    description="滚动窗口"
                     icon={<IconChartBar size={18} />}
                     color="green"
                 />
                 <StatCard
-                    title="本月次数"
-                    value={stats.FrequencyPerMonth}
-                    description="最近 30 天"
+                    title={`近 ${LAST_30_DAYS} 天`}
+                    value={stats.Last30DayCount}
+                    description="滚动窗口，非自然月"
                     icon={<IconDroplet size={18} />}
                     color="violet"
                 />

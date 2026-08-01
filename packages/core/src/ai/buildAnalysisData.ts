@@ -1,16 +1,14 @@
 import type { IRecord } from "@dickhelper/shared";
 import type { IAiAnalysisData } from "./ai.types";
-
-const DAY_MS = 86_400_000;
-const WEEK_MS = 7 * DAY_MS;
+import { CountInWindow, LAST_7_DAYS, LAST_30_DAYS } from "../statsWindow";
 
 export function BuildAnalysisData(records: readonly IRecord[]): IAiAnalysisData {
     if (records.length === 0) {
         return {
             TotalCount: 0,
             AverageDuration: 0,
-            FrequencyPerWeek: 0,
-            FrequencyPerMonth: 0,
+            Last7DayCount: 0,
+            Last30DayCount: 0,
             HourlyDistribution: BuildEmptyHourlyDistribution(),
             WeekdayDistribution: BuildEmptyWeekdayDistribution(),
             MonthlyTrend: [],
@@ -40,25 +38,12 @@ export function BuildAnalysisData(records: readonly IRecord[]): IAiAnalysisData 
 
     const sortedDurations = [...durations].sort((a, b) => a - b);
     const totalDuration = Sum(durations);
-    const weekStart = new Date(now.getTime() - WEEK_MS);
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    let recentWeek = 0;
-    let recentMonth = 0;
-    for (const record of records) {
-        if (record.EndTime >= weekStart) {
-            recentWeek++;
-        }
-        if (record.EndTime >= monthStart) {
-            recentMonth++;
-        }
-    }
 
     return {
         TotalCount: records.length,
         AverageDuration: totalDuration / records.length,
-        FrequencyPerWeek: recentWeek,
-        FrequencyPerMonth: recentMonth,
+        Last7DayCount: CountInWindow(records, now, LAST_7_DAYS),
+        Last30DayCount: CountInWindow(records, now, LAST_30_DAYS),
         HourlyDistribution: BuildHourlyDistribution(hourlyMap),
         WeekdayDistribution: BuildWeekdayDistribution(weekdayMap),
         MonthlyTrend: BuildMonthlyTrend(monthlyMap),

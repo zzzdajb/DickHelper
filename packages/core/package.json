@@ -12,7 +12,7 @@
     "cross-env": "^7.0.3"
   },
   "scripts": {
-    "test": "cross-env TZ=Asia/Shanghai tsx test/recordImportExport.test.ts && cross-env TZ=Asia/Shanghai tsx test/prediction.test.ts && cross-env TZ=Asia/Shanghai tsx test/ai.test.ts",
+    "test": "cross-env TZ=Asia/Shanghai tsx test/recordImportExport.test.ts && cross-env TZ=Asia/Shanghai tsx test/prediction.test.ts && cross-env TZ=Asia/Shanghai tsx test/statsWindow.test.ts && cross-env TZ=Asia/Shanghai tsx test/ai.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   }
 }

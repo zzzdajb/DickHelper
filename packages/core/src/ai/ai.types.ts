@@ -8,8 +8,8 @@ export interface IDurationStats {
 export interface IAiAnalysisData {
     readonly TotalCount: number;
     readonly AverageDuration: number;
-    readonly FrequencyPerWeek: number;
-    readonly FrequencyPerMonth: number;
+    readonly Last7DayCount: number;
+    readonly Last30DayCount: number;
     readonly HourlyDistribution: readonly { readonly Hour: number; readonly Count: number }[];
     readonly WeekdayDistribution: readonly { readonly Weekday: number; readonly Count: number }[];
     readonly MonthlyTrend: readonly { readonly Month: string; readonly Count: number }[];

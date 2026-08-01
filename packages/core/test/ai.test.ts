@@ -16,8 +16,8 @@ RunTest("BuildAnalysisData returns zeroed stats for empty records", () => {
 
     assert.equal(result.TotalCount, 0);
     assert.equal(result.AverageDuration, 0);
-    assert.equal(result.FrequencyPerWeek, 0);
-    assert.equal(result.FrequencyPerMonth, 0);
+    assert.equal(result.Last7DayCount, 0);
+    assert.equal(result.Last30DayCount, 0);
     assert.equal(result.HourlyDistribution.length, 24);
     assert.equal(result.WeekdayDistribution.length, 7);
     assert.equal(result.MonthlyTrend.length, 0);
