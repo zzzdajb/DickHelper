@@ -31,7 +31,7 @@ import {
 } from "recharts";
 import { DatabaseService } from "../services/DatabaseService";
 import type { IDailyCount, IHourlyCount, IMonthlyCount, IStats, IWeekdayCount } from "@dickhelper/shared";
-import { LAST_7_DAYS, LAST_30_DAYS } from "@dickhelper/core";
+import { LAST_7_DAYS, LAST_30_DAYS, MONTHLY_TREND_MONTHS } from "@dickhelper/core";
 
 const DAYS_IN_WEEK: number = 7;
 const WEEKS_TO_SHOW: number = 4;
@@ -343,9 +343,9 @@ export const StatsChart = () => {
 
             <Paper shadow="sm" radius="md" p="lg" withBorder>
                 <Stack gap={2} mb="md">
-                    <Title order={4}>90 天趋势</Title>
+                    <Title order={4}>{TREND_DAYS} 天趋势</Title>
                     <Text size="sm" c="dimmed">
-                        最近 90 天的频率变化
+                        最近 {TREND_DAYS} 天的频率变化
                     </Text>
                 </Stack>
                 <Box h={CHART_HEIGHT}>
@@ -388,7 +388,7 @@ export const StatsChart = () => {
                 <Stack gap={2} mb="md">
                     <Title order={4}>月度对比</Title>
                     <Text size="sm" c="dimmed">
-                        最近 12 个月的频率对比
+                        最近 {MONTHLY_TREND_MONTHS} 个月的频率对比
                     </Text>
                 </Stack>
                 <Box h={CHART_HEIGHT}>

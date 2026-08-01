@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "周期长度常量只存一份，UI 文案从同一源渲染"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "12 个月是主进程与渲染进程之间的隐式契约，上个任务刚在此文档写明该约定"}
+{"file": ".trellis/spec/frontend/code-style.md", "reason": "不为假想的未来需求做设计——故不改 GetMonthlyTrend 的 IPC 签名"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "StatsChart 图表标题与副标题的文案改为常量渲染"}
+{"file": ".trellis/spec/backend/database-guidelines.md", "reason": "database.ts GetMonthlyTrend 的起始月份改为由共享常量推导"}

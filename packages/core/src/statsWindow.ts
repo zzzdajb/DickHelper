@@ -6,6 +6,9 @@ const DAY_MS = 86_400_000;
 export const LAST_7_DAYS: number = 7;
 export const LAST_30_DAYS: number = 30;
 
+// 月度趋势的跨度：主进程据此取数、渲染进程据此写文案，两侧必须同源
+export const MONTHLY_TREND_MONTHS: number = 12;
+
 export function GetWindowStart(now: Date, days: number): Date {
     return new Date(now.getTime() - days * DAY_MS);
 }

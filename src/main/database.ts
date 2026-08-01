@@ -10,7 +10,7 @@ import type {
     IMonthlyCount,
     IWeekdayCount,
 } from "@dickhelper/shared";
-import { GetWindowStart, LAST_7_DAYS, LAST_30_DAYS } from "@dickhelper/core";
+import { GetWindowStart, LAST_7_DAYS, LAST_30_DAYS, MONTHLY_TREND_MONTHS } from "@dickhelper/core";
 
 // 从 SQLite 读取的原始记录类型
 interface IDbRecord {
@@ -280,10 +280,10 @@ export class DatabaseService {
         return result;
     }
 
-    /** 按月统计次数（最近 12 个月，使用本地时区） */
+    /** 按月统计次数（跨度取自 MONTHLY_TREND_MONTHS，使用本地时区） */
     public GetMonthlyTrend(): IMonthlyCount[] {
         const now = new Date();
-        const startDate = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+        const startDate = new Date(now.getFullYear(), now.getMonth() - (MONTHLY_TREND_MONTHS - 1), 1);
         const rows = this._queryAll(
             `SELECT EndTime FROM ${TABLE_NAME} WHERE EndTime >= ? AND Deleted = 0`,
             [startDate.toISOString()]

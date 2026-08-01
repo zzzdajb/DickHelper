@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "验证两个进程确实读同一个常量，而非各写各的"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "验证不再有表示周期长度的裸数字"}
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "renderer 改动的质量门槛"}
+{"file": ".trellis/spec/backend/quality-guidelines.md", "reason": "main 进程改动的质量门槛"}
