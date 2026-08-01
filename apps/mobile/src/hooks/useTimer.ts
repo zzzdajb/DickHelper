@@ -1,4 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
+
+// 固定 tag，避免与库默认 tag 或其他调用方混淆
+const KEEP_AWAKE_TAG = "dickhelper-timer";
+
+// 常亮只是锦上添花，激活失败不能阻断计时，因此吞掉异常
+function ActivateKeepAwake(): void {
+    activateKeepAwakeAsync(KEEP_AWAKE_TAG).catch(() => {
+        // 静默忽略
+    });
+}
+
+function ReleaseKeepAwake(): void {
+    deactivateKeepAwake(KEEP_AWAKE_TAG).catch(() => {
+        // 静默忽略
+    });
+}
 
 export interface ITimerStopResult {
     readonly startTime: Date;
@@ -54,6 +71,7 @@ export function useTimer(): IUseTimerResult {
         setIsPaused(false);
         setElapsedSeconds(0);
         intervalRef.current = setInterval(UpdateElapsed, 1000);
+        ActivateKeepAwake();
     }, [ClearTimer, UpdateElapsed]);
 
     const pause = useCallback((): void => {
@@ -80,6 +98,8 @@ export function useTimer(): IUseTimerResult {
 
     const stop = useCallback((): ITimerStopResult | null => {
         ClearTimer();
+        // 放在分支之前，正常结束与提前返回两条路径都会释放
+        ReleaseKeepAwake();
 
         if (startTimeRef.current === null) {
             setIsRecording(false);
@@ -112,6 +132,7 @@ export function useTimer(): IUseTimerResult {
     useEffect(() => {
         return () => {
             ClearTimer();
+            ReleaseKeepAwake();
         };
     }, [ClearTimer]);
 
