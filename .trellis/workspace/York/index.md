@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 32
-- **Last Active**: 2026-08-01
+- **Total Sessions**: 33
+- **Last Active**: 2026-08-02
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~1140 | Active |
+| `journal-1.md` | ~1173 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 33 | 2026-08-02 | 计时取消抽象到公共包，桌面端补齐 | `edf7176` | `main` |
 | 32 | 2026-08-01 | 移动端三改动：屏幕常亮 / 可取消计时 / 黑夜模式 | `752391a` | `main` |
 | 31 | 2026-08-01 | 图表周期文案改为常量渲染 | `837f9dc` | `fix/stats-chart-period-constants` |
 | 30 | 2026-08-01 | 统计口径改滚动窗口 + core 时区基准修复 | `6f3b0ba`, `3fce8b9`, `f8f99a3` | `fix/stats-rolling-window` |

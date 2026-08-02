@@ -1138,3 +1138,36 @@ grilling 收敛出 7 项决策后实施。统计卡片「本月次数」标题/�
 ### Next Steps
 
 - None - task complete
+
+
+## Session 33: 计时取消抽象到公共包，桌面端补齐
+
+**Date**: 2026-08-02
+**Task**: 计时取消抽象到公共包，桌面端补齐
+**Branch**: `main`
+
+### Summary
+
+两端各一份的计时器记账逻辑抽到 packages/core/src/timer（纯函数、不可变状态、时间由参数注入，可不借假时钟做单元测试），两端 useTimer 收成薄对接层。对外契约 IUseTimerResult 由公共包单一提供，漏改一端直接 typecheck 报错（已实验验证 TS2741）——这是本次抽象的真正目的。桌面端新增「取消本次计时」、「结束」改为「结束并保存」、补上保存与取消的提示反馈（此前保存成功也是静默的）、防误触间距改由按钮自身承担以免被外层 gap 静默削掉。桌面端三个潜伏缺陷随之消除，其中两个由对接层单一清理路径闭合而非公共包。移动端 8 个 useCallback 按规范移除，两端差异现在只剩屏幕常亮。顺带发现 lint 从未覆盖 src/renderer（19 个界面文件含 react-hooks 规则从未被检查），已补进 npm run check；并修正两份失真的规范文档，其中 state-management 的 importMessage 字段在本次改动之前就已不存在。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `edf7176` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
