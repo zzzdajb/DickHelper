@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "质量检查基线"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "这份 Prompt 两端共用，且两端渲染方式不同，需核对格式约束对两端都成立"}
+{"file": ".trellis/spec/frontend/code-style.md", "reason": "代码风格核对"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "核对新增字段是否在所有构造点都被填充"}

@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/code-style.md", "reason": "C# 风格 TypeScript：PascalCase 导出、显式返回类型、禁止过早抽象"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "IAiAnalysisData 要增字段，属于跨端消费的类型契约"}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "「暂无数据」文案要抽成单一常量供两处引用，不得两处各写一份"}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "可能在 packages/core/src/ai 下新增常量文件，需符合既有分层"}
+{"file": ".trellis/spec/backend/error-handling.md", "reason": "改动 AnalyzeWithApi 的请求体，需确认错误处理约定不被破坏"}

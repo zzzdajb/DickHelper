@@ -1,5 +1,5 @@
 import type { IAiAnalysisData, IAiConfig } from "./ai.types";
-import { BuildPrompt } from "./buildPrompt";
+import { ANALYSIS_SYSTEM_PROMPT, BuildPrompt } from "./buildPrompt";
 
 const FETCH_TIMEOUT_MS: number = 30_000;
 
@@ -33,10 +33,13 @@ export async function AnalyzeWithApi(data: IAiAnalysisData, config: IAiConfig): 
     const response = await FetchWithTimeout(config.ApiEndpoint, {
         method: "POST",
         headers,
+        // 刻意不传 max_tokens 与 temperature：推理型模型收到这两个字段会直接 400，且思考过程会吃掉长度额度让正文返回空，长度改由 system prompt 约束
         body: JSON.stringify({
             model: config.Model,
-            messages: [{ role: "user", content: BuildPrompt(data) }],
-            max_tokens: 1024,
+            messages: [
+                { role: "system", content: ANALYSIS_SYSTEM_PROMPT },
+                { role: "user", content: BuildPrompt(data) },
+            ],
         }),
     });
 

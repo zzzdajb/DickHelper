@@ -44,7 +44,17 @@ export type {
     PredictionStatus,
 } from "./prediction";
 export type { IAiAnalysisData, IAiConfig, IDurationStats } from "./ai";
-export { BuildAnalysisData, BuildPrompt, AnalyzeLocally, AnalyzeWithApi, Analyze } from "./ai";
+export {
+    ANALYSIS_SYSTEM_PROMPT,
+    MIN_RECORDS_FOR_FREQUENCY_VERDICT,
+    MIN_SPAN_DAYS_FOR_FREQUENCY_VERDICT,
+    NO_DATA_MESSAGE,
+    BuildAnalysisData,
+    BuildPrompt,
+    AnalyzeLocally,
+    AnalyzeWithApi,
+    Analyze,
+} from "./ai";
 export { reportTelemetryLaunch } from "./telemetryClient";
 export type { ITimerSession, ITimerState, IUseTimerResult } from "./timer";
 export {

@@ -3,9 +3,12 @@ import { LAST_7_DAYS } from "../statsWindow";
 
 const WEEKDAY_NAMES: readonly string[] = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
 
+// 本地分析与 API 路径的 0 条记录兜底共用这一句，别在两处各写一份
+export const NO_DATA_MESSAGE: string = "暂无数据记录，开始记录后即可获得分析洞察。";
+
 export function AnalyzeLocally(data: IAiAnalysisData): string {
     if (data.TotalCount === 0) {
-        return "暂无数据记录，开始记录后即可获得分析洞察。";
+        return NO_DATA_MESSAGE;
     }
 
     const insights: string[] = [];
@@ -29,13 +32,14 @@ export function AnalyzeLocally(data: IAiAnalysisData): string {
         insights.push(`星期分布最活跃的是${WEEKDAY_NAMES[peakDay.Weekday] ?? "?"}，共有 ${peakDay.Count} 次。`);
     }
 
+    // 分档照旧给，但只报水平不加建议：同一个 App 里本地分析的口吻必须和 API 那侧的 system prompt 一致，不劝诫
     const last7DayCount = data.Last7DayCount;
     if (last7DayCount <= 3) {
         insights.push(`近 ${LAST_7_DAYS} 天 ${last7DayCount} 次，整体偏平稳。`);
     } else if (last7DayCount <= 7) {
         insights.push(`近 ${LAST_7_DAYS} 天 ${last7DayCount} 次，处于中等水平。`);
     } else {
-        insights.push(`近 ${LAST_7_DAYS} 天 ${last7DayCount} 次，频率偏高，建议适当控制。`);
+        insights.push(`近 ${LAST_7_DAYS} 天 ${last7DayCount} 次，处于偏高水平。`);
     }
 
     insights.push(`持续时长范围约 ${data.DurationStats.Min.toFixed(1)} - ${data.DurationStats.Max.toFixed(1)} 分钟。`);
