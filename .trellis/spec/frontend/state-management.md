@@ -27,7 +27,7 @@ Renderer (React)  →  IPC (invoke)  →  Main Process  →  SQLite (better-sqli
 | Component | States |
 |-----------|--------|
 | App | `activeView: View` ("record" \| "stats" \| "history" \| "settings") |
-| RecordForm | `notes: string`, `importMessage: string \| null` |
+| RecordForm | `notes: string`, `message: string` (save / cancel feedback line, auto-cleared after 3s by `messageTimeoutRef`; the line always renders so appearing / disappearing never shifts layout) |
 | StatsChart | `stats: IStats`, `dailyCounts: Map<string, number>` |
 | HistoryList | `deleteModalOpen: boolean` |
 
@@ -36,7 +36,7 @@ Renderer (React)  →  IPC (invoke)  →  Main Process  →  SQLite (better-sqli
 | Hook | States | Returned |
 |------|--------|----------|
 | useRecords | `records: IRecord[]`, `loading: boolean` | `{ records, loading, refresh }` |
-| useTimer | `isRecording`, `isPaused`, `elapsedSeconds` (via useRef for timers) | `{ IsRecording, IsPaused, ElapsedSeconds, Start, Pause, Resume, Stop }` |
+| useTimer | `timerState: ITimerState` (mirrored in a ref for the tick), `elapsedSeconds: number` | `IUseTimerResult` from `@dickhelper/core` — `{ IsRecording, IsPaused, ElapsedSeconds, Start, Pause, Resume, Stop, Cancel }`. Desktop and mobile implement that one declaration, so the contract has a single source. |
 
 ---
 

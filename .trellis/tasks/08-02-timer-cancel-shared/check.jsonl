@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "质量检查基线"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "改动跨 packages/core、桌面端渲染层、移动端三层，需逐层核对数据流"}
+{"file": ".trellis/spec/frontend/code-style.md", "reason": "代码风格核对，重点是两端对外命名是否已统一为 PascalCase"}
+{"file": ".trellis/spec/frontend/hook-guidelines.md", "reason": "核对文档是否已同步更新且矛盾条目已修掉"}
+{"file": ".trellis/spec/frontend/mobile-implementation.md", "reason": "确认移动端界面外观与屏幕常亮行为未被改动破坏"}

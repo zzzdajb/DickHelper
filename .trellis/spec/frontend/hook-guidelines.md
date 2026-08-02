@@ -27,28 +27,34 @@ const { records, loading, refresh } = useRecords();
 
 ### `useTimer` — Timer Logic
 
-Encapsulates the timer state machine (start/pause/resume/stop). Uses `useRef` for mutable values that shouldn't trigger re-renders.
+Thin React adapter over the timer bookkeeping in `packages/core/src/timer`. The hook owns only React state, the 1-second tick, and (on mobile) screen keep-awake — **it must not compute durations itself**.
+
+`src/renderer/hooks/useTimer.ts` and `apps/mobile/src/hooks/useTimer.ts` both implement the **single** `IUseTimerResult` declared in `packages/core/src/timer/timer.types.ts` and re-exported from `@dickhelper/core`. Neither hook declares its own copy, so the contract needs **no manual mirroring** — if one side drops or renames a member, `typecheck` fails on that side.
+
+`IUseTimerResult` lives in `packages/core`, not `packages/shared`, because it references `ITimerSession`: `packages/core` depends on `packages/shared`, so moving the contract to `shared` would create a `shared ↔ core` cycle. The type contains only booleans, numbers, and function signatures — no React dependency, so it does not compromise `core`'s purity.
 
 ```typescript
 import { useTimer } from "../hooks/useTimer";
 
-const { IsRecording, IsPaused, ElapsedSeconds, Start, Pause, Resume, Stop } = useTimer();
+const { IsRecording, IsPaused, ElapsedSeconds, Start, Pause, Resume, Stop, Cancel } = useTimer();
 
-// Start(): void — begin timing
+// Start(): void — begin timing (clears any leftover interval first)
 // Pause(): void — pause (no-op if not recording or already paused)
 // Resume(): void — resume after pause (no-op if not paused)
-// Stop(): { startTime: Date; endTime: Date; durationMinutes: number } | null
+// Stop(): ITimerSession | null — null when never started; { StartTime, EndTime, DurationMinutes }
+// Cancel(): void — discard this session, no result returned, safe no-op when not recording
 ```
 
 **Return naming**: PascalCase because these are public API surface (C# convention). The hook is a factory that returns an object with control methods and state values.
 
-**Internal refs** (not exposed):
-- `startTimeRef: Date | null`
-- `accumulatedPauseRef: number` — total pause time in milliseconds
-- `lastPauseTimeRef: Date | null` — when current pause started
-- `intervalRef` — setInterval handle for 1-second tick
+**Bookkeeping lives in `@dickhelper/core`** — `IDLE_TIMER_STATE`, `StartTimer`, `PauseTimer`, `ResumeTimer`, `StopTimer`, `GetTimerElapsedSeconds`, `IsTimerRunning`, `IsTimerPaused`, plus the types `ITimerState`, `ITimerSession`, `IUseTimerResult`. Those are pure functions over an immutable `ITimerState`; "now" is always passed in as `nowMs`, so the whole layer is unit-testable without fake clocks (`packages/core/test/timer.test.ts`).
 
-**Cleanup**: Clears interval on Stop and on unmount (useEffect return).
+**Internals** (not exposed):
+- `timerState: ITimerState` — state used for rendering
+- `timerStateRef: ITimerState` — mirror of the above so the tick and the button callbacks read the latest value
+- `intervalRef` — setInterval handle for the 1-second tick
+
+**Cleanup**: `Stop` and `Cancel` share one `ResetTimerState()` path (clears interval, resets state, zeroes `ElapsedSeconds`, releases keep-awake on mobile). `StopTimer` is pure and clears nothing, so this path is the adapter's responsibility. The unmount `useEffect` uses an **empty** dependency array with inlined cleanup — a dependency there would re-run cleanup on every render and kill the interval / keep-awake mid-session.
 
 ---
 
@@ -57,7 +63,7 @@ const { IsRecording, IsPaused, ElapsedSeconds, Start, Pause, Resume, Stop } = us
 1. Only use hooks at the top level of components — no conditional hooks
 2. Cleanup all intervals, event listeners, and subscriptions in useEffect return
 3. Do not use `useMemo` / `useCallback` unless a performance issue is measured and proven
-4. Return values are PascalCase for state flags, camelCase for functions (matching the C# convention of `Start`/`Stop` being method names)
+4. Return values are PascalCase throughout — **both** state flags and methods (matching the C# convention where `Start` / `Stop` are method names). The previous wording of this rule said "camelCase for functions", which contradicted both its own parenthetical and the `useTimer` example above it; PascalCase is the rule. This applies to `apps/mobile` hooks as well, not just the desktop renderer.
 5. One hook per concern — don't combine timer logic with data fetching
 
 ---

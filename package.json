@@ -16,7 +16,7 @@
     "typecheck:core": "tsc -p packages/core/tsconfig.json",
     "typecheck:mobile": "tsc -p apps/mobile/tsconfig.json",
     "typecheck": "npm run typecheck:desktop && npm run typecheck:core && npm run typecheck:mobile",
-    "lint": "eslint src/main src/preload packages apps/mobile --ext .ts,.tsx",
+    "lint": "eslint src/main src/preload src/renderer packages apps/mobile --ext .ts,.tsx",
     "test:core": "npm --workspace @dickhelper/core run test",
     "mobile:start": "npm --workspace @dickhelper/mobile run start",
     "mobile:export": "npm --workspace @dickhelper/mobile run export:android",

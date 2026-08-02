@@ -1,0 +1,7 @@
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "本任务的核心动机就是消除两端 useTimer 的重复实现"}
+{"file": ".trellis/spec/frontend/code-style.md", "reason": "C# 风格 TypeScript：PascalCase 对外接口、Handle 前缀、显式返回类型"}
+{"file": ".trellis/spec/frontend/hook-guidelines.md", "reason": "两端 useTimer 对外契约要重写，且本任务要修正该文档自相矛盾的第 4 条"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "新增 ITimerState / ITimerSession 两个跨端类型契约"}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "在 packages/core 下新增 timer/ 子目录，需符合既有分层"}
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "桌面端记录页新增取消按钮与提示文字"}
+{"file": ".trellis/spec/frontend/mobile-implementation.md", "reason": "改动同时落在 apps/mobile 与 packages/core，需确认归属边界"}

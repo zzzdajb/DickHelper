@@ -46,3 +46,14 @@ export type {
 export type { IAiAnalysisData, IAiConfig, IDurationStats } from "./ai";
 export { BuildAnalysisData, BuildPrompt, AnalyzeLocally, AnalyzeWithApi, Analyze } from "./ai";
 export { reportTelemetryLaunch } from "./telemetryClient";
+export type { ITimerSession, ITimerState, IUseTimerResult } from "./timer";
+export {
+    IDLE_TIMER_STATE,
+    StartTimer,
+    PauseTimer,
+    ResumeTimer,
+    StopTimer,
+    GetTimerElapsedSeconds,
+    IsTimerRunning,
+    IsTimerPaused,
+} from "./timer";

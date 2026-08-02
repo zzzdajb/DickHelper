@@ -1,131 +1,96 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+    GetTimerElapsedSeconds,
+    IDLE_TIMER_STATE,
+    IsTimerPaused,
+    IsTimerRunning,
+    PauseTimer,
+    ResumeTimer,
+    StartTimer,
+    StopTimer,
+    type ITimerSession,
+    type ITimerState,
+    type IUseTimerResult,
+} from "@dickhelper/core";
 
-
-/**
- * 计时器 Hook
- * 封装开始/暂停/继续/停止逻辑
- * 与旧版 RecordForm 计时器保持相同行为：
- * - 暂停时停止累计时间增长
- * - 继续时跳过暂停期间的时间
- * - 停止时返回总用时（扣除暂停时间）
- */
-export function useTimer() {
-    const [isRecording, setIsRecording] = useState<boolean>(false);
-    const [isPaused, setIsPaused] = useState<boolean>(false);
+// 记账逻辑（何时开始、暂停累计多久、本次多少分钟）与对外契约 IUseTimerResult 都在 @dickhelper/core，
+// 契约已是单一来源，此处无需与移动端人工同步：少实现一个成员会直接 typecheck 报错。这里只做 React 状态与每秒刷新
+export function useTimer(): IUseTimerResult {
+    const [timerState, setTimerState] = useState<ITimerState>(IDLE_TIMER_STATE);
     const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
 
-    // 用于在渲染间保存可变值，不触发重新渲染
-    const startTimeRef = useRef<Date | null>(null);
-    const accumulatedPauseRef = useRef<number>(0);
-    const lastPauseTimeRef = useRef<Date | null>(null);
+    // 每秒的定时回调闭包读不到最新的 timerState，所以镜像一份 ref 给它和各个操作函数读
+    const timerStateRef = useRef<ITimerState>(IDLE_TIMER_STATE);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    // 清理定时器
-    const clearTimer = useCallback((): void => {
+    function ApplyTimerState(next: ITimerState): void {
+        timerStateRef.current = next;
+        setTimerState(next);
+    }
+
+    function ClearTimer(): void {
         if (intervalRef.current !== null) {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
         }
-    }, []);
+    }
 
-    // 更新已用时间
-    const updateElapsed = useCallback((): void => {
-        if (startTimeRef.current === null) return;
-        const now = new Date();
-        const totalPaused =
-            accumulatedPauseRef.current +
-            (lastPauseTimeRef.current !== null
-                ? now.getTime() - lastPauseTimeRef.current.getTime()
-                : 0);
-        const elapsed = Math.floor(
-            (now.getTime() - startTimeRef.current.getTime() - totalPaused) / 1000
-        );
-        setElapsedSeconds(elapsed);
-    }, []);
-
-    // 开始计时
-    const Start = useCallback((): void => {
-        startTimeRef.current = new Date();
-        accumulatedPauseRef.current = 0;
-        lastPauseTimeRef.current = null;
-        setIsRecording(true);
-        setIsPaused(false);
+    // 结束与取消共用这条清理路径：StopTimer 只算结果不清状态，漏掉任一条都会留下残留秒数或定时器
+    function ResetTimerState(): void {
+        ClearTimer();
+        ApplyTimerState(IDLE_TIMER_STATE);
         setElapsedSeconds(0);
+    }
 
-        // 每秒更新
-        intervalRef.current = setInterval(updateElapsed, 1000);
-    }, [updateElapsed]);
+    function HandleTick(): void {
+        setElapsedSeconds(GetTimerElapsedSeconds(timerStateRef.current, Date.now()));
+    }
 
-    // 暂停
-    const Pause = useCallback((): void => {
-        if (!isRecording || isPaused) return;
-        setIsPaused(true);
-        lastPauseTimeRef.current = new Date();
-    }, [isRecording, isPaused]);
-
-    // 继续
-    const Resume = useCallback((): void => {
-        if (!isRecording || !isPaused) return;
-        if (lastPauseTimeRef.current !== null) {
-            const now = new Date();
-            accumulatedPauseRef.current += now.getTime() - lastPauseTimeRef.current.getTime();
-            lastPauseTimeRef.current = null;
-        }
-        setIsPaused(false);
-    }, [isRecording, isPaused]);
-
-    // 停止计时，返回 { startTime, endTime, durationMinutes }
-    const Stop = useCallback((): {
-        startTime: Date;
-        endTime: Date;
-        durationMinutes: number;
-    } | null => {
-        clearTimer();
-        if (startTimeRef.current === null) {
-            setIsRecording(false);
-            setIsPaused(false);
-            return null;
-        }
-
-        const endTime = new Date();
-        const actualStartTime: Date = startTimeRef.current;
-        // 计算总暂停时间
-        const totalPaused =
-            accumulatedPauseRef.current +
-            (lastPauseTimeRef.current !== null
-                ? endTime.getTime() - lastPauseTimeRef.current.getTime()
-                : 0);
-        const durationMs = endTime.getTime() - actualStartTime.getTime() - totalPaused;
-        const durationMinutes = Number(((durationMs / (1000 * 60))).toFixed(2));
-
-        setIsRecording(false);
-        setIsPaused(false);
+    function Start(): void {
+        // 先清掉可能残留的定时器，否则重复调用 Start 会泄漏一个 interval
+        ClearTimer();
+        ApplyTimerState(StartTimer(Date.now()));
         setElapsedSeconds(0);
-        startTimeRef.current = null;
-        accumulatedPauseRef.current = 0;
-        lastPauseTimeRef.current = null;
+        intervalRef.current = setInterval(HandleTick, 1000);
+    }
 
-        return {
-            startTime: actualStartTime,
-            endTime,
-            durationMinutes,
-        };
-    }, [clearTimer]);
+    // 非法状态下公共包原样返回同一个状态对象，React 会自动跳过重渲染，所以这里不需要额外判断
+    function Pause(): void {
+        ApplyTimerState(PauseTimer(timerStateRef.current, Date.now()));
+    }
 
-    // 组件卸载时清理定时器
+    function Resume(): void {
+        ApplyTimerState(ResumeTimer(timerStateRef.current, Date.now()));
+    }
+
+    function Stop(): ITimerSession | null {
+        const session = StopTimer(timerStateRef.current, Date.now());
+        ResetTimerState();
+        return session;
+    }
+
+    // 未在计时中调用是安全空操作：状态本来就是 IDLE_TIMER_STATE
+    function Cancel(): void {
+        ResetTimerState();
+    }
+
+    // 卸载时清理定时器。依赖数组必须为空、清理内联：填了依赖就会每次重渲染都跑一遍 cleanup，把正在计时的 interval 清掉
     useEffect(() => {
         return () => {
-            clearTimer();
+            if (intervalRef.current !== null) {
+                clearInterval(intervalRef.current);
+            }
         };
-    }, [clearTimer]);
+    }, []);
 
     return {
-        IsRecording: isRecording,
-        IsPaused: isPaused,
+        IsRecording: IsTimerRunning(timerState),
+        IsPaused: IsTimerPaused(timerState),
         ElapsedSeconds: elapsedSeconds,
         Start,
         Pause,
         Resume,
         Stop,
+        Cancel,
     };
 }

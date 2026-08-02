@@ -16,43 +16,43 @@ export default function RecordScreen() {
     const [message, setMessage] = useState<string | null>(null);
 
     const statusLabel = useMemo((): string => {
-        if (!timer.isRecording) {
+        if (!timer.IsRecording) {
             return "未开始";
         }
 
-        if (timer.isPaused) {
+        if (timer.IsPaused) {
             return "已暂停";
         }
 
         return "记录中";
-    }, [timer.isPaused, timer.isRecording]);
+    }, [timer.IsPaused, timer.IsRecording]);
 
     const HandleStart = (): void => {
-        if (timer.isRecording) {
+        if (timer.IsRecording) {
             return;
         }
 
         setMessage(null);
-        timer.start();
+        timer.Start();
     };
 
     const HandlePauseResume = (): void => {
-        if (timer.isPaused) {
-            timer.resume();
+        if (timer.IsPaused) {
+            timer.Resume();
             return;
         }
 
-        timer.pause();
+        timer.Pause();
     };
 
     const HandleCancel = (): void => {
-        timer.cancel();
+        timer.Cancel();
         setNotes("");
         setMessage("已取消，本次未保存");
     };
 
     const HandleStop = async (): Promise<void> => {
-        const result = timer.stop();
+        const result = timer.Stop();
         if (result === null) {
             return;
         }
@@ -61,9 +61,9 @@ export default function RecordScreen() {
         try {
             const trimmedNotes = notes.trim();
             await database.SaveRecord(
-                result.startTime,
-                result.endTime,
-                result.durationMinutes,
+                result.StartTime,
+                result.EndTime,
+                result.DurationMinutes,
                 trimmedNotes.length > 0 ? trimmedNotes : undefined
             );
             setNotes("");
@@ -92,7 +92,7 @@ export default function RecordScreen() {
                     {statusLabel}
                 </Text>
                 <Text variant="displayMedium" style={styles.timerText}>
-                    {FormatElapsedSeconds(timer.elapsedSeconds)}
+                    {FormatElapsedSeconds(timer.ElapsedSeconds)}
                 </Text>
                 <Text variant="bodySmall" style={styles.captionText}>
                     本次记录时长
@@ -100,7 +100,7 @@ export default function RecordScreen() {
             </Surface>
 
             <View style={styles.actions}>
-                {!timer.isRecording ? (
+                {!timer.IsRecording ? (
                     <Button
                         mode="contained"
                         icon="play"
@@ -114,12 +114,12 @@ export default function RecordScreen() {
                     <>
                         <Button
                             mode="outlined"
-                            icon={timer.isPaused ? "play" : "pause"}
+                            icon={timer.IsPaused ? "play" : "pause"}
                             onPress={HandlePauseResume}
                             contentStyle={styles.actionButtonContent}
                             style={styles.actionButton}
                         >
-                            {timer.isPaused ? "继续" : "暂停"}
+                            {timer.IsPaused ? "继续" : "暂停"}
                         </Button>
                         <Button
                             mode="contained"
